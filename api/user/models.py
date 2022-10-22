@@ -56,7 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now=True)
-    update = models.DateTimeField(auto_now_add=True)
+    #update = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'github'
     REQUIRED_FIELDS = ['username']
