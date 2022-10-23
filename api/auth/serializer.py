@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from api.user.serializer import UserSerializer
 from api.user.models import User
 
-
+#made fouosac a
 class LoginSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
@@ -27,15 +27,15 @@ class LoginSerializer(TokenObtainPairSerializer):
 
 class RegisterSerializer(UserSerializer):
     password = serializers.CharField(max_length=128, min_length=8, write_only=True, required=True)
-    github = serializers.URLField(required=True, write_only=True, max_length=128)
+    #github = serializers.URLField(required=True, write_only=True, max_length=128)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'displayName','url','github','profileImage','password', 'is_active', 'created']
+        fields = ['id', 'username', 'displayName','url','profileImage','password', 'is_active', 'created']
 
     def create(self, validated_data):
         try:
-            user = User.objects.get(github=validated_data['github'])
+            user = User.objects.get(username=validated_data['username'])
         except ObjectDoesNotExist:
             user = User.objects.create_user(**validated_data)
         return user
