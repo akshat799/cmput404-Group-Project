@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager, Permiss
 # Create your models here.
 class UserManager(BaseUserManager):
     
-    def create_user(self, username, profileImage='https://cdn.pixabay.com/photo/2017/07/18/23/23/user-2517433_1280.png',password=None, **kwargs):
+    def create_user(self, username,password=None, profileImage='https://cdn.pixabay.com/photo/2017/07/18/23/23/user-2517433_1280.png', **kwargs):
         """Create and return a `User` with an email, phone number, username and password."""
         if username is None:
             raise TypeError('Users must have a username.')
