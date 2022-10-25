@@ -75,8 +75,14 @@ WSGI_APPLICATION = 'socialnetwork.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'akshat799/socialNetwork',
+        'USER': 'akshat799',
+        'PASSWORD': 'v2_3v4Rs_spcP92G8nhFXbKbMLt4GSRL',
+        'HOST': 'db.bit.io',
+        'PORT': '5432',
+        'OPTIONS': {'sslmode': 'require'},
+
     }
 }
 
