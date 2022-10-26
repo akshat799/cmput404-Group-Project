@@ -1,7 +1,9 @@
 // import logo from './logo.svg';
 import './App.css';
 import {BrowserRouter as Router , Routes , Route} from 'react-router-dom';
-import Login from "./containers/Login";
+// import Login from "./components/Login";
+// import Signup from "./components/Signup"
+import SignInOutContainer from './containers';
 // import { Router } from 'react-router-dom';
 
 function App() {
@@ -10,7 +12,8 @@ function App() {
       <div className="App">
         <h1>Homepage</h1>
       <Routes>
-          <Route path= "/" element={<Login />} />
+          {/* <Route path= "/" element={<Login />} /> */}
+          <Route path= "/" element={<SignInOutContainer/>} />
       </Routes>
         {/* <header className="App-header"> */}
           {/* <img src={logo} className="App-logo" alt="logo" />
