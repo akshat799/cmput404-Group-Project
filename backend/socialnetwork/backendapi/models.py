@@ -1,3 +1,4 @@
+from unittest.util import _MAX_LENGTH
 from django.contrib.postgres.fields import ArrayField
 import uuid
 from django.db import models
@@ -8,30 +9,37 @@ url="http://CMPUT404-GROUP-PROJECT.herokuapp.com/"
 #create user.
 class UserManager(BaseUserManager):
     
-    def create_user(self, username,password=None, profileImage='https://cdn.pixabay.com/photo/2017/07/18/23/23/user-2517433_1280.png', **kwargs):
+    def create_user(self, username, email, displayName , password,githubName=None, profileImage='https://cdn.pixabay.com/photo/2017/07/18/23/23/user-2517433_1280.png', **kwargs):
         """Create and return a `User` with an email, phone number, username and password."""
         if username is None:
             raise TypeError('Users must have a username.')
+        if password is None:
+            raise TypeError("User must have a password.")
+        if displayName is None:
+            raise TypeError("User must have a display name.")
         
-
-        user = self.model(username=username,displayName=username,profileImage=profileImage)
+        user = self.model(username = username, email=self.normalize_email(email), displayName=displayName , githubName=githubName, profileImage=profileImage,is_active=True, )
+        user.is_superuser = False
+        user.is_staff = False
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, username, password):
+    def create_superuser(self, username, password , email , displayName , githubName):
         """
         Create and return a `User` with superuser (admin) permissions.
         """
+        if displayName is None:
+            raise TypeError("Superusers must have first and last name")
         if password is None:
             raise TypeError('Superusers must have a password.')
-        # if github is None:
-        #     raise TypeError('Superusers must have an github.')
         if username is None:
             raise TypeError('Superusers must have an username.')
+        if email is None:
+            raise TypeError('Superuser must have an email')
 
-        user = self.create_user(username, password)
+        user = self.create_user(username , email , displayName , password, githubName )
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
@@ -43,8 +51,8 @@ class AutoDateTimeField(models.DateTimeField):
         return timezone.now()
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    type = models.CharField(default="author",editable=False)
+class Users(AbstractBaseUser, PermissionsMixin):
+    type = models.CharField(default="author",editable=False, max_length=300)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     url = models.CharField(max_length=225, default="http://127.0.0.1:8000/authors/"+str(id))
     host = models.CharField(max_length=200, default='http://127.0.0.1:8000/', blank=True)
@@ -62,7 +70,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     #update = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'username'
-    #REQUIRED_FIELDS = ['username']
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['email', 'displayName','githubName']
 
     objects = UserManager()
 
@@ -71,7 +80,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def save(self,*args,**kwargs):
         self.url = "http://127.0.0.1:8000/authors/"+str(self.id)
-        return super(User,self).save(*args,**kwargs)
+        return super(Users,self).save(*args,**kwargs)
+
+    class Meta:
+        db_table = 'users'
 
 # Create your models here.
 class LoginInformationModle(models.Model):
@@ -82,10 +94,10 @@ class LoginInformationModle(models.Model):
     email = models.EmailField(db_index=True, unique=True,  null=True, blank=True)
     
     class Meta:
-        db_table = 'LoginInformation'
+        db_table = 'loginInformation'
 
 class PostModel(models.Model):
-    type = models.CharField(default="post",editable=False) 
+    type = models.CharField(default="post",editable=False , max_length =300) 
     title = models.CharField(max_length=200)
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     source = models.URLField(max_length=255, default=url) # where did you get this post from?
@@ -120,7 +132,7 @@ class PostModel(models.Model):
         default=CT_MARKDOWN
     )
     
-    author = models.ForeignKey(User,on_delete=models.CASCADE)
+    author = models.ForeignKey(Users,on_delete=models.CASCADE)
     
     categories = ArrayField(models.TextField(), blank=True, default=list, null=True) # e.g. ["web","tutorial"]
     count =  models.PositiveIntegerField(default=0)       # for comments
@@ -137,12 +149,13 @@ class PostModel(models.Model):
         return CommentModel.objects.filter(post=self.id)
     class Meta:
         ordering = ['-published']
+        db_table = "postInformation"
         
 class CommentModel(models.Model):
     # ID of the Comment (UUID)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     post = models.ForeignKey(PostModel, on_delete=models.PROTECT)
-    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    author = models.ForeignKey(Users, on_delete=models.PROTECT)
     
     comment = models.TextField()
     #only choose default type for now
@@ -155,24 +168,25 @@ class CommentModel(models.Model):
     
     class Meta:
         ordering = ['published']
+        db_table = 'commentInformation'
 
 class FriendModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user1 = models.CharField(max_length=40)
     user2 = models.CharField(max_length=40)
     #local = models.BooleanField(default=True)
- 
+
 #simlpe model   
 class LikeModel(models.Model):
     at_context = models.CharField(max_length=200)
-    author = models.ForeignKey(User, related_name=("author"), on_delete=models.CASCADE)
-    actor = models.ForeignKey(User, related_name=("actor"), on_delete=models.CASCADE)
+    author = models.ForeignKey(Users, related_name=("author"), on_delete=models.CASCADE)
+    actor = models.ForeignKey(Users, related_name=("actor"), on_delete=models.CASCADE)
     object = models.CharField(max_length=200)   # linked to an author's posts and comments
     summary = models.CharField(max_length=200)
 
 class ShareModel(models.Model):
     author_name = models.CharField(max_length=200,default='authorName')
-    author = models.ForeignKey(User, related_name=('Sharer'),on_delete=models.CASCADE)
+    author = models.ForeignKey(Users, related_name=('Sharer'),on_delete=models.CASCADE)
     post = models.ForeignKey(PostModel,related_name=('Shared_post'), on_delete=models.CASCADE)
 
 class InboxModel(models.Model):
