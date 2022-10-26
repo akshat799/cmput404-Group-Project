@@ -161,5 +161,23 @@ class FriendModel(models.Model):
     user1 = models.CharField(max_length=40)
     user2 = models.CharField(max_length=40)
     #local = models.BooleanField(default=True)
+ 
+#simlpe model   
+class LikeModel(models.Model):
+    at_context = models.CharField(max_length=200)
+    author = models.ForeignKey(User, related_name=("author"), on_delete=models.CASCADE)
+    actor = models.ForeignKey(User, related_name=("actor"), on_delete=models.CASCADE)
+    object = models.CharField(max_length=200)   # linked to an author's posts and comments
+    summary = models.CharField(max_length=200)
+
+class ShareModel(models.Model):
+    author_name = models.CharField(max_length=200,default='authorName')
+    author = models.ForeignKey(User, related_name=('Sharer'),on_delete=models.CASCADE)
+    post = models.ForeignKey(PostModel,related_name=('Shared_post'), on_delete=models.CASCADE)
+
+class InboxModel(models.Model):
+    author = models.CharField(max_length=200)
+    models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
+
     
-#may need like modle
+
