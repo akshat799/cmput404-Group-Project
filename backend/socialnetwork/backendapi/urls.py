@@ -10,6 +10,7 @@ routes.register(r'backendapi/auth/login/', views.LoginViewSet, basename='auth-lo
 routes.register(r'backendapi/auth/register/', views.RegistrationViewSet, basename='auth-register')
 
 urlpatterns = [
+    path('editprofile/{str:author_id}',views.editProfielView),
     path('backendapi/authors/', views.AuthorsListView),
     path('backendapi/authors/{str:author_id}', views.AuthorsView),
     *routes.urls
