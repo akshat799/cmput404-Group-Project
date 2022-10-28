@@ -1,3 +1,5 @@
+from email.policy import default
+from tkinter import CASCADE
 from unittest.util import _MAX_LENGTH
 from django.contrib.postgres.fields import ArrayField
 import uuid
@@ -170,11 +172,21 @@ class CommentModel(models.Model):
         ordering = ['published']
         db_table = 'commentInformation'
 
-class FriendModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user1 = models.CharField(max_length=40)
-    user2 = models.CharField(max_length=40)
-    #local = models.BooleanField(default=True)
+# class FriendModel(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     user1 = models.CharField(max_length=40)
+#     user2 = models.CharField(max_length=40)
+#     #local = models.BooleanField(default=True)
+
+class FollowerModel(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    type = models.CharField(max_length = 20, default = 'follow')
+    follower = models.ForeignKey(Users, related_name = ("follower"), on_delete = models.CASCADE)
+    followedAuthor = models.ForeignKey(Users, related_name = "followedAuthor", on_delete = models.CASCADE)
+    true_friends = models.BooleanField(default = False)
+
+    class Meta:
+        db_table = 'followerList'
 
 #simlpe model   
 class LikeModel(models.Model):
