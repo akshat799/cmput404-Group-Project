@@ -3,7 +3,7 @@ import {Paper, Tabs, Tab, Typography, Box} from "@mui/material";
 import Login from '../components/Login'
 import Signup from '../components/Signup' 
 
-const SignInOutContainer = () => {
+const LoginSignUpContainer = () => {
 
     const [value, setValue] = useState(0)
     const handleChange = (event, newValue) => {
@@ -38,6 +38,7 @@ const SignInOutContainer = () => {
           textColor="primary"
           onChange={handleChange}
           aria-label="log in sign up"
+          variant='fullWidth'
         >
           <Tab label="Log In" />
          
@@ -53,18 +54,4 @@ const SignInOutContainer = () => {
     )
 }
 
-export default SignInOutContainer
-
-
-
-// <Grid>
-        //     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        //         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-        //             <Tab label="Item One" {...a11yProps(0)}/>
-        //             <Tab label="Item Two" {...a11yProps(1)}/>
-        //         </Tabs>
-        //     </Box>
-        // <TabPanel value={value} index={0}> Item One </TabPanel>
-        // <TabPanel value={value} index={1}> Item Two </TabPanel>
-        // </Grid>
-
+export default LoginSignUpContainer
