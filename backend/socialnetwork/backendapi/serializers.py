@@ -43,3 +43,16 @@ class RegisterSerializer(UserSerializer):
             user = models.Users.objects.create_user(**validated_data)
         return user
 
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PostModel
+        fields = '__all__'
+class LikesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.LikeModel
+        fields = '__all__'
+
+    
+    
+
