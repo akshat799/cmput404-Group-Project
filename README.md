@@ -33,9 +33,9 @@ pip install -r requirements.txt
 For front-end devs:
 ```
 cd frontend
+```
 npm install
 ```
-
 
 ## Running Django
 
