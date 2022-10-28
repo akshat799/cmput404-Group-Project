@@ -12,7 +12,7 @@ routes.register(r'backendapi/auth/register', views.RegistrationViewSet, basename
 #routes.register(r'api/auth/refresh', RefreshViewSet, basename='auth-refresh')
 
 # USER
-routes.register(r'backendapi/user', views.UserViewSet, basename='user')
+# routes.register(r'backendapi/user', views.UserViewSet, basename='user')
 # routes.register(r'backendapi/authors', views.UserViewSet, basename='author')
 # routes.register(r'backendapi/authors/', views.AuthorsListView, basename='author')
 
@@ -25,5 +25,7 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/posts/<post_id>/likes', views.LikeViewSet),
     path('backendapi/authors/<author_id>/posts/<post_id>/comments/<comment_id>/likes',views.LikeViewSet),
     path('backendapi/authors/<author_id>/liked', views.LikedViewSet),
+    path('backendapi/editprofile/<author_id>',views.editProfielView),
+    path('backendapi/authors/', views.AuthorsListView),
     *routes.urls
 ]
