@@ -24,5 +24,8 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/posts/<post_id>/likes', views.LikeViewSet),
     path('backendapi/authors/<author_id>/posts/<post_id>/comments/<comment_id>/likes',views.LikeViewSet),
     path('backendapi/authors/<author_id>/liked', views.LikedViewSet),
+    path('editprofile/{str:author_id}',views.editProfielView),
+    path('backendapi/authors/', views.AuthorsListView),
+    path('backendapi/authors/{str:author_id}', views.AuthorsView),
     *routes.urls
 ]
