@@ -1,3 +1,4 @@
+from dataclasses import fields
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
@@ -51,8 +52,16 @@ class PostSerializer(serializers.ModelSerializer):
 class LikesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.LikeModel
+        fields = '__all__'   
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.CommentModel
         fields = '__all__'
 
-    
-    
+class FollowerSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = models.FollowerModel
+        fields = '__all__'
