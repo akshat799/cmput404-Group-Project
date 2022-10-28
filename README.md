@@ -1,8 +1,6 @@
-# cmput404-Group-Project# cmput404-Group-Project
+# cmput404-Group-Project
 
 CMPUT404 Fall 2022 Team 18 Group Project
-
-## Resources / Dependencies Used
 
 
 ### Note about Postgres
@@ -25,14 +23,14 @@ Activate it:
 
 ### For devs:
 
-And install the requirements:
+For backend devs:
 
 ```console
 cd backend
 pip install -r requirements.txt
 ```
 
-For front-end devs:
+For frontend devs:
 
 ```console
 cd frontend
@@ -67,4 +65,4 @@ cd backend/socialnetwork
 python3 manage.py test
 ```
 
-## External Sources
+## Resources / Dependencies Used
