@@ -24,16 +24,18 @@ Activate it:
 ```
 
 ### For devs:
-```
+
 And install the requirements:
-```
+
+```console
+cd backend
 pip install -r requirements.txt
 ```
 
 For front-end devs:
-```
+
+```console
 cd frontend
-```
 npm install
 ```
 
