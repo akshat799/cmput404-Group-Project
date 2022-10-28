@@ -35,6 +35,31 @@ def AuthorsListView(request):
 def AuthorsView(request,author_id):
     #return specific author
     try:
+        authors = get_object_or_404(models.Users,id=author_id)
+        serializer = serializers.UserSerializer(authors)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        data = {'error': str(e)}
+        return Response(data,status=status.HTTP_400_BAD_REQUEST)
+
+class UserViewSet(ModelViewSet):
+    http_method_names = ['get']
+    serializer_class = serializers.UserSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['updated']
+    ordering = ['-updated']
+
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return models.Users.objects.all()
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def AuthorsView(request,author_id):
+    #return specific author
+    try:
         authors = models.Users.objects.get(id=author_id)
         serializer = serializers.UserSerializer(authors)
         return Response(serializer.data)
@@ -102,6 +127,8 @@ def editProfielView(request,author_id):
 
     
 
+    
+
 class LoginViewSet(ModelViewSet, TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
     permission_classes = (AllowAny,)
@@ -139,7 +166,6 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
             "refresh": res["refresh"],
             "token": res["access"]
         }, status=status.HTTP_201_CREATED)
-
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
