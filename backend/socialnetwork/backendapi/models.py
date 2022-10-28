@@ -1,3 +1,5 @@
+from email.policy import default
+from tkinter import CASCADE
 from unittest.util import _MAX_LENGTH
 from django.contrib.postgres.fields import ArrayField
 import uuid
@@ -18,7 +20,7 @@ class UserManager(BaseUserManager):
         if displayName is None:
             raise TypeError("User must have a display name.")
         
-        user = self.model(username = username, email=self.normalize_email(email), displayName=displayName , githubName=githubName, profileImage=profileImage,is_active=True, )
+        user = self.model(username = username, email=self.normalize_email(email), displayName=displayName , githubName=githubName, profileImage=profileImage,is_active=True, type="author")
         user.is_superuser = False
         user.is_staff = False
         user.set_password(password)
@@ -42,6 +44,7 @@ class UserManager(BaseUserManager):
         user = self.create_user(username , email , displayName , password, githubName )
         user.is_superuser = True
         user.is_staff = True
+        user.type = "server_admin"
         user.save(using=self._db)
 
         return user
@@ -131,6 +134,7 @@ class PostModel(models.Model):
         choices=CONTENT_TYPE_CHOICES,
         default=CT_MARKDOWN
     )
+    content = models.TextField(default="")
     
     author = models.ForeignKey(Users,on_delete=models.CASCADE)
     
@@ -154,7 +158,7 @@ class PostModel(models.Model):
 class CommentModel(models.Model):
     # ID of the Comment (UUID)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    post = models.ForeignKey(PostModel, on_delete=models.PROTECT)
+    post = models.ForeignKey(PostModel, on_delete=models.CASCADE)
     author = models.ForeignKey(Users, on_delete=models.PROTECT)
     
     comment = models.TextField()
@@ -170,20 +174,34 @@ class CommentModel(models.Model):
         ordering = ['published']
         db_table = 'commentInformation'
 
-class FriendModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user1 = models.CharField(max_length=40)
-    user2 = models.CharField(max_length=40)
-    #local = models.BooleanField(default=True)
+# class FriendModel(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     user1 = models.CharField(max_length=40)
+#     user2 = models.CharField(max_length=40)
+#     #local = models.BooleanField(default=True)
+
+class FollowerModel(models.Model):
+    id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
+    type = models.CharField(max_length = 20, default = 'follow')
+    follower = models.ForeignKey(Users, related_name = ("follower"), on_delete = models.CASCADE)
+    followedAuthor = models.ForeignKey(Users, related_name = "followedAuthor", on_delete = models.CASCADE)
+    true_friends = models.BooleanField(default = False)
+
+    class Meta:
+        db_table = 'followerList'
 
 #simlpe model   
 class LikeModel(models.Model):
+    type = models.TextField(default="like", editable=False)
     at_context = models.CharField(max_length=200)
     author = models.ForeignKey(Users, related_name=("author"), on_delete=models.CASCADE)
-    actor = models.ForeignKey(Users, related_name=("actor"), on_delete=models.CASCADE)
+    post = models.ForeignKey(PostModel,default=None,on_delete=models.CASCADE)
+    comment = models.ForeignKey(CommentModel,default=None,on_delete=models.CASCADE, null=True,blank=True)
     object = models.CharField(max_length=200)   # linked to an author's posts and comments
     summary = models.CharField(max_length=200)
 
+    class Meta:
+        db_table = 'likesInformation'
 class ShareModel(models.Model):
     author_name = models.CharField(max_length=200,default='authorName')
     author = models.ForeignKey(Users, related_name=('Sharer'),on_delete=models.CASCADE)
