@@ -1,9 +1,5 @@
 from django.shortcuts import render,get_object_or_404
-from email import message
-from logging import raiseExceptions
-import profile
 from pyexpat.errors import messages
-from requests import request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
