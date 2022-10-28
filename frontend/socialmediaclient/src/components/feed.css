@@ -1,0 +1,19 @@
+
+.feed-container{
+    /* width: 80%;
+    background-color: beige;
+    height:100%;
+    margin-left: 10%;
+    margin-right: 10%; */
+flex :6
+}
+/* .breaker{
+    background-color: white;
+    height: 5px;
+    border: 0px;
+} */
+.wrap{
+    padding: 20px;
+}
+
+

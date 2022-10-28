@@ -1,0 +1,30 @@
+.post{
+    width: 100%;
+    height: 100px;
+    background-color: beige;
+
+}
+.input{
+    width: 30%;
+    display: flex;
+}
+.what-to-post{
+    text-align: center;
+    
+}
+.post-options{
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    justify-content: space-evenly;
+}
+.post-type{
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+.button{
+   background-color: transparent;
+    cursor: pointer;
+    border:0
+}
