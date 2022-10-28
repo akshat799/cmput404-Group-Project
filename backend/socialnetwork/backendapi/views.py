@@ -131,6 +131,8 @@ def editProfielView(request,author_id):
 
     
 
+    
+
 class LoginViewSet(ModelViewSet, TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
     permission_classes = (AllowAny,)
