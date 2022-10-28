@@ -12,7 +12,7 @@ routes.register(r'backendapi/auth/register', views.RegistrationViewSet, basename
 #routes.register(r'api/auth/refresh', RefreshViewSet, basename='auth-refresh')
 
 # USER
-routes.register(r'backendapi/user', views.UserViewSet, basename='user')
+# routes.register(r'backendapi/user', views.UserViewSet, basename='user')
 # routes.register(r'backendapi/authors', views.UserViewSet, basename='author')
 # routes.register(r'backendapi/authors/', views.AuthorsListView, basename='author')
 
