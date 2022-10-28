@@ -26,7 +26,7 @@ def AuthorsListView(request):
         data = {"type":"authors",
                 "items":serializer.data
                 }
-        return Response(data)
+        return Response(data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
