@@ -1,3 +1,4 @@
+from email.policy import default
 from unittest.util import _MAX_LENGTH
 from django.contrib.postgres.fields import ArrayField
 import uuid
@@ -189,9 +190,11 @@ class ShareModel(models.Model):
     author = models.ForeignKey(Users, related_name=('Sharer'),on_delete=models.CASCADE)
     post = models.ForeignKey(PostModel,related_name=('Shared_post'), on_delete=models.CASCADE)
 
+#inbox model
 class InboxModel(models.Model):
-    author = models.CharField(max_length=200)
-    models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
+    type = "inbox"
+    author = models.ForeignKey(Users,on_delete=models.CASCADE,primary_key=True)
+    posts = models.ManyToManyField('Pos')
 
     
 
