@@ -129,6 +129,8 @@ def editProfielView(request,author_id):
 
     
 
+    
+
 class LoginViewSet(ModelViewSet, TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
     permission_classes = (AllowAny,)
@@ -166,7 +168,6 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
             "refresh": res["refresh"],
             "token": res["access"]
         }, status=status.HTTP_201_CREATED)
-
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
