@@ -3,6 +3,8 @@ from unittest.util import _MAX_LENGTH
 from django.contrib.postgres.fields import ArrayField
 import uuid
 from django.db import models
+from django.db.models import *
+from django.forms import CharField
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager, PermissionsMixin
 #make this as defual url for now
@@ -197,10 +199,14 @@ class ShareModel(models.Model):
     post = models.ForeignKey(PostModel,related_name=('Shared_post'), on_delete=models.CASCADE)
 
 #inbox model
-class InboxModel(models.Model):
-    type = "inbox"
-    author = models.ForeignKey(Users,on_delete=models.CASCADE,primary_key=True)
-    posts = models.ManyToManyField('Pos')
+# class InboxModel(models.Model):
+#     type = CharField(max_length=10,default="inbox",editable= False)
+#     author = OneToOneField(Users,primary_key=True,on_delete=CASCADE,null=False,related_name="inbox_author")
+#     posts = ManyToManyField(PostModel,related_name="inbox_posts")
+#     comments = ManyToManyField(CommentModel)
+#     likes = ManyToManyField(LikeModel)
+    #follow_request = ManyToManyField(FriendModelxs)
+    #models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
 
     
 

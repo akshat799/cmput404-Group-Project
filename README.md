@@ -62,7 +62,7 @@ cd backend/socialnetwork
 ```
 
 ```console
-python3 manage.py test
+python3 manage.py test --settings socialnetwork.test_setting.local
 ```
 
 ## Resources / Dependencies Used

@@ -27,13 +27,13 @@ def AuthorsListView(request):
         return Response(data,status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def AuthorsView(request,author_id):
     #return specific author
     try:
         authors = models.Users.objects.get(id=author_id)
         serializer = serializers.UserSerializer(authors)
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
     except Exception as e:
         message = {'error':str(e)}
         return Response(message,status=status.HTTP_400_BAD_REQUEST)
