@@ -31,7 +31,7 @@ def AuthorsListView(request):
         return Response(data)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def AuthorsView(request,author_id):
     #return specific author
     try:
