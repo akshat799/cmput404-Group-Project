@@ -1,4 +1,4 @@
-import axios from axios;
+import axios from 'axios';
 
 const api = axios.createUrl({baseUrl : 'http://localhost:8000'});
 
