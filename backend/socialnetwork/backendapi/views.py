@@ -29,6 +29,9 @@ def AuthorsListView(request):
                 "items":serializer.data
                 }
         return Response(data)
+    else:
+        message = {'error': "Must be a superuser to view all authors"}
+        return Response(message,status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
