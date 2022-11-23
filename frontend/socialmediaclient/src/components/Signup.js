@@ -104,7 +104,7 @@ const Signup = () => {
             type="submit"
             color="primary"
             fullWidth
-            onClick={registerCall(formData)}
+            onClick={() => registerCall(formData)}
           >
             {" "}
             Sign Up
