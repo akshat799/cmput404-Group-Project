@@ -3,6 +3,7 @@ import {Paper} from "@mui/material";
 import React, { useState } from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useSelector , useDispatch} from "react-redux";
+import { useEffect } from 'react';
 
 const Signup=() => {
     console.log("LOADING");
@@ -15,7 +16,16 @@ const Signup=() => {
     const [lastName, setLastName] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [isError, setError] = useState(false)
 
+    useEffect(() => {
+        if (confirmPassword != password){
+            setError(true)
+        }
+        else{
+            setError(false)
+        }
+    }, [confirmPassword]);
 
     const paperStyle={padding: 20, height: '70vh', width: 300, margin:"0px auto"}
     const avatarStyle={backgroundColor: '#9494de'}
@@ -92,6 +102,7 @@ const Signup=() => {
                         fullWidth 
                         required 
                         type='password'/>
+                    {isError && <div className='dispError' style={{color:"red"}}> Error:Passwords Don't Match!</div>}
                     <Button 
                         className='submit' 
                         style={{margin: '25px 0px 10px 0px'}} 
