@@ -3,8 +3,9 @@ import {Paper} from "@mui/material";
 import React, { useState } from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useSelector , useDispatch} from "react-redux";
+import { signUp } from '../features/auth';
 
-const Signup=() => {
+const Signup=({handleChange}) => {
     console.log("LOADING");
 
     const { isSignedIn } = useSelector((state) => state.auth.isSignedIn);
@@ -15,15 +16,28 @@ const Signup=() => {
     const [lastName, setLastName] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [githubName, setGithubName] = useState("")
 
 
     const paperStyle={padding: 20, height: '70vh', width: 300, margin:"0px auto"}
     const avatarStyle={backgroundColor: '#9494de'}
     const formFieldStyle ={margin: '10px 0px 0px 0px'}
     const headerStyle = {margin:0}
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
         if(password === confirmPassword){
-            
+            let formData = {
+              "username" : username,
+              "displayName" : firstName + lastName,
+              "password" : password,
+              "githubName" : githubName
+            }
+
+            const status = signUp(formData);
+            if(status == 200){
+              handleChange(e, 0);
+            } else{
+              //DISPLAY ERROR
+            }
         }
         else{
             
@@ -70,6 +84,16 @@ const Signup=() => {
                         style={formFieldStyle} 
                         fullWidth 
                         required/>
+                      <TextField 
+                      className='githubName'
+                      value = {githubName}
+                      onChange={(e) => setGithubName(e.target.value)} 
+                      variant="standard" 
+                      label='Github Name' 
+                      placeholder="Enter Github Name" 
+                      style={formFieldStyle} 
+                      fullWidth 
+                      required/>
                     <TextField 
                         className='password' 
                         value = {password}
@@ -99,7 +123,7 @@ const Signup=() => {
                         type='submit' 
                         color='primary' 
                         fullWidth
-                        onClick={handleSubmit}
+                        onClick={(e) => handleSubmit(e)}
                         > 
                         Sign Up</Button>                
                 </form>
