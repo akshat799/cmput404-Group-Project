@@ -22,7 +22,6 @@ const Login=({handleChange}) => {
 
     const store = useStore()
     const state = store.getState()
-    const isSignedIn = state.auth.isSignedIn
 
     const handleSubmit= async(e) => {
 
