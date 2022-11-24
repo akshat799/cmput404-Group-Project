@@ -32,7 +32,7 @@ const Signup=() => {
     const formFieldStyle ={margin: '10px 0px 0px 0px'}
     const headerStyle = {margin:0}
     const handleSubmit = () => {
-        if(password === confirmPassword){
+        if(!isError){
             
         }
         else{
