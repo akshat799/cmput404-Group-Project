@@ -33,7 +33,7 @@ const Signup=({handleChange}) => {
     const avatarStyle={backgroundColor: '#9494de'}
     const formFieldStyle ={margin: '10px 0px 0px 0px'}
     const headerStyle = {margin:0}
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         if(!isError){
             let formData = {
               "username" : username,
@@ -42,11 +42,11 @@ const Signup=({handleChange}) => {
               "githubName" : githubName
             }
 
-            const status = signUp(formData);
+            const status = await dispatch(signUp(formData));
             if(status == 200){
               handleChange(e, 0);
             } else{
-              //DISPLAY ERROR
+              //DISPLAY 
             }
         }
         else{

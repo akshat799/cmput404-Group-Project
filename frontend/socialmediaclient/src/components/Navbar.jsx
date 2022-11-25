@@ -8,19 +8,18 @@ import { logout } from "../features/auth";
 
 export default function Navbar() {
 
-  const navigateTo = useNavigate();
   const navigate = useNavigate()
 
   const handleLogout= () =>{
     logout()
-    navigate("/")
+    navigate("/", { replace: true })
   }
   return (
     <div className="navbar">
         <p style={{marginLeft: "0.5rem"}} className="name">Social Connection</p>
         <div class = "options">
           <span className="inbox"><button className="buttoni"><InboxIcon></InboxIcon>Inbox</button></span>
-          <span className="profile"><button className="buttonp" onClick={navigateTo("/profile")}><AccountCircleIcon></AccountCircleIcon>Profile</button></span>
+          <span className="profile"><button className="buttonp" onClick={navigate("/profile")}><AccountCircleIcon></AccountCircleIcon>Profile</button></span>
           <span className="signOut"><button className="signOutButton" onClick={handleLogout()}><ExitToAppIcon></ExitToAppIcon>Logout</button></span>
         </div>
     </div>
