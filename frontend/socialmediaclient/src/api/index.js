@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const api = axios.create({baseUrl : 'http://localhost:8000/'});
+const api = axios.create({baseURL : 'http://localhost:8000/'});
 
 api.interceptors.request.use((req) =>{
     if(localStorage.getItem('token')) {
@@ -10,7 +10,7 @@ api.interceptors.request.use((req) =>{
 })
 
 //AUTH
-export const signIn = (data) => api.post('backendapi/auth/login', data);
+export const signIn = (data) => api.post('backendapi/auth/login/', data);
 export const register = (data) => api.post('backendapi/auth/register', data);
 
 //AUTHORS

@@ -37,15 +37,19 @@ export const signUp = (data) => async(dispatch) => {
 
 
 export const login = (data) => async(dispatch) => {
-  const resp = await api.signIn(data);
 
-  if(resp.status === 200){
-    dispatch(signIn);
-    return resp.status
+  try{
+      const resp = await api.signIn(data);
+    
+      if(resp.status === 200){
+        dispatch(signIn);
+        dispatch(editProfile(resp.data))
+        return resp.status
+      }
   }
-  else{
-    dispatch(authError);
-    return 0
+  catch(e){
+      dispatch(authError);
+      return "error"
   }
 }
 

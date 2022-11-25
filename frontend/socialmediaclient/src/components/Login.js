@@ -4,6 +4,7 @@ import { Paper } from "@mui/material";
 import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from "react-router-dom";
 import { login } from "../features/auth";
+import { useDispatch } from "react-redux";
 
 const Login=({handleChange}) => {
 
@@ -13,18 +14,20 @@ const Login=({handleChange}) => {
    
     const navigate = useNavigate()
 
-    const isError = false
-    // const isError = this.state.auth.error
-
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [isError, setIsError] = useState(false)
+    const dispatch = useDispatch();
 
-    const handleSubmit= (e) => {
+    const handleSubmit= async(e) => {
+
         let formData = {
             "username" : username,
             "password" : password
         }
-        const status = login(formData);
+        
+        const status = await dispatch(login(formData));
+        console.log(status);
 
         if (status === 200){
             //Navigate to feed
@@ -33,7 +36,6 @@ const Login=({handleChange}) => {
         else{
             handleChange(e, 0);
         }
-
     }
     
 
