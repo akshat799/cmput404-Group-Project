@@ -17,6 +17,7 @@ routes.register(r'backendapi/auth/register', views.RegistrationViewSet, basename
 
 
 urlpatterns = [
+    path('backendapi/posts/foreign',views.get_foreign_posts),
     path('backendapi/authors/<author_id>', views.AuthorsView),
     path('backendapi/authors/<author_id>/posts/<post_id>', views.PostViewSet),
     path('backendapi/authors/<author_id>/posts/', views.PostViewSet),

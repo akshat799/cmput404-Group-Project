@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework.pagination import PageNumberPagination
 from . import serializers
 from . import models
+import requests
 import json
 import uuid
 
@@ -527,3 +528,52 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 data = {'error' : str(e)}
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
+
+def get_foreign_posts_t17(request):
+    url = 'https://cmput404f22t17.herokuapp.com/authors/'
+    r = request.get(url,auth=('t18user1','Password123!'))
+    authors = json.loads(r.content)['items']
+    posts_list = []
+    for author in authors:
+        url = author['url'] + '/posts/'
+        try:
+            r = requests.get(url,auth=('t18user1','Password123!'),timeout=5)
+            for post in json.loads(r.content)['items']:
+                posts_list.append({
+                    "from": "TEAM17",
+                    "type": "post",
+                    "title": post['title'],
+                    "id": str(post['id']),
+                    "source": post['source'],
+                    "origin": '',
+                    "description": post['description'],
+                    "contentType": post['contentType'],
+                    "content": post['content'],
+                    "author": post['author'],
+                    "categories": post['categories'],
+                    "count": post['count'],
+                    "comments": post['comments'],
+                    "commentsSrc": post['commentsSrc'],
+                    "published": post['published'],
+                    "visibility": post['visibility'],
+                    "unlisted": post['unlisted'],
+                })
+        except Exception as e:
+            pass
+        continue
+    return posts_list
+    
+# def team17_contentType_adaptor(data):
+#     if data == 
+
+#get foregin posts
+def get_foreign_posts(request):
+    posts_list = []
+    try:
+        posts_list.extend(get_foreign_posts_t17(request))
+    except:
+        pass
+    posts_list.sort(key=lambda x:x['published'],reverse=True)
+    data = {'posts_list':posts_list}
+    return Response(data, status = status.HTTP_200_OK)
+    
