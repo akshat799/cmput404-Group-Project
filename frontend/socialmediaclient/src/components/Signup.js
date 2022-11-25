@@ -34,7 +34,7 @@ const Signup=({handleChange}) => {
     const formFieldStyle ={margin: '10px 0px 0px 0px'}
     const headerStyle = {margin:0}
     const handleSubmit = (e) => {
-        if(password === confirmPassword){
+        if(!isError){
             let formData = {
               "username" : username,
               "displayName" : firstName + lastName,

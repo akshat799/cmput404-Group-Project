@@ -5,6 +5,7 @@ import Post from './Post'
 import { Posts } from "../dummy";
 
 export default function Feed() {
+
   return (
     <div className="feed">
 

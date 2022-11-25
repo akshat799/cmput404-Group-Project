@@ -3,6 +3,7 @@ import { Avatar, Button, Grid, Link, TextField, Typography } from '@mui/material
 import { Paper } from "@mui/material";
 import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from "react-router-dom";
+import { login } from "../features/auth";
 
 const Login=({handleChange}) => {
 
@@ -11,18 +12,43 @@ const Login=({handleChange}) => {
     const formFieldStyle ={margin: '15px 0px 0px 0px'}
    
     const navigate = useNavigate()
+
+    const isError = false
+    // const isError = this.state.auth.error
+
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+
+    const handleSubmit= (e) => {
+        let formData = {
+            "username" : username,
+            "password" : password
+        }
+        const status = login(formData);
+
+        if (status === 200){
+            //Navigate to feed
+            navigate("/Feed")
+        }
+        else{
+            handleChange(e, 0);
+        }
+
+    }
     
 
     return (
         <Grid>
              <Paper style={paperStyle}>
+                {isError && <div className = "error" style={{color:"red"}} > Cannot Login. Please try Again</div>}
                 <Grid align='center'> 
                     <Avatar style= {avatarStyle} ><LockIcon/></Avatar>
                     <h2>Login</h2>
                 </Grid>
-                <TextField variant="standard" label='Username' placeholder="Enter Username" style={formFieldStyle} fullWidth required/>
-                <TextField variant="standard" label='Password' placeholder="Enter Password" style={formFieldStyle} fullWidth required type='password'/>
-                <Button style={{margin: '25px 0px 10px 0px'}} variant='contained' type='submit' color='primary' fullWidth> Login</Button>
+                <TextField onChange={(e) => setUsername(e.target.value)} variant="standard" label='Username' placeholder="Enter Username" style={formFieldStyle} fullWidth required/>
+                <TextField onChange={(e) => setPassword(e.target.value)} variant="standard" label='Password' placeholder="Enter Password" style={formFieldStyle} fullWidth required type='password'/>
+                <Button onClick={(e)=>handleSubmit(e)}
+                    style={{margin: '25px 0px 10px 0px'}} variant='contained' type='submit' color='primary' fullWidth> Login</Button>
                 <Typography> Don't have an account?
                     <Link onClick={(e) => handleChange(e,1)} style={{cursor: "pointer" }}> Sign Up</Link>
                 </Typography>

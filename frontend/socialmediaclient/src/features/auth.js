@@ -3,21 +3,28 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   isSignedIn: false,
-  author: {}
+  author: {},
+  error: false,
 }
 
 export const authorSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-      signIn: (state) => {
+      signIn: (state, action) => {
         state.isSignedIn = true
+        state.author = action.payload
+        state.error = false
       },
       signOut: (state) => {
         state.isSignedIn = false
+        state.error = false
       },
       editProfile: (state,action) => {
         state.author = action.payload
+      },
+      authError: (state) => {
+        state.error = true
       }
     },
   })
@@ -27,14 +34,20 @@ export const signUp = (data) => async(dispatch) => {
   return responseData.status;
 }
 
+
 export const login = (data) => async(dispatch) => {
-  const response = await api.signIn(data);
-  if(response.status == 200){
+  const resp = await api.signIn(data);
+
+  if(resp.status === 200){
     dispatch(signIn);
-    dispatch(editProfile(response.data));
+    return resp.status
+  }
+  else{
+    dispatch(authError);
+    return 0
   }
 }
 
-export const { signIn, signOut, editProfile } = authorSlice.actions
+export const { signIn, signOut, editProfile, authError } = authorSlice.actions
 
 export default authorSlice.reducer
