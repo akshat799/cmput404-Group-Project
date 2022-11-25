@@ -1,3 +1,4 @@
+import * as api from "../api"
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
@@ -20,6 +21,19 @@ export const authorSlice = createSlice({
       }
     },
   })
+
+export const signUp = (data) => async(dispatch) => {
+  const responseData = await api.register(data);
+  return responseData.status;
+}
+
+export const login = (data) => async(dispatch) => {
+  const response = await api.signIn(data);
+  if(response.status == 200){
+    dispatch(signIn);
+    dispatch(editProfile(response.data));
+  }
+}
 
 export const { signIn, signOut, editProfile } = authorSlice.actions
 
