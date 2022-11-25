@@ -32,6 +32,3 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/followers', views.FollowerViewSet),
     *routes.urls,
 ]
-
-routes.register(r'backendapi/user', views.UserViewSet, basename='user')
-routes.register(r'backendapi/authors', views.UserViewSet, basename='author')
