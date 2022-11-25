@@ -1,5 +1,3 @@
-
-
 import "./Post.css";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Users } from "../dummy";
