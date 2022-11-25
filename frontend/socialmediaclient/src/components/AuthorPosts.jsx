@@ -4,11 +4,17 @@ import PostOption from "./PostOption"
 import Post from './Post'
 import { getAuthorPosts } from '../api'
 import { Posts } from "../dummy";
+import { useStore } from 'react-redux'
 
 export default function AuthorPosts() {
 
+  const store = useStore()
+  const state = store.getState()
+
+  const authorId = state.auth.author.id
+
   const getPosts = async() => {
-    const response = await getAuthorPosts(this.state.auth.author) 
+    const response = await getAuthorPosts(authorId) 
     return response.json
   }
 

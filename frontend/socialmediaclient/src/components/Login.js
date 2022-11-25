@@ -5,6 +5,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import { useNavigate } from "react-router-dom";
 import { login } from "../features/auth";
 import { useDispatch } from "react-redux";
+import { useStore } from "react-redux";
 
 const Login=({handleChange}) => {
 
@@ -18,6 +19,10 @@ const Login=({handleChange}) => {
     const [password, setPassword] = useState("")
     const [isError, setIsError] = useState(false)
     const dispatch = useDispatch();
+
+    const store = useStore()
+    const state = store.getState()
+    const isSignedIn = state.auth.isSignedIn
 
     const handleSubmit= async(e) => {
 
@@ -34,6 +39,7 @@ const Login=({handleChange}) => {
             navigate("/home")
         }
         else{
+            setIsError(status)
             handleChange(e, 0);
         }
     }

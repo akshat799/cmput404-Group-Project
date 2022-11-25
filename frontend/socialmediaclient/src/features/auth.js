@@ -13,7 +13,7 @@ export const authorSlice = createSlice({
     reducers: {
       signIn: (state, action) => {
         state.isSignedIn = true
-        state.author = action.payload
+        // state.author = action.payload.user
         state.error = false
       },
       signOut: (state) => {
@@ -22,7 +22,7 @@ export const authorSlice = createSlice({
         state.author= {}
       },
       editProfile: (state,action) => {
-        state.author = action.payload
+        state.author = action.payload.user
       },
       authError: (state) => {
         state.error = true
