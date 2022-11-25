@@ -19,6 +19,7 @@ export const authorSlice = createSlice({
       signOut: (state) => {
         state.isSignedIn = false
         state.error = false
+        state.author= {}
       },
       editProfile: (state,action) => {
         state.author = action.payload
@@ -47,6 +48,10 @@ export const login = (data) => async(dispatch) => {
     return 0
   }
 }
+
+export const logout = () => (dispatch) =>{
+  dispatch(signOut);
+}  
 
 export const { signIn, signOut, editProfile, authError } = authorSlice.actions
 

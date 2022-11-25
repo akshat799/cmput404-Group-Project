@@ -28,7 +28,7 @@ const Login=({handleChange}) => {
 
         if (status === 200){
             //Navigate to feed
-            navigate("/Feed")
+            navigate("/home")
         }
         else{
             handleChange(e, 0);
