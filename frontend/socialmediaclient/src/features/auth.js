@@ -31,10 +31,14 @@ export const authorSlice = createSlice({
   })
 
 export const signUp = (data) => async(dispatch) => {
-  const responseData = await api.register(data);
-  return responseData.status;
+  try{
+    const responseData = await api.register(data);
+    return responseData.status;
+  }
+  catch(e){
+    return(e?.response?.data?.detail);
+  }
 }
-
 
 export const login = (data) => async(dispatch) => {
 
@@ -43,13 +47,13 @@ export const login = (data) => async(dispatch) => {
     
       if(resp.status === 200){
         dispatch(signIn);
-        dispatch(editProfile(resp.data))
+        localStorage.setItem("token", resp.data.access);
         return resp.status
       }
   }
   catch(e){
       dispatch(authError);
-      return "error"
+      return(e?.response?.data?.detail);
   }
 }
 

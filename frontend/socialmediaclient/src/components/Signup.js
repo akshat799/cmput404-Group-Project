@@ -6,15 +6,13 @@ import { useSelector , useDispatch} from "react-redux";
 import { useEffect } from 'react';
 import { signUp } from '../features/auth';
 
-const Signup=({handleChange}) => {
-    console.log("LOADING");
-
+const Signup = ({handleChange}) => {
     const { isSignedIn } = useSelector((state) => state.auth.isSignedIn);
     const dispatch = useDispatch();
 
     const [username, setUsername] = useState("")
-    const [firstName, setFirstName] = useState("")
-    const [lastName, setLastName] = useState("")
+    const [fullName, setFullName] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [isError, setError] = useState(false)
@@ -33,25 +31,29 @@ const Signup=({handleChange}) => {
     const avatarStyle={backgroundColor: '#9494de'}
     const formFieldStyle ={margin: '10px 0px 0px 0px'}
     const headerStyle = {margin:0}
-    const handleSubmit = (e) => {
-        if(!isError){
-            let formData = {
-              "username" : username,
-              "displayName" : firstName + lastName,
-              "password" : password,
-              "githubName" : githubName
-            }
 
-            const status = signUp(formData);
-            if(status == 200){
-              handleChange(e, 0);
-            } else{
-              //DISPLAY ERROR
-            }
-        }
-        else{
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if(!isError){
+          let formData = {
+            "username" : username,
+            "displayName" : fullName,
+            "password" : password,
+            "githubName" : githubName,
+            "email" : email
+          }
+
+          const status = dispatch(signUp(formData));
+
+          if(status == 201){
+            handleChange(e, 0);
+          } else{
             
-        }
+          }
+      }
+      else{
+          
+      }
 
     }
 
@@ -75,24 +77,25 @@ const Signup=({handleChange}) => {
                         fullWidth 
                         required/>
                     <TextField 
-                        className='firstName'
-                        value = {firstName} 
-                        onChange={(e) => setFirstName(e.target.value)}
+                        className='fullName'
+                        value = {fullName} 
+                        onChange={(e) => setFullName(e.target.value)}
                         variant="standard" 
-                        label='First Name' 
-                        placeholder="Enter First Name" 
+                        label='Full Name' 
+                        placeholder="Enter Full Name" 
                         style={formFieldStyle} 
                         fullWidth 
                         required/>
                     <TextField 
-                        className='lastName'
-                        value = {lastName}
-                        onChange={(e) => setLastName(e.target.value)} 
+                        className='email'
+                        value = {email}
+                        onChange={(e) => setEmail(e.target.value)} 
                         variant="standard" 
-                        label='Last Name' 
-                        placeholder="Enter Last Name" 
+                        label='Email id' 
+                        placeholder="Enter email id" 
                         style={formFieldStyle} 
-                        fullWidth 
+                        fullWidth
+                        type={email} 
                         required/>
                       <TextField 
                       className='githubName'

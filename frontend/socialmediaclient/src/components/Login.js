@@ -27,8 +27,6 @@ const Login=({handleChange}) => {
         }
         
         const status = await dispatch(login(formData));
-        console.log(status);
-
         if (status === 200){
             //Navigate to feed
             navigate("/home")
