@@ -6,17 +6,19 @@
     align-items: center;
     position: sticky;
     margin: 0%;
-    padding: 0.2rem;
-    justify-content: space-between;
+    padding: 0%;
+ 
   }
   .name, .profile, .inbox{
     color: white;
   }
-
-.options{
-  display: flex;
+.profile{
+    margin-left: auto;
+    
 }
-
+.inbox{
+  margin-left: 85%;
+}
 .buttonp{
     
     cursor: pointer;
