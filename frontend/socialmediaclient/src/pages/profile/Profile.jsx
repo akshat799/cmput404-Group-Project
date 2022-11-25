@@ -1,10 +1,16 @@
 import "./Profile.css";
 import AuthorPosts from "../../components/AuthorPosts";
 import Navbar from "../../components/Navbar";
+import { useStore } from "react-redux";
 
 export default function Profile() {
-  const ProfilePhoto = process.env.PUBLIC_URL + "/images/ProfileIcon.png";
-  const Username = "Justin Bieber";
+
+  const store = useStore()
+  const state = store.getState()
+
+  const ProfilePhoto = state.auth.author.profileImage
+  const Username = state.auth.author.displayName
+  
   return (
     <>
       <Navbar />

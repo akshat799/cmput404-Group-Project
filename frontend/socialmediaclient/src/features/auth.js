@@ -3,7 +3,10 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   isSignedIn: false,
-  author: {},
+  author: { 
+    displayName : "Admin", 
+    profileImage: process.env.PUBLIC_URL + "/images/ProfileIcon.png",
+  },
   error: false,
 }
 
