@@ -1,6 +1,7 @@
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import "./Post.css";
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { useState } from "react";
 import { Users } from "../dummy";
 import AddComment from "./AddComment";
