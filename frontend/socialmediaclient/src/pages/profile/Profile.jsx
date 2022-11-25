@@ -1,4 +1,4 @@
-import "./Profile.css";
+import "./Profile.css"
 import AuthorPosts from "../../components/AuthorPosts";
 import Navbar from "../../components/Navbar";
 import { useStore } from "react-redux";

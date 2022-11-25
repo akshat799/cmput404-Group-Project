@@ -17,13 +17,14 @@ export default function Navbar() {
   }
   return (
     <div className="navbar">
-        <p style={{marginLeft: "0.5rem"}} className="name">Social Connection</p>
-        <div class = "options">
-          <span className="inbox"><button className="buttoni"><InboxIcon></InboxIcon>Inbox</button></span>
-          <span className="profile"><button className="buttonp" onClick={() => navigate("/profile")}><AccountCircleIcon></AccountCircleIcon>Profile</button></span>
-          <span className="signOut"><button className="signOutButton" onClick={handleLogout}><ExitToAppIcon></ExitToAppIcon>Logout</button></span>
+      
+        <span class = "name">Social Media App</span>
+        <span className="inbox"><button className="buttoni"><InboxIcon></InboxIcon>Inbox</button></span>
+        <span className="profile"><button className="buttonp"><AccountCircleIcon></AccountCircleIcon>Profile</button></span>
         </div>
-    </div>
+   
+
+   
   );
 
 
