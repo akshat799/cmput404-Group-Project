@@ -76,9 +76,13 @@ def AuthorsListView(request):
         return response
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def AuthorsView(request,author_id):
     #return specific author
+    response = check_auth(request)
+    if response == None:
+        message = {"Error": "Authorization Required"}
+        return Response(message , status.HTTP_401_UNAUTHORIZED)
     try:
         authors = get_object_or_404(models.Users,id=author_id)
         serializer = serializers.UserSerializer(authors)
