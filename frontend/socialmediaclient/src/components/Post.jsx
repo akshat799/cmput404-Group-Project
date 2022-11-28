@@ -1,8 +1,5 @@
-
-
 import "./Post.css";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Users } from "../dummy";
 import { useState } from "react";
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
@@ -20,11 +17,12 @@ export default function Post({ post }) {
           <div className="postTopLeft">
             <img
               className="postProfileImg"
-              src={Users.filter((u) => u.id === post?.userId)[0].profilePicture}
+              src={post.author.profileImage}
               alt=""
             />
             <span className="postUsername">
-              {Users.filter((u) => u.id === post?.userId)[0].username}
+              {/* {Users.filter((u) => u.id === post?.userId)[0].username} */}
+              {/* {post.author.displayName} */}
             </span>
           </div>
           <div className="postTopRight">
@@ -32,16 +30,17 @@ export default function Post({ post }) {
           </div>
         </div>
         <div className="postCenter">
-          <span className="postText">{post?.desc}</span>
-          <img className="postImg" src={post.photo} alt="" />
+          <span className="postText">{post?.title}</span>
+          <img className="postImg" src={post?.img} alt="" />
+          <span className="postText">{post?.description}</span>
         </div>
         <div className="postBottom">
           <div className="postBottomLeft">
             <ThumbUpIcon className="likes" onClick={likeHandler}/>
-            <span className="postLikeCounter">{like} Likes</span>
+            {/* <span className="postLikeCounter">{like} Likes</span> */}
           </div>
           <div className="postBottomRight">
-            <span className="postCommentText">{post.comment} Comments</span>
+            <span className="postCommentText">{post.count} Comments</span>
           </div>
         </div>
       </div>
