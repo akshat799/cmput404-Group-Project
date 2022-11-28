@@ -10,8 +10,10 @@
 }
 .what-to-post{
     text-align: center;
-    
+    color: black;
+    font-size: larger;
 }
+
 .post-options{
     display: flex;
     align-items: center;
@@ -28,4 +30,7 @@
    background-color: transparent;
     cursor: pointer;
     border:0
+}
+.option{
+    color: black;
 }
