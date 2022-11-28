@@ -5,7 +5,7 @@ from django import http
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.permissions import AllowAny,IsAuthenticated,IsAuthenticatedOrReadOnly
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
@@ -29,6 +29,9 @@ grp17_password = 'Password123!'
 @permission_classes([IsAuthenticated])
 def AuthorsListView(request):
     response = check_auth(request)
+    if response == None:
+        message = {"Error": "Authorization Required"}
+        return Response(message , status.HTTP_401_UNAUTHORIZED)
     authors = models.Users.objects.filter(type="author")
     serializer = serializers.UserSerializer(authors,many=True)
 
@@ -76,6 +79,10 @@ def AuthorsListView(request):
 @permission_classes([IsAuthenticated])
 def AuthorsView(request,author_id):
     #return specific author
+    response = check_auth(request)
+    if response == None:
+        message = {"Error": "Authorization Required"}
+        return Response(message , status.HTTP_401_UNAUTHORIZED)
     try:
         authors = models.Users.objects.get(id=author_id)
         serializer = serializers.UserSerializer(authors)
@@ -189,6 +196,9 @@ def PostViewSet(request,author_id = None,post_id = None):
     
     if(request.method == 'GET'):
         response = check_auth(request)
+        if response == None:
+            message = {"Error": "Authorization Required"}
+            return Response(message , status.HTTP_401_UNAUTHORIZED)
 
         if(response != 'local' and response != 'remote'):
             return response
@@ -270,9 +280,12 @@ def PostViewSet(request,author_id = None,post_id = None):
 
                     if(response == 'local'):
                         pass
+                    post_list = []
                     data = {"type":"posts",
                             "items":serializer.data
                             }
+                    post_list.append(get_foreign_posts())
+                    
                     return Response(data,status=status.HTTP_200_OK)
                 except Exception as e:
                     return Response(f"Error:{e}",status=status.HTTP_404_NOT_FOUND)
@@ -625,3 +638,49 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 data = {'error' : str(e)}
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
+def get_foreign_posts_t17():
+    url = 'https://cmput404f22t17.herokuapp.com/authors/'
+    r = requests.get(url,auth=('t18user1','Password123!'))
+    authors = json.loads(r.content)['items']
+    posts_list = []
+    for author in authors:
+        url = author['url'] + 'posts/'
+        try:
+            r = requests.get(url,auth=('t18user1','Password123!'),timeout=5)
+            # posts_list.append(json.loads(r.content))
+            for post in json.loads(r.content)['items']:
+                if post != []:
+                    posts_list.append(post)
+                # posts_list.append({
+                #     "from": "TEAM17",
+                #     "type": "post",
+                #     "title": post['title'],
+                #     "id": str(post['id']),
+                #     "source": post['source'],
+                #     "origin": '',
+                #     "description": post['description'],
+                #     "contentType": post['contentType'],
+                #     "content": post['content'],
+                #     "author": post['author'],
+                #     "categories": post['categories'],
+                #     "count": post['count'],
+                #     "comments": post['comments'],
+                #     "commentsSrc": post['commentsSrc'],
+                #     "published": post['published'],
+                #     "visibility": post['visibility'],
+                #     "unlisted": post['unlisted'],
+                # })
+        except Exception as e:
+            pass
+        continue
+    return posts_list
+#get foregin posts
+def get_foreign_posts():
+    posts_list = []
+    try:
+        posts_list.extend(get_foreign_posts_t17())
+    except:
+        pass
+    posts_list.sort(key=lambda x:x['published'],reverse=True)
+    data = {'posts_list':posts_list}
+    return posts_list
