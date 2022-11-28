@@ -5,8 +5,7 @@ import base64
 
 
 def check_auth(req):
-
-    if(req.META['HTTP_AUTHORIZATION'] == None):
+    if(req.META.get('HTTP_AUTHORIZATION') == None):
         message = {"Error": "Authorization Required"}
         return Response(message , status.HTTP_401_UNAUTHORIZED)
 
@@ -18,14 +17,12 @@ def check_auth(req):
     elif(auth_method == 'bearer'):
         return 'local'
     elif(auth_method == 'basic'):
-        auth_param = base64.b64decode(auth_param.strip()).decode('utf-8')
+        auth_header = req.META['HTTP_AUTHORIZATION']
+        encodeC = auth_header.split(' ')[1] #remove basic 'Basic' from string
+        decodeC = base64.b64decode(encodeC).decode('utf-8').split(':')
 
-            # username = auth_param.split(':')[0]
-            # password = auth_param.split(':')[1]
-            username = decodeC[0]
-            password = decodeC[1]
-
-        print(username , password)
+        username = decodeC[0]
+        password = decodeC[1]
 
         try:
             user = models.Node.objects.get(username=username)
