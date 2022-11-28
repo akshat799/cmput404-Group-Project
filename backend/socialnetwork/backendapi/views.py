@@ -29,9 +29,6 @@ grp17_password = 'Password123!'
 @permission_classes([IsAuthenticated])
 def AuthorsListView(request):
     response = check_auth(request)
-    if response == None:
-        message = {"Error": "Authorization Required"}
-        return Response(message , status.HTTP_401_UNAUTHORIZED)
     authors = models.Users.objects.filter(type="author")
     serializer = serializers.UserSerializer(authors,many=True)
 
@@ -62,9 +59,6 @@ def AuthorsListView(request):
                 "items":items_data
                 }
         return Response(data, status.HTTP_200_OK)
-        # else:
-        #     message = {"Error": "This method is not allowed for the given credentials"}
-        #     return Response(message, status.HTTP_403_FORBIDDEN)
     
     elif(response == 'remote'):
         data = {"type":"authors",
@@ -196,19 +190,14 @@ def PostViewSet(request,author_id = None,post_id = None):
     
     if(request.method == 'GET'):
         response = check_auth(request)
-        if response == None:
-            message = {"Error": "Authorization Required"}
-            return Response(message , status.HTTP_401_UNAUTHORIZED)
 
         if(response != 'local' and response != 'remote'):
             return response
 
         try:
             if author_id != None:
-                
                     if post_id != None:
                         try:
-                            author = get_object_or_404(models.Users,id=author_id)
                             post = models.PostModel.objects.get(id=post_id,visibility='PUBLIC')
                             serializer = serializers.PostSerializer(post)
                             serial_data = serializer.data
@@ -223,28 +212,35 @@ def PostViewSet(request,author_id = None,post_id = None):
                             }
                             return Response(serial_data, status.HTTP_200_OK)
                         except Exception as e:
-                            if(response == 'local'):
-                                try:
-                                    req = requests.get(grp17_url + '/authors/posts', auth=HTTPBasicAuth(grp17_username,grp17_password))
-                                    if(req.status_code == 200):
-                                        node_data = json.loads(req.content.decode('utf-8'))
-                                        return Response(node_data, status=status.HTTP_200_OK )
-                                except http.Http404 as e:
-                                    message = {'error':str(e)}
-                                    return Response(message , status.HTTP_404_NOT_FOUND)
-                                except Exception as e:
-                                    message = {'error':str(e)}
-                                    return Response(message , status.HTTP_400_BAD_REQUEST)
-                            elif(response == 'remote'):
-                                return Response(f"Error:{e}",status=status.HTTP_404_NOT_FOUND)
+                            try:    
+                                posts = []
+                                posts.extend(get_foreign_posts_t17())
+                                if(posts == []):
+                                    message = {"Error": "The Post does not Exist"}
+                                    return Response(message  , status.HTTP_404_NOT_FOUND)
+                                for entry in posts:
+                                     
+                                    localPostId = entry['id'].split("/")[-2]
+                                    if(localPostId == post_id):
+                                        return Response(entry , status=status.HTTP_200_OK )
+
+                                message = {"Error" : "The Post does not exist"}
+                                return Response(message  , status.HTTP_404_NOT_FOUND)
+                            except http.Http404 as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_404_NOT_FOUND)
+                            except Exception as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_400_BAD_REQUEST)
+
                     elif post_id == None:
-                        print("hello")
                         try:
                             author = models.Users.objects.get(id=author_id)
                             post = models.PostModel.objects.filter(author=author)
                             serializer = serializers.PostSerializer(post,many=True)
-                            print("hi")
+  
                             data = serializer.data
+
                             for entry in data:
                                 entry["author"] = {
                                     "type": author.type,
@@ -257,21 +253,18 @@ def PostViewSet(request,author_id = None,post_id = None):
                                 }
                             return Response(data, status=status.HTTP_200_OK)
                         except Exception as e:
-                            if(response == 'local'):
-                                try:
-                                    req = requests.get(grp17_url + '/authors/{author_id}/posts', auth=HTTPBasicAuth(grp17_username,grp17_password))
-                                    if(req.status_code == 200):
-                                        print("hello", req)
-                                        node_data = json.loads(req.content.decode('utf-8'))
-                                        return Response(node_data, status=status.HTTP_200_OK )
-                                except http.Http404 as e:
-                                    message = {'error':str(e)}
-                                    return Response(message , status.HTTP_404_NOT_FOUND)
-                                except Exception as e:
-                                    message = {'error':str(e)}
-                                    return Response(message , status.HTTP_400_BAD_REQUEST)
-                            elif(response == 'remote'):
-                                return Response(f"Error:{e}",status=status.HTTP_404_NOT_FOUND)
+                            try:
+                                req = requests.get(grp17_url + '/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                                if(req.status_code == 200):
+                                    print("hello", req)
+                                    node_data = json.loads(req.content.decode('utf-8'))
+                                    return Response(node_data, status=status.HTTP_200_OK )
+                            except http.Http404 as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_404_NOT_FOUND)
+                            except Exception as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_400_BAD_REQUEST)
                     
             elif author_id == None:
                 try:
@@ -639,48 +632,30 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
 def get_foreign_posts_t17():
-    url = 'https://cmput404f22t17.herokuapp.com/authors/'
-    r = requests.get(url,auth=('t18user1','Password123!'))
+    r = requests.get(grp17_url + "/authors/",auth=HTTPBasicAuth('t18user1','Password123!'))
+    
     authors = json.loads(r.content)['items']
     posts_list = []
     for author in authors:
-        url = author['url'] + 'posts/'
+        author_url = author['url'] + 'posts/'
+        
         try:
-            r = requests.get(url,auth=('t18user1','Password123!'),timeout=5)
-            # posts_list.append(json.loads(r.content))
+            r = requests.get(author_url,auth=HTTPBasicAuth('t18user1','Password123!'))
             for post in json.loads(r.content)['items']:
                 if post != []:
                     posts_list.append(post)
-                # posts_list.append({
-                #     "from": "TEAM17",
-                #     "type": "post",
-                #     "title": post['title'],
-                #     "id": str(post['id']),
-                #     "source": post['source'],
-                #     "origin": '',
-                #     "description": post['description'],
-                #     "contentType": post['contentType'],
-                #     "content": post['content'],
-                #     "author": post['author'],
-                #     "categories": post['categories'],
-                #     "count": post['count'],
-                #     "comments": post['comments'],
-                #     "commentsSrc": post['commentsSrc'],
-                #     "published": post['published'],
-                #     "visibility": post['visibility'],
-                #     "unlisted": post['unlisted'],
-                # })
         except Exception as e:
-            pass
-        continue
+            message = {'error':str(e)}
+            # return Response(message , status.HTTP_404_NOT_FOUND) 
+            return []  
     return posts_list
 #get foregin posts
-def get_foreign_posts():
-    posts_list = []
-    try:
-        posts_list.extend(get_foreign_posts_t17())
-    except:
-        pass
-    posts_list.sort(key=lambda x:x['published'],reverse=True)
-    data = {'posts_list':posts_list}
-    return posts_list
+# def get_foreign_posts():
+#     posts_list = []
+#     try:
+#         posts_list.extend(get_foreign_posts_t17())
+#     except:
+#         pass
+#     posts_list.sort(key=lambda x:x['published'],reverse=True)
+#     data = {'posts_list':posts_list}
+#     return posts_list
