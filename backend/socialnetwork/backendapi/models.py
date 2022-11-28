@@ -211,5 +211,17 @@ class InboxModel(models.Model):
     author = models.CharField(max_length=200)
     models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
 
+class Node(models.Model):
+    username = models.CharField(max_length=200)
+    password = models.CharField(max_length=200)
+    host = models.CharField(max_length=200)
+    verified = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'node'
+
+
+
+
     
 
