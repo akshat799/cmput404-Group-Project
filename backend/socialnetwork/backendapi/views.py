@@ -436,7 +436,6 @@ def CommentViewSet(request, author_id, post_id):
                 "github": f'http://github.com/{author.githubName}',
                 "profileImage": author.profileImage
             }
-
             responseData = {
                 "type" : "comment",
                 "author" : authorData,
