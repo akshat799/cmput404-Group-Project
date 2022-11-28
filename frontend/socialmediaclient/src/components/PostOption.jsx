@@ -74,7 +74,7 @@ export default function PostOption() {
   return (
     <div className="post">
       <div className="what-to-post">
-        <h2>What would you like to post today?</h2>
+        What would you like to post today?
       </div>
       <br />
       <div className="post-options">
@@ -105,8 +105,9 @@ export default function PostOption() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center' }}>
-            Enter what you would like to post
+          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color:'black' }}>
+            <div className="option">Enter what you would like to post</div>
+            
           </Typography>
           <TextField
             id="outlined-multiline-static"
