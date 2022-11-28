@@ -4,14 +4,12 @@ import { useEffect } from "react";
 import { signUp } from "../features/auth";
 
 const Signup = ({ handleChange }) => {
-  console.log("LOADING");
-
   const { isSignedIn } = useSelector((state) => state.auth.isSignedIn);
   const dispatch = useDispatch();
 
   const [username, setUsername] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isError, setError] = useState(false);
@@ -25,40 +23,25 @@ const Signup = ({ handleChange }) => {
     }
   }, [confirmPassword]);
 
-  const paperStyle = {
-    padding: 20,
-    height: "70vh",
-    width: 300,
-    margin: "0px auto",
-  };
-  const avatarStyle = { backgroundColor: "#9494de" };
-  const formFieldStyle = { margin: "10px 0px 0px 0px" };
-  const headerStyle = { margin: 0 };
   const handleSubmit = (e) => {
-    if (password === confirmPassword) {
+    e.preventDefault();
+    if (!isError) {
       let formData = {
         username: username,
-        displayName: firstName + lastName,
+        displayName: fullName,
         password: password,
         githubName: githubName,
+        email: email,
       };
 
-      const status = signUp(formData);
-      if (status == 200) {
+      const status = dispatch(signUp(formData));
+
+      if (status == 201) {
         handleChange(e, 0);
       } else {
-        //DISPLAY ERROR
       }
     } else {
     }
-
-    useEffect(() => {
-      if (confirmPassword != password) {
-        setError(true);
-      } else {
-        setError(false);
-      }
-    }, [confirmPassword]);
 
     const paperStyle = {
       padding: 20,
@@ -69,11 +52,6 @@ const Signup = ({ handleChange }) => {
     const avatarStyle = { backgroundColor: "#9494de" };
     const formFieldStyle = { margin: "10px 0px 0px 0px" };
     const headerStyle = { margin: 0 };
-    const handleSubmit = () => {
-      if (password === confirmPassword) {
-      } else {
-      }
-    };
 
     return (
       <Grid>
@@ -101,25 +79,26 @@ const Signup = ({ handleChange }) => {
               required
             />
             <TextField
-              className="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              className="fullName"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               variant="standard"
-              label="First Name"
-              placeholder="Enter First Name"
+              label="Full Name"
+              placeholder="Enter Full Name"
               style={formFieldStyle}
               fullWidth
               required
             />
             <TextField
-              className="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              className="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               variant="standard"
-              label="Last Name"
-              placeholder="Enter Last Name"
+              label="Email id"
+              placeholder="Enter email id"
               style={formFieldStyle}
               fullWidth
+              type={email}
               required
             />
             <TextField
@@ -157,6 +136,12 @@ const Signup = ({ handleChange }) => {
               required
               type="password"
             />
+            {isError && (
+              <div className="dispError" style={{ color: "red" }}>
+                {" "}
+                Error:Passwords Don't Match!
+              </div>
+            )}
             <Button
               className="submit"
               style={{ margin: "25px 0px 10px 0px" }}
@@ -174,5 +159,3 @@ const Signup = ({ handleChange }) => {
     );
   };
 };
-
-export default Signup;
