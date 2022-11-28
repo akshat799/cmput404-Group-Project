@@ -15,6 +15,8 @@ const Login=({handleChange}) => {
    
     const navigate = useNavigate()
 
+    
+
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [isError, setIsError] = useState(false)
@@ -32,26 +34,28 @@ const Login=({handleChange}) => {
         
         const resp = await dispatch(login(formData));
         if (resp.status === 200){
+            setIsError(false)
             if(resp.data.user.type == "author")
                 navigate("/home")
             else
                 navigate("http://localhost:8000/admin")
         }
         else{
-            setIsError(resp.status)
-        }
+            setIsError(true)
+            setPassword("")
+        }        
     }
     
     return (
         <Grid>
              <Paper style={paperStyle}>
-                {isError && <div className = "error" style={{color:"red"}} > Cannot Login. Please try Again</div>}
+                {isError && <div className = "error" style={{color:"red", padding:20}} > Invalid Credentials. Try Again</div>}
                 <Grid align='center'> 
                     <Avatar style= {avatarStyle} ><LockIcon/></Avatar>
                     <h2>Login</h2>
                 </Grid>
                 <TextField onChange={(e) => setUsername(e.target.value)} variant="standard" label='Username' placeholder="Enter Username" style={formFieldStyle} fullWidth required/>
-                <TextField onChange={(e) => setPassword(e.target.value)} variant="standard" label='Password' placeholder="Enter Password" style={formFieldStyle} fullWidth required type='password'/>
+                <TextField value={password} onChange={(e) => setPassword(e.target.value)} variant="standard" label='Password' placeholder="Enter Password" style={formFieldStyle} fullWidth required type='password'/>
                 <Button onClick={(e)=>handleSubmit(e)}
                     style={{margin: '25px 0px 10px 0px'}} variant='contained' type='submit' color='primary' fullWidth> Login</Button>
                 <Typography> Don't have an account?

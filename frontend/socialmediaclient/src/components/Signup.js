@@ -36,7 +36,7 @@ const Signup = ({ handleChange }) => {
 
       const status = dispatch(signUp(formData));
 
-      if (status == 201) {
+      if (status === 201) {
         handleChange(e, 0);
       } else {
       }
@@ -158,3 +158,5 @@ const Signup = ({ handleChange }) => {
     );
   };
 };
+
+export default Signup

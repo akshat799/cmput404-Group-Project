@@ -53,6 +53,10 @@ export const login = (data) => async(dispatch) => {
         localStorage.setItem("token", resp.data.access);
         return resp
       }
+      else{
+        dispatch(authError)
+        return resp
+      }
   }
   catch(e){
       dispatch(authError);
