@@ -1,5 +1,5 @@
-import { Avatar, Button, Grid, TextField, Typography } from "@mui/material";
-import { Paper } from "@mui/material";
+import { Avatar, Button, Grid, Link, TextField, Typography } from '@mui/material';
+import {Paper} from "@mui/material";
 import React, { useState } from "react";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useSelector , useDispatch} from "react-redux";
@@ -27,19 +27,10 @@ const Signup = ({handleChange}) => {
         }
     }, [confirmPassword]);
 
-  const initialState = {
-    username: "",
-    firstname: "",
-    lastname: "",
-    password: "",
-    github: "",
-  };
-
-  const [formData, setFormData] = useState(initialState);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const paperStyle={padding: 20, height: '70vh', width: 300, margin:"0px auto"}
+    const avatarStyle={backgroundColor: '#9494de'}
+    const formFieldStyle ={margin: '10px 0px 0px 0px'}
+    const headerStyle = {margin:0}
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -155,4 +146,4 @@ const Signup = ({handleChange}) => {
     )
 } 
 
-export default Signup;
+export default Signup
