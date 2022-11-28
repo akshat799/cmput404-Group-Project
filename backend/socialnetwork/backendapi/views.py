@@ -266,7 +266,9 @@ def PostViewSet(request,author_id = None,post_id = None):
                                 return Response(message , status.HTTP_400_BAD_REQUEST)
 
                     elif post_id == None:
+                        
                         try:
+                            
                             author = models.Users.objects.get(id=author_id)
                             post = models.PostModel.objects.filter(author=author)
                             serializer = serializers.PostSerializer(post,many=True)
@@ -283,14 +285,14 @@ def PostViewSet(request,author_id = None,post_id = None):
                                     "github": f'http://github.com/{author.githubName}',
                                     "profileImage": author.profileImage
                                 }
+                                
                             return Response(data, status=status.HTTP_200_OK)
                         except Exception as e:
+                            
                             try:
-                                req = requests.get(grp17_url + '/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp17_username,grp17_password))
-                                if(req.status_code == 200):
-                                    print("hello", req)
-                                    node_data = json.loads(req.content.decode('utf-8'))
-                                    return Response(node_data, status=status.HTTP_200_OK )
+                                req = requests.get(grp17_url + f'/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                                node_data = json.loads(req.content)
+                                return Response(node_data, status=status.HTTP_200_OK )
                             except http.Http404 as e:
                                 message = {'error':str(e)}
                                 return Response(message , status.HTTP_404_NOT_FOUND)
@@ -304,13 +306,16 @@ def PostViewSet(request,author_id = None,post_id = None):
                     serializer =  serializers.PostSerializer(post_obj,many=True)
 
                     if(response == 'local'):
-                        pass
-                    post_list = []
+                        posts_all = get_foreign_posts_t17()
+                        all_data = serializer.data + posts_all
+
+                    else:
+                        all_data = serializer.data
+
                     data = {"type":"posts",
-                            "items":serializer.data
+                            "items":all_data 
                             }
-                    post_list.append(get_foreign_posts())
-                    
+
                     return Response(data,status=status.HTTP_200_OK)
                 except Exception as e:
                     return Response(f"Error:{e}",status=status.HTTP_404_NOT_FOUND)
@@ -672,13 +677,12 @@ def get_foreign_posts_t17():
         
         try:
             r = requests.get(author_url,auth=HTTPBasicAuth('t18user1','Password123!'))
+            # print(json.loads(r.content)['items'])
             for post in json.loads(r.content)['items']:
                 if post != []:
                     posts_list.append(post)
         except Exception as e:
-            message = {'error':str(e)}
-            # return Response(message , status.HTTP_404_NOT_FOUND) 
-            return []  
+            return posts_list  
     return posts_list
 #get foregin posts
 def get_foreign_posts():
