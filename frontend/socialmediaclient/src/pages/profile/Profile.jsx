@@ -26,7 +26,7 @@ export default function Profile() {
         <h4 className="profileName">{Username}</h4>
         <span className="profileDescription">Welcome to my profile! </span>
       </div>
-      <AuthorPosts state={state}/>
+      <AuthorPosts />
     </>
   );
 }
