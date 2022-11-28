@@ -167,6 +167,7 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
             "token": res["access"]
         }, status=status.HTTP_201_CREATED)
 
+
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def PostViewSet(request,author_id,post_id = None):
