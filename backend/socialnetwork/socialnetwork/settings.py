@@ -71,6 +71,10 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'socialnetwork.urls'
 AUTH_USER_MODEL = 'backendapi.Users'
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
