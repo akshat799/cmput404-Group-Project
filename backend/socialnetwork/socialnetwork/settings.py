@@ -104,10 +104,10 @@ WSGI_APPLICATION = 'socialnetwork.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'd383v2o645074u',
-        'USER': 'uiofpkystoiepr',
-        'PASSWORD': '9945d2fa7a733a6886bd5247aa1bd9fe2c1bd8d97674fd88e49a523f55644d32',
-        'HOST': 'ec2-44-209-24-62.compute-1.amazonaws.com',
+        'NAME': 'deqae1runnv345',
+        'USER': 'wmbzhgsqywgkxe',
+        'PASSWORD': '1a17774c55292051e88d6f8eb24dfee66b1d6fe5920c7582cdda1689e59ea4e4',
+        'HOST': 'ec2-44-205-177-160.compute-1.amazonaws.com',
         'PORT': '5432',
         #'OPTIONS': {'sslmode': 'require'},
 

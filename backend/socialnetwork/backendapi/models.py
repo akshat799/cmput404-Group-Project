@@ -146,8 +146,6 @@ class PostModel(models.Model):
     # unlisted is used for images so they won't show up in timelines
     unlisted = models.BooleanField(default=False)
     
-    def get_comments(self):
-        return CommentModel.objects.filter(post=self.id)
     class Meta:
         ordering = ['-published']
         db_table = "postInformation"

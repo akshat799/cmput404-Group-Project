@@ -21,9 +21,13 @@ from requests.auth import HTTPBasicAuth
 
 url = "https://cmput404-backend.herokuapp.com/backendapi"
 grp17_url = "https://cmput404f22t17.herokuapp.com"
+grp15_url = "https://fallsocialuahank.herokuapp.com"
 
 grp17_username = 't18user1'
 grp17_password = 'Password123!'
+
+grp15_username = 'Demo'
+grp15_password = '1'
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -44,15 +48,20 @@ def AuthorsListView(request):
     if(response == 'local'):
         #get and return all the authors
         try:
-            req = requests.get(grp17_url + '/authors', auth=HTTPBasicAuth(grp17_username,grp17_password))
-            if(req.status_code == 200):
-                node_data = json.loads(req.content.decode('utf-8'))
-                items_data = serializer.data + node_data['items']
+            req1 = requests.get(grp17_url + '/authors', auth=HTTPBasicAuth(grp17_username,grp17_password))
+            req2 = requests.get(grp15_url + '/service/authors', auth=HTTPBasicAuth(grp15_username,grp15_password))
+            print(req2)
+            if(req1.status_code == 200):
+                node_data1 = json.loads(req1.content.decode('utf-8'))
+                
+            if(req2.status_code == 200):
+                node_data2 = json.loads(req2.content.decode('utf-8'))
+            items_data = serializer.data + node_data1['items'] + node_data2['items']
         except http.Http404 as e:
             message = {'error':str(e)}
             return Response(message , status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            if(req.status_code == 403):
+            if(req1.status_code == 403 or req2.status_code==403):
                 items_data = serializer.data
             else:
                 message = {'error':str(e)}
