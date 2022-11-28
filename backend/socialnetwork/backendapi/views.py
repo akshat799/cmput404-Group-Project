@@ -1,11 +1,12 @@
 from pyexpat.errors import messages
 from pyexpat import model
 from django.shortcuts import render, get_object_or_404
+from django import http
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny,IsAuthenticated
-from rest_framework import status,filters
+from rest_framework.permissions import AllowAny,IsAuthenticated,IsAuthenticatedOrReadOnly
+from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.decorators import api_view,permission_classes
@@ -14,26 +15,68 @@ from . import serializers
 from . import models
 import json
 import uuid
+from .auth import *
+import requests
+from requests.auth import HTTPBasicAuth
 
+url = "https://cmput404-backend.herokuapp.com/backendapi"
+grp17_url = "https://cmput404f22t17.herokuapp.com"
 
-url = "http://127.0.0.1:8000/"
+grp17_username = 't18user1'
+grp17_password = 'Password123!'
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def AuthorsListView(request):
-    #get and return all the authors
-    if request.user.is_superuser:
-        authors = models.Users.objects.filter(type="author")
-        serializer = serializers.UserSerializer(authors,many=True)
+    response = check_auth(request)
+    authors = models.Users.objects.filter(type="author")
+    serializer = serializers.UserSerializer(authors,many=True)
+
+    for entry in serializer.data:
+        entry["github"] = entry["githubName"]
+        del entry["githubName"]
+        entry["github"] = f'http://github.com/{entry["github"]}'
+        entry["id"] = f'{url}/authors/{entry["id"]}'
+
+    if(response == 'local'):
+        #get and return all the authors
+        try:
+            req = requests.get(grp17_url + '/authors', auth=HTTPBasicAuth(grp17_username,grp17_password))
+            if(req.status_code == 200):
+                node_data = json.loads(req.content.decode('utf-8'))
+                items_data = serializer.data + node_data['items']
+        except http.Http404 as e:
+            message = {'error':str(e)}
+            return Response(message , status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            if(req.status_code == 403):
+                items_data = serializer.data
+            else:
+                message = {'error':str(e)}
+                return Response(message , status.HTTP_400_BAD_REQUEST)
+
+        data = {"type":"authors",
+                "items":items_data
+                }
+        return Response(data, status.HTTP_200_OK)
+    
+    elif(response == 'remote'):
         data = {"type":"authors",
                 "items":serializer.data
                 }
-        return Response(data)
+        return Response(data, status.HTTP_200_OK)
+
+    else:
+        return response
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def AuthorsView(request,author_id):
     #return specific author
+    response = check_auth(request)
+    if response == None:
+        message = {"Error": "Authorization Required"}
+        return Response(message , status.HTTP_401_UNAUTHORIZED)
     try:
         authors = models.Users.objects.get(id=author_id)
         serializer = serializers.UserSerializer(authors)
@@ -143,41 +186,107 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def PostViewSet(request,author_id,post_id = None):
-
+def PostViewSet(request,author_id = None,post_id = None):
+    
     if(request.method == 'GET'):
+        response = check_auth(request)
+
+        if(response != 'local' and response != 'remote'):
+            return response
+
         try:
-            if post_id != None:
-                author = get_object_or_404(models.Users,id=author_id)
-                post = get_object_or_404(models.PostModel,id=post_id,author=author)
-                serializer = serializers.PostSerializer(post)
-                data = serializer.data
-                data["author"] = {
-                    "type": author.type,
-                    "id": author.id,
-                    "host": author.host,
-                    "displayName": author.displayName,
-                    "url": author.url,
-                    "github": f'http://github.com/{author.githubName}',
-                    "profileImage": author.profileImage
-                }
-                return Response(data, status=status.HTTP_200_OK)
-            elif post_id == None:
-                author = get_object_or_404(models.Users,id=author_id)
-                post = models.PostModel.objects.filter(author=author)
-                serializer = serializers.PostSerializer(post,many=True)
-                data = serializer.data
-                for entry in data:
-                    entry["author"] = {
-                        "type": author.type,
-                        "id": author.id,
-                        "host": author.host,
-                        "displayName": author.displayName,
-                        "url": author.url,
-                        "github": f'http://github.com/{author.githubName}',
-                        "profileImage": author.profileImage
-                    }
-                return Response(data, status=status.HTTP_200_OK)
+            if author_id != None:
+                    if post_id != None:
+                        try:
+                            post = models.PostModel.objects.get(id=post_id,visibility='PUBLIC')
+                            serializer = serializers.PostSerializer(post)
+                            serial_data = serializer.data
+                            serial_data["author"] = {
+                                "type": post.author.type,
+                                "id": f'{url}/authors/{post.author.id}',
+                                "host": post.author.host,
+                                "displayName": post.author.displayName,
+                                "url": post.author.url,
+                                "github": f'http://github.com/{post.author.githubName}',
+                                "profileImage": post.author.profileImage
+                            }
+                            return Response(serial_data, status.HTTP_200_OK)
+                        except Exception as e:
+                            try:    
+                                posts = []
+                                posts.extend(get_foreign_posts_t17())
+                                if(posts == []):
+                                    message = {"Error": "The Post does not Exist"}
+                                    return Response(message  , status.HTTP_404_NOT_FOUND)
+                                for entry in posts:
+                                     
+                                    localPostId = entry['id'].split("/")[-2]
+                                    if(localPostId == post_id):
+                                        return Response(entry , status=status.HTTP_200_OK )
+
+                                message = {"Error" : "The Post does not exist"}
+                                return Response(message  , status.HTTP_404_NOT_FOUND)
+                            except http.Http404 as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_404_NOT_FOUND)
+                            except Exception as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_400_BAD_REQUEST)
+
+                    elif post_id == None:
+                        
+                        try:
+                            
+                            author = models.Users.objects.get(id=author_id)
+                            post = models.PostModel.objects.filter(author=author)
+                            serializer = serializers.PostSerializer(post,many=True)
+  
+                            data = serializer.data
+
+                            for entry in data:
+                                entry["author"] = {
+                                    "type": author.type,
+                                    "id": f'{url}/authors/{author.id}',
+                                    "host": author.host,
+                                    "displayName": author.displayName,
+                                    "url": author.url,
+                                    "github": f'http://github.com/{author.githubName}',
+                                    "profileImage": author.profileImage
+                                }
+                                
+                            return Response(data, status=status.HTTP_200_OK)
+                        except Exception as e:
+                            
+                            try:
+                                req = requests.get(grp17_url + f'/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                                node_data = json.loads(req.content)
+                                return Response(node_data, status=status.HTTP_200_OK )
+                            except http.Http404 as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_404_NOT_FOUND)
+                            except Exception as e:
+                                message = {'error':str(e)}
+                                return Response(message , status.HTTP_400_BAD_REQUEST)
+                    
+            elif author_id == None:
+                try:
+                    post_obj = models.PostModel.objects.filter(visibility='PUBLIC')
+                    serializer =  serializers.PostSerializer(post_obj,many=True)
+
+                    if(response == 'local'):
+                        posts_all = get_foreign_posts_t17()
+                        all_data = serializer.data + posts_all
+
+                    else:
+                        all_data = serializer.data
+
+                    data = {"type":"posts",
+                            "items":all_data 
+                            }
+
+                    return Response(data,status=status.HTTP_200_OK)
+                except Exception as e:
+                    return Response(f"Error:{e}",status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             data = {'error': str(e)}
             return Response(data,status=status.HTTP_400_BAD_REQUEST)
@@ -527,3 +636,30 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 data = {'error' : str(e)}
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
+def get_foreign_posts_t17():
+    r = requests.get(grp17_url + "/authors/",auth=HTTPBasicAuth('t18user1','Password123!'))
+    
+    authors = json.loads(r.content)['items']
+    posts_list = []
+    for author in authors:
+        author_url = author['url'] + 'posts/'
+        
+        try:
+            r = requests.get(author_url,auth=HTTPBasicAuth('t18user1','Password123!'))
+            # print(json.loads(r.content)['items'])
+            for post in json.loads(r.content)['items']:
+                if post != []:
+                    posts_list.append(post)
+        except Exception as e:
+            return posts_list  
+    return posts_list
+#get foregin posts
+# def get_foreign_posts():
+#     posts_list = []
+#     try:
+#         posts_list.extend(get_foreign_posts_t17())
+#     except:
+#         pass
+#     posts_list.sort(key=lambda x:x['published'],reverse=True)
+#     data = {'posts_list':posts_list}
+#     return posts_list
