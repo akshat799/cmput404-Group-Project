@@ -4,7 +4,7 @@ const api = axios.create({baseURL : 'http://localhost:8000/'});
 
 api.interceptors.request.use((req) =>{
     if(localStorage.getItem('token')) {
-        req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('token'))}`;
+        req.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
     }
     return req;
 })
@@ -29,6 +29,7 @@ export const getPublicPost = (author_id, post_id) => api.get(`backendapi/authors
 export const createPost = (data, author_id, post_id) => api.put(`backendapi/authors/${author_id}/posts/${post_id}/`, data);
 export const updatePost = (data, author_id, post_id) => api.post(`backendapi/authors/${author_id}/posts/${post_id}/`, data);
 export const deletePost = (author_id, post_id) => api.delete(`backendapi/authors/${author_id}/posts/${post_id}/`);
+
 
 export const getAuthorPosts = (author_id) => api.get(`backendapi/authors/${author_id}/posts/`);
 export const createNewPost = (data, author_id) => api.post(`backendapi/authors/${author_id}/posts/`, data);

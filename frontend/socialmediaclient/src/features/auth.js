@@ -16,7 +16,7 @@ export const authorSlice = createSlice({
     reducers: {
       signIn: (state, action) => {
         state.isSignedIn = true
-        // state.author = action.payload.user
+        state.author = action.payload.data.user
         state.error = false
       },
       signOut: (state) => {
@@ -25,7 +25,7 @@ export const authorSlice = createSlice({
         state.author= {}
       },
       editProfile: (state,action) => {
-        state.author = action.payload.user
+        state.author = action.payload.data.user
       },
       authError: (state) => {
         state.error = true
@@ -47,9 +47,10 @@ export const login = (data) => async(dispatch) => {
 
   try{
       const resp = await api.signIn(data);
-    
+      
+
       if(resp.status === 200){
-        dispatch(signIn);
+        dispatch(signIn(resp));
         localStorage.setItem("token", resp.data.access);
         return resp.status
       }
@@ -62,6 +63,7 @@ export const login = (data) => async(dispatch) => {
 
 export const logout = () => (dispatch) =>{
   dispatch(signOut);
+  localStorage.removeItem('token')
 }  
 
 export const { signIn, signOut, editProfile, authError } = authorSlice.actions
