@@ -40,7 +40,6 @@ const Signup = ({ handleChange }) => {
         handleChange(e, 0);
       } else {
       }
-    } else {
     }
 
     const paperStyle = {

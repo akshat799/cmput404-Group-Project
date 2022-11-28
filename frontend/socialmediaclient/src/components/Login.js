@@ -30,18 +30,18 @@ const Login=({handleChange}) => {
             "password" : password
         }
         
-        const status = await dispatch(login(formData));
-        if (status === 200){
-            //Navigate to feed
-            navigate("/home")
+        const resp = await dispatch(login(formData));
+        if (resp.status === 200){
+            if(resp.data.user.type == "author")
+                navigate("/home")
+            else
+                navigate("http://localhost:8000/admin")
         }
         else{
-            setIsError(status)
-            handleChange(e, 0);
+            setIsError(resp.status)
         }
     }
     
-
     return (
         <Grid>
              <Paper style={paperStyle}>
@@ -63,3 +63,9 @@ const Login=({handleChange}) => {
 }
 
 export default Login
+
+/* TODO : 
+1. IF INCORRECT CREDENTIALS:
+-> MAKE PASSWORD TEXTFILED EMPTY
+-> DISPLAY MODAL WITH MESSAGE
+*/

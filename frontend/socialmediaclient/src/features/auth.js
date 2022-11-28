@@ -47,12 +47,11 @@ export const login = (data) => async(dispatch) => {
 
   try{
       const resp = await api.signIn(data);
-      
 
       if(resp.status === 200){
         dispatch(signIn(resp));
         localStorage.setItem("token", resp.data.access);
-        return resp.status
+        return resp
       }
   }
   catch(e){

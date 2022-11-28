@@ -14,7 +14,6 @@ export default function Feed() {
   const authorId = state.auth.author.id;
   const [posts, setPosts] = useState([]);
 
-  console.log(authorId)
   // const authorId = state.auth.author.id.split("/")[-1]
   const getPosts = async() => {
     const response = await getAuthorPosts(authorId);
