@@ -2,6 +2,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { signUp } from "../features/auth";
+import { useState } from "react";
+import { Grid, Paper, TextField, Button, Avatar, Typography} from "@mui/material";
 
 const Signup = ({ handleChange }) => {
   const { isSignedIn } = useSelector((state) => state.auth.isSignedIn);

@@ -3,27 +3,24 @@ import "./AuthorPosts.css";
 import PostOption from "./PostOption";
 import Post from "./Post";
 import { useDispatch } from "react-redux";
-import { getPublicPosts } from "../features/posts";
-import { useStore } from "react-redux";
+import { getAuthorPosts } from "../features/userposts";
+import { useSelector } from "react-redux";
 
 export default function AuthorPosts() {
   const dispatch = useDispatch();
 
-  const store = useStore()
-  const state = store.getState()
+  let state = useSelector((state) => state);
 
   const authorId = state.auth.author.id
-  // const authorId = state.auth.author.id.split("/")[-1]
 
   useEffect(() => {
-    dispatch(getPublicPosts(authorId));
+    dispatch(getAuthorPosts(authorId));
   }, []);
 
   return (
     <div className="authorPosts">
       <PostOption />
-      {console.log(state.posts.posts)}
-      {state.posts.posts.map((p) => (
+      {state.userposts.posts.map((p) => (
         <Post key={p.id} post={p} />
       ))}
     </div>

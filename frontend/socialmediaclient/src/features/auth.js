@@ -64,8 +64,8 @@ export const login = (data) => async(dispatch) => {
   }
 }
 
-export const logout = () => (dispatch) =>{
-  dispatch(signOut);
+export const logout = () => async(dispatch) =>{
+  await dispatch(signOut);
   localStorage.removeItem('token')
 }  
 

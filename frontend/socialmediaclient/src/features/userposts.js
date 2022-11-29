@@ -7,7 +7,7 @@ const initialState = {
 };
 
 export const authorSlice = createSlice({
-  name: "posts",
+  name: "userposts",
   initialState,
   reducers: {
     updatePosts: (state, action) => {
@@ -16,13 +16,12 @@ export const authorSlice = createSlice({
   },
 });
 
-export const getPublicPosts = () => async (dispatch) => {
+export const getAuthorPosts = (data) => async (dispatch) => {
   try {
-    const res = await api.getPublicPosts();
+    const res = await api.getAuthorPosts(data);
 
     if (res.status == 200) {
-      console.log(res)
-      dispatch(updatePosts(res.data.items));
+      dispatch(updatePosts(res.data));
       return res;
     }
   } catch (e) {

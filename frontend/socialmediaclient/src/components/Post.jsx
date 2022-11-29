@@ -50,24 +50,6 @@ export default function Post({ post }) {
           <span className="postCommentText">{post.count} Comments</span>
         </div>
       </div>
-      <div className="postCenter">
-        <span className="postText">{post?.title}</span>
-        <img className="postImg" src={post?.img} alt="" />
-        <span className="postText">{post?.description}</span>
-      </div>
-      <div className="postBottom">
-        <div className="postBottomLeft">
-          <ThumbUpIcon className="likes" onClick={likeHandler} />
-          {/* <span className="postLikeCounter">{like} Likes</span> */}
-        </div>
-        <div className="postBottomRight">
-          <span className="postCommentText">{post.count} Comments</span>
-        </div>
-      </div>
-      <div className="postCenter">
-        <span className="postText">{post?.desc}</span>
-        <img className="postImg" src={post.photo} alt="" />
-      </div>
       <Comment />
       <AddComment />
     </div>

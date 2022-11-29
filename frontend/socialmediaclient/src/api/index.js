@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const api = axios.create({baseURL : 'http://localhost:8000/'});
+const api = axios.create({baseURL : 'https://cmput404team18-backend.herokuapp.com/'});
 
 api.interceptors.request.use((req) =>{
     if(localStorage.getItem('token')) {
@@ -26,6 +26,7 @@ export const removeFollower = (author_id, foreign_author_id) => api.delete(`back
 
 // POST
 export const getPublicPost = (author_id, post_id) => api.get(`backendapi/authors/${author_id}/posts/${post_id}/`);
+export const getPublicPosts = () => api.get('backendapi/authors/posts/')
 export const createPost = (data, author_id, post_id) => api.put(`backendapi/authors/${author_id}/posts/${post_id}/`, data);
 export const updatePost = (data, author_id, post_id) => api.post(`backendapi/authors/${author_id}/posts/${post_id}/`, data);
 export const deletePost = (author_id, post_id) => api.delete(`backendapi/authors/${author_id}/posts/${post_id}/`);
