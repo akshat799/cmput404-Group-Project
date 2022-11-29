@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager, PermissionsMixin
 #make this as defual url for now
-url="http://CMPUT404-GROUP-PROJECT.herokuapp.com/"
+url="https://cmput404team18-backend.herokuapp.com/"
 #create user.
 class UserManager(BaseUserManager):
     
@@ -54,8 +54,8 @@ class AutoDateTimeField(models.DateTimeField):
 class Users(AbstractBaseUser, PermissionsMixin):
     type = models.CharField(default="author",editable=False, max_length=300)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    url = models.CharField(max_length=225, default="https://cmput404-backend.herokuapp.com/backendapi/authors/"+str(id))
-    host = models.CharField(max_length=200, default='https://cmput404-backend.herokuapp.com/backendapi/', blank=True)
+    url = models.CharField(max_length=225, default="https://cmput404team18-backend.herokuapp.com/backendapi/authors/"+str(id))
+    host = models.CharField(max_length=200, default='https://cmput404team18-backend.herokuapp.com/backendapi/', blank=True)
     username = models.CharField(db_index=True, max_length=255, unique=True)
     email = models.EmailField(db_index=True, unique=True,  null=True, blank=True)
     displayName = models.CharField(max_length=200, default="")
@@ -79,7 +79,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
         return f"{self.username}"
     
     def save(self,*args,**kwargs):
-        self.url = "https://cmput404-backend.herokuapp.com/backendapi/authors/"+str(self.id)
+        self.url = "https://cmput404team18-backend.herokuapp.com/backendapi/authors/"+str(self.id)
         return super(Users,self).save(*args,**kwargs)
 
     class Meta:
