@@ -202,9 +202,9 @@ class ShareModel(models.Model):
     author = models.ForeignKey(Users, related_name=('Sharer'),on_delete=models.CASCADE)
     post = models.ForeignKey(PostModel,related_name=('Shared_post'), on_delete=models.CASCADE)
 
-class InboxModel(models.Model):
-    author = models.CharField(max_length=200)
-    models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
+# class InboxModel(models.Model):
+#     author = models.CharField(max_length=200)
+#     models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
 
 class Node(models.Model):
     username = models.CharField(max_length=200)
