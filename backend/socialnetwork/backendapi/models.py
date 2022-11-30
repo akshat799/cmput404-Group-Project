@@ -206,6 +206,12 @@ class ShareModel(models.Model):
 #     author = models.CharField(max_length=200)
 #     models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
 
+######### InboxObject #########
+class InboxObject(models.Model):
+    type = models.CharField(default="inbox", max_length=100)
+    author = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True)
+    object = models.JSONField(null=True, blank=True)
+
 class Node(models.Model):
     username = models.CharField(max_length=200)
     password = models.CharField(max_length=200)

@@ -52,7 +52,8 @@ class PostSerializer(serializers.ModelSerializer):
 class LikesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.LikeModel
-        fields = '__all__'   
+        fields = ["type", "author", "summary", "object"]
+        #fields = '__all__'   
 
 class CommentSerializer(serializers.ModelSerializer):
 
@@ -65,3 +66,10 @@ class FollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.FollowerModel
         fields = '__all__'
+
+class InboxObjectSerializer(serializers.ModelSerializer):
+    author = UserSerializer(required=False)
+
+    class Meta:
+        model = models.InboxObject
+        fields = ["type", "author", "object"]

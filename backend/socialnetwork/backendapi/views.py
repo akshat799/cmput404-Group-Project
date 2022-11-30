@@ -6,13 +6,14 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny,IsAuthenticated,IsAuthenticatedOrReadOnly
-from rest_framework import status
+from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.pagination import PageNumberPagination
 from . import serializers
 from . import models
+from .paginaion import CustomPagiantor
 import json
 import uuid
 from .auth import *
@@ -393,8 +394,16 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
     try:
         if(request.method == 'POST'):
             if post_id != None:
-                data = {'error': 'This method is not allowed'}
-                return Response(data , status = status.HTTP_405_METHOD_NOT_ALLOWED)
+                author = get_object_or_404(models.Users,id = author_id)
+                serializer = serializers.LikesSerializer(data=requests.data)
+                if serializer.is_valid():
+                    instance = models.LikeModel(author = author)
+                    instance.summary = data["summary"]
+                    instance.object = data["object"]
+                    instance.save()
+                return Response(serializers.LikesSerializer(instance).data, status=status.HTTP_200_OK)
+                #data = {'error': 'This method is not allowed'}
+                #return Response(data , status = status.HTTP_405_METHOD_NOT_ALLOWED)
             elif post_id == None:
                 postData = request.data
                 author = get_object_or_404(models.Users,id=postData["author"])
@@ -487,7 +496,9 @@ def LikedViewSet(requests,author_id):
     except Exception as e:
         data = {'error': str(e)}
         return Response(data,status=status.HTTP_400_BAD_REQUEST)
-        
+
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def CommentViewSet(request, author_id, post_id):
@@ -662,3 +673,104 @@ def get_foreign_posts_t17():
         except Exception as e:
             return posts_list  
     return posts_list
+
+def author_not_found(authorID):
+    """ check existence of an author """
+    try:
+        if models.Users.objects.get(id=authorID):
+            return False
+    except models.Users.DoesNotExist:
+        return True
+
+
+
+class InboxViewSet(viewsets.GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    #authentication_classes = [BasicAuthentication]
+    serializer_class = serializers.InboxObjectSerializer
+    queryset = {}
+
+    @api_view(['GET'])
+    #@action(methods=[methods.POST], detail=True)
+    def get_inbox_items(self, request, authorID):
+        if author_not_found(authorID):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        author = models.Users.objects.get(id=authorID)
+        queryset = models.InboxObject.objects.filter(author=author)
+        pagination = CustomPagiantor()
+        qs = pagination.paginate_queryset(queryset, request)
+        serializers = serializers.InboxObjectSerializer(qs, many=True)
+
+        res = {
+            "type": "inbox",
+            "author": author.url,
+            "items": [io["object"] for io in serializers.data]
+        }
+        return Response(res, status=status.HTTP_200_OK)
+    
+    @api_view(['POST'])
+    #@action(methods=[methods.POST], detail=True)
+    def add_item_to_inbox(self, request, authorID):
+        if author_not_found(authorID):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        if request.data["type"] == "post":
+            """ required: {"type", "postID" }"""
+            postID = request.data["id"]
+            post = models.PostModel.objects.get(id=postID)
+            serialized_post = serializers.PostSerializer(post)
+
+            instance = models.InboxObject(type="post")
+            instance.author = models.Users.objects.get(id=authorID)
+            instance.object = serialized_post.data
+            instance.save()
+
+        elif request.data["type"] == "like":
+            """ required: {"type", "object", "actor"} """
+            actor = models.Users.objects.get(id=request.data["actor"])
+            obj_type = "comment" if (
+                "comment" in request.data["object"]) else "post"
+
+            like = {
+                "type": "like",
+                "author": models.Users(actor).data,
+                "summary": actor.displayName + " likes your " + obj_type,
+                "object": request.data["object"]
+            }
+
+            instance = models.InboxObject(type="like")
+            instance.author = models.Users.objects.get(id=authorID)
+            instance.object = like
+            instance.save()
+
+        elif request.data["type"] == "follow":
+            """ required: {"type", "follower"} """
+            followee = models.Users.objects.get(id=authorID)
+            follower = models.Users.objects.get(
+                authorID=request.data["follower"])
+
+            req = {
+                "type": "follow",
+                "summary": follower.displayName + " wants to follow " + followee.displayName,
+                "actor": serializers.UserSerializer(follower).data,
+                "object": serializers.UserSerializer(followee).data
+            }
+
+            instance = models.InboxObject(type="follow")
+            instance.author = followee
+            instance.object = req
+            instance.save()
+
+        return Response(serializers.InboxObjectSerializer(instance).data, status=status.HTTP_200_OK)
+    
+    @api_view(['DELETE'])
+    #@action(methods=[methods.DELETE], detail=True)
+    def clear_inbox(self, request, authorID):
+        if author_not_found(authorID):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        author = models.Users.objects.get(id=authorID)
+        models.InboxObject.objects.filter(author=author).delete()
+
+        return Response(status=status.HTTP_200_OK)
