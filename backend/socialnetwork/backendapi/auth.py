@@ -20,8 +20,10 @@ def check_auth(req):
     elif(auth_method == 'basic'):
         auth_param = base64.b64decode(auth_param.strip()).decode('utf-8')
 
-        username = auth_param.split(':')[0]
-        password = auth_param.split(':')[1]
+            # username = auth_param.split(':')[0]
+            # password = auth_param.split(':')[1]
+            username = decodeC[0]
+            password = decodeC[1]
 
         print(username , password)
 

@@ -5,7 +5,7 @@ from django import http
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.permissions import AllowAny,IsAuthenticated,IsAuthenticatedOrReadOnly
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
@@ -26,9 +26,12 @@ grp17_username = 't18user1'
 grp17_password = 'Password123!'
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def AuthorsListView(request):
     response = check_auth(request)
+    if response == None:
+        message = {"Error": "Authorization Required"}
+        return Response(message , status.HTTP_401_UNAUTHORIZED)
     authors = models.Users.objects.filter(type="author")
     serializer = serializers.UserSerializer(authors,many=True)
 
@@ -216,11 +219,14 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
         }, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def PostViewSet(request,author_id = None,post_id = None):
     
     if(request.method == 'GET'):
         response = check_auth(request)
+        if response == None:
+            message = {"Error": "Authorization Required"}
+            return Response(message , status.HTTP_401_UNAUTHORIZED)
 
         if(response != 'local' and response != 'remote'):
             return response

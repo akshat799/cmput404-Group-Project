@@ -54,8 +54,8 @@ class AutoDateTimeField(models.DateTimeField):
 class Users(AbstractBaseUser, PermissionsMixin):
     type = models.CharField(default="author",editable=False, max_length=300)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    url = models.CharField(max_length=225, default="http://127.0.0.1:8000/authors/"+str(id))
-    host = models.CharField(max_length=200, default='http://127.0.0.1:8000/', blank=True)
+    url = models.CharField(max_length=225, default="https://cmput404-backend.herokuapp.com/backendapi/authors/"+str(id))
+    host = models.CharField(max_length=200, default='https://cmput404-backend.herokuapp.com/backendapi/', blank=True)
     username = models.CharField(db_index=True, max_length=255, unique=True)
     email = models.EmailField(db_index=True, unique=True,  null=True, blank=True)
     displayName = models.CharField(max_length=200, default="")
@@ -79,7 +79,7 @@ class Users(AbstractBaseUser, PermissionsMixin):
         return f"{self.username}"
     
     def save(self,*args,**kwargs):
-        self.url = "http://127.0.0.1:8000/authors/"+str(self.id)
+        self.url = "https://cmput404-backend.herokuapp.com/backendapi/authors/"+str(self.id)
         return super(Users,self).save(*args,**kwargs)
 
     class Meta:
