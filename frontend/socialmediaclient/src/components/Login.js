@@ -15,6 +15,8 @@ const Login=({handleChange}) => {
    
     const navigate = useNavigate()
 
+    
+
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [isError, setIsError] = useState(false)
@@ -22,7 +24,6 @@ const Login=({handleChange}) => {
 
     const store = useStore()
     const state = store.getState()
-    const isSignedIn = state.auth.isSignedIn
 
     const handleSubmit= async(e) => {
 
@@ -31,28 +32,30 @@ const Login=({handleChange}) => {
             "password" : password
         }
         
-        const status = await dispatch(login(formData));
-        if (status === 200){
-            //Navigate to feed
-            navigate("/home")
+        const resp = await dispatch(login(formData));
+        if (resp.status === 200){
+            setIsError(false)
+            if(resp.data.user.type == "author")
+                navigate("/home")
+            else
+                navigate("http://localhost:8000/admin")
         }
         else{
-            setIsError(status)
-            handleChange(e, 0);
-        }
+            setIsError(true)
+            setPassword("")
+        }        
     }
     
-
     return (
         <Grid>
              <Paper style={paperStyle}>
-                {isError && <div className = "error" style={{color:"red"}} > Cannot Login. Please try Again</div>}
+                {isError && <div className = "error" style={{color:"red", padding:20}} > Invalid Credentials. Try Again</div>}
                 <Grid align='center'> 
                     <Avatar style= {avatarStyle} ><LockIcon/></Avatar>
                     <h2>Login</h2>
                 </Grid>
                 <TextField onChange={(e) => setUsername(e.target.value)} variant="standard" label='Username' placeholder="Enter Username" style={formFieldStyle} fullWidth required/>
-                <TextField onChange={(e) => setPassword(e.target.value)} variant="standard" label='Password' placeholder="Enter Password" style={formFieldStyle} fullWidth required type='password'/>
+                <TextField value={password} onChange={(e) => setPassword(e.target.value)} variant="standard" label='Password' placeholder="Enter Password" style={formFieldStyle} fullWidth required type='password'/>
                 <Button onClick={(e)=>handleSubmit(e)}
                     style={{margin: '25px 0px 10px 0px'}} variant='contained' type='submit' color='primary' fullWidth> Login</Button>
                 <Typography> Don't have an account?
@@ -64,3 +67,9 @@ const Login=({handleChange}) => {
 }
 
 export default Login
+
+/* TODO : 
+1. IF INCORRECT CREDENTIALS:
+-> MAKE PASSWORD TEXTFILED EMPTY
+-> DISPLAY MODAL WITH MESSAGE
+*/

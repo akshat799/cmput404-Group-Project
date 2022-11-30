@@ -145,6 +145,14 @@ def editProfielView(request,author_id):
 
     
 
+    
+
+    
+
+    
+
+    
+
 class LoginViewSet(ModelViewSet, TokenObtainPairView):
     serializer_class = serializers.LoginSerializer
     permission_classes = (AllowAny,)
@@ -182,7 +190,6 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
             "refresh": res["refresh"],
             "token": res["access"]
         }, status=status.HTTP_201_CREATED)
-
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -519,7 +526,6 @@ def CommentViewSet(request, author_id, post_id):
                 "github": f'http://github.com/{author.githubName}',
                 "profileImage": author.profileImage
             }
-
             responseData = {
                 "type" : "comment",
                 "author" : authorData,

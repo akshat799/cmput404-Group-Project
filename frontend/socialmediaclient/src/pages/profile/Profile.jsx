@@ -1,12 +1,11 @@
 import "./Profile.css";
 import AuthorPosts from "../../components/AuthorPosts";
 import Navbar from "../../components/Navbar";
-import { useStore } from "react-redux";
+import { useSelector } from "react-redux";
 
 export default function Profile() {
 
-  const store = useStore()
-  const state = store.getState()
+  const state = useSelector((state) => state)
 
   const ProfilePhoto = state.auth.author.profileImage
   const Username = state.auth.author.displayName
@@ -26,7 +25,7 @@ export default function Profile() {
         <h4 className="profileName">{Username}</h4>
         <span className="profileDescription">Welcome to my profile! </span>
       </div>
-      <AuthorPosts state={state}/>
+      <AuthorPosts/>
     </>
   );
 }

@@ -5,12 +5,9 @@ import "./home.css"
 
 export default function Home() {
   return (
- 
     <div className="home_container">
         <Navbar/>
         <Feed />
-        
     </div>
-    
   );
 }
