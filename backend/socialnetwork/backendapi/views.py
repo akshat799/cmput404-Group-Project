@@ -22,9 +22,12 @@ from requests.auth import HTTPBasicAuth
 
 url = "https://cmput404team18-backend.herokuapp.com/backendapi"
 grp17_url = "https://cmput404f22t17.herokuapp.com"
+grp15_url = ""
 
 grp17_username = 't18user1'
 grp17_password = 'Password123!'
+grp15_username = ""
+grp15_password = ""
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -199,7 +202,8 @@ def PostViewSet(request,author_id = None,post_id = None):
             if author_id != None:
                     if post_id != None:
                         try:
-                            post = models.PostModel.objects.get(id=post_id,visibility='PUBLIC')
+                            author = models.Users.objects.get(id = author_id)
+                            post = models.PostModel.objects.get(id=post_id,visibility='PUBLIC', author = author)
                             serializer = serializers.PostSerializer(post)
                             serial_data = serializer.data
                             serial_data["author"] = {
@@ -214,19 +218,11 @@ def PostViewSet(request,author_id = None,post_id = None):
                             return Response(serial_data, status.HTTP_200_OK)
                         except Exception as e:
                             try:    
-                                posts = []
-                                posts.extend(get_foreign_posts_t17())
-                                if(posts == []):
-                                    message = {"Error": "The Post does not Exist"}
-                                    return Response(message  , status.HTTP_404_NOT_FOUND)
-                                for entry in posts:
-                                     
-                                    localPostId = entry['id'].split("/")[-2]
-                                    if(localPostId == post_id):
-                                        return Response(entry , status=status.HTTP_200_OK )
-
-                                message = {"Error" : "The Post does not exist"}
-                                return Response(message  , status.HTTP_404_NOT_FOUND)
+                                
+                                req = requests.get(grp17_url + f'authors/{author_id}/posts/{post_id}', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                                posts = json.loads(r.content)['items']
+                                print(grp17_url + f'authors/{author_id}/posts/{post_id}')
+                                return Response(posts , status=status.HTTP_200_OK )
                             except http.Http404 as e:
                                 message = {'error':str(e)}
                                 return Response(message , status.HTTP_404_NOT_FOUND)
@@ -276,7 +272,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                     posts_all = []
                     if(response == 'local'):
                         try:
-                            r = requests.get(grp17_url+"/posts",auth=HTTPBasicAuth('t18user1','Password123!'))
+                            r = requests.get(grp17_url+"/posts",auth=HTTPBasicAuth(grp17_username,grp17_password))
                             posts_all.append(json.loads(r.content)['items'])
                         except Exception as e:
                             return posts_all
@@ -653,26 +649,26 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 data = {'error' : str(e)}
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
-def get_foreign_posts_t17():
-    r = requests.get(grp17_url + "/posts/",auth=HTTPBasicAuth('t18user1','Password123!'))
+# def get_foreign_posts_t17():
+#     r = requests.get(grp17_url + "/posts/",auth=HTTPBasicAuth('t18user1','Password123!'))
     
-    authors = json.loads(r.content)['items']
-    #print(authors)
-    posts_list = []
-    for author in authors:
-        author_url = author['url'] + 'posts/'
-        print(author['url'])
+#     authors = json.loads(r.content)['items']
+#     #print(authors)
+#     posts_list = []
+#     for author in authors:
+#         author_url = author['url'] + 'posts/'
+#         print(author['url'])
         
-        try:
-            r = requests.get(author_url,auth=HTTPBasicAuth('t18user1','Password123!'))
-            #print(json.loads(r.content)['items'])
-            for post in json.loads(r.content)['items']:
-                #print(post)
-                if post != []:
-                    posts_list.append(post)
-        except Exception as e:
-            return posts_list  
-    return posts_list
+#         try:
+#             r = requests.get(author_url,auth=HTTPBasicAuth('t18user1','Password123!'))
+#             #print(json.loads(r.content)['items'])
+#             for post in json.loads(r.content)['items']:
+#                 #print(post)
+#                 if post != []:
+#                     posts_list.append(post)
+#         except Exception as e:
+#             return posts_list  
+#     return posts_list
 
 def author_not_found(authorID):
     """ check existence of an author """
