@@ -78,31 +78,6 @@ def AuthorsView(request,author_id):
         message = {"Error": "Authorization Required"}
         return Response(message , status.HTTP_401_UNAUTHORIZED)
     try:
-        authors = get_object_or_404(models.Users,id=author_id)
-        serializer = serializers.UserSerializer(authors)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Exception as e:
-        data = {'error': str(e)}
-        return Response(data,status=status.HTTP_400_BAD_REQUEST)
-
-class UserViewSet(ModelViewSet):
-    http_method_names = ['get']
-    serializer_class = serializers.UserSerializer
-    permission_classes = (IsAuthenticated,)
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['updated']
-    ordering = ['-updated']
-
-
-    def get_queryset(self):
-        if self.request.user.is_superuser:
-            return models.Users.objects.all()
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def AuthorsView(request,author_id):
-    #return specific author
-    try:
         authors = models.Users.objects.get(id=author_id)
         serializer = serializers.UserSerializer(authors)
         return Response(serializer.data)
@@ -685,12 +660,12 @@ def get_foreign_posts_t17():
             return posts_list  
     return posts_list
 #get foregin posts
-def get_foreign_posts():
-    posts_list = []
-    try:
-        posts_list.extend(get_foreign_posts_t17())
-    except:
-        pass
-    posts_list.sort(key=lambda x:x['published'],reverse=True)
-    data = {'posts_list':posts_list}
-    return posts_list
+# def get_foreign_posts():
+#     posts_list = []
+#     try:
+#         posts_list.extend(get_foreign_posts_t17())
+#     except:
+#         pass
+#     posts_list.sort(key=lambda x:x['published'],reverse=True)
+#     data = {'posts_list':posts_list}
+#     return posts_list
