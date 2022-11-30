@@ -683,37 +683,34 @@ def author_not_found(authorID):
         return True
 
 
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def InboxViewSet(request,authorID):
+    if(request.method == "GET"):
+        try:
+            author = get_object_or_404(models.Users,id = authorID)
+            #author = models.Users.objects.get(id=authorID)
+            queryset = models.InboxObject.objects.filter(author=author)
+            pagination = CustomPagiantor()
+            qs = pagination.paginate_queryset(queryset, request)
+            serializers = serializers.InboxObjectSerializer(qs, many=True)
 
-class InboxViewSet(viewsets.GenericViewSet):
-    permission_classes = [IsAuthenticated]
-    #authentication_classes = [BasicAuthentication]
-    serializer_class = serializers.InboxObjectSerializer
-    queryset = {}
+            res = {
+                "type": "inbox",
+                "author": author.url,
+                "items": [io["object"] for io in serializers.data]
+            }
+            return Response(res, status=status.HTTP_200_OK)
+        except Exception as e:
+            data = {'error' : str(e)}
+            return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
-    @api_view(['GET'])
-    #@action(methods=[methods.POST], detail=True)
-    def get_inbox_items(self, request, authorID):
-        if author_not_found(authorID):
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        author = models.Users.objects.get(id=authorID)
-        queryset = models.InboxObject.objects.filter(author=author)
-        pagination = CustomPagiantor()
-        qs = pagination.paginate_queryset(queryset, request)
-        serializers = serializers.InboxObjectSerializer(qs, many=True)
-
-        res = {
-            "type": "inbox",
-            "author": author.url,
-            "items": [io["object"] for io in serializers.data]
-        }
-        return Response(res, status=status.HTTP_200_OK)
     
-    @api_view(['POST'])
-    #@action(methods=[methods.POST], detail=True)
-    def add_item_to_inbox(self, request, authorID):
-        if author_not_found(authorID):
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    # @api_view(['POST'])
+    # #@action(methods=[methods.POST], detail=True)
+    # def add_item_to_inbox(self, request, authorID):
+    if(request.method == "POST"):
+        author = get_object_or_404(models.Users,id = authorID)
 
         if request.data["type"] == "post":
             """ required: {"type", "postID" }"""
@@ -764,11 +761,13 @@ class InboxViewSet(viewsets.GenericViewSet):
 
         return Response(serializers.InboxObjectSerializer(instance).data, status=status.HTTP_200_OK)
     
-    @api_view(['DELETE'])
-    #@action(methods=[methods.DELETE], detail=True)
-    def clear_inbox(self, request, authorID):
-        if author_not_found(authorID):
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    # @api_view(['DELETE'])
+    # #@action(methods=[methods.DELETE], detail=True)
+    # def clear_inbox(self, request, authorID):
+    if(request.method == "DELETE"):
+        author = get_object_or_404(models.Users,id = authorID)
+        # if author_not_found(authorID):
+        #     return Response(status=status.HTTP_404_NOT_FOUND)
 
         author = models.Users.objects.get(id=authorID)
         models.InboxObject.objects.filter(author=author).delete()
