@@ -272,10 +272,15 @@ def PostViewSet(request,author_id = None,post_id = None):
                 try:
                     post_obj = models.PostModel.objects.filter(visibility='PUBLIC')
                     serializer =  serializers.PostSerializer(post_obj,many=True)
-                    
+                    posts_all = []
                     if(response == 'local'):
-                        posts_all = get_foreign_posts_t17()
-                        print(posts_all)
+                        try:
+                            r = requests.get(grp17_url+"/posts",auth=HTTPBasicAuth('t18user1','Password123!'))
+                            posts_all.append(json.loads(r.content)['items'])
+                        except Exception as e:
+                            return posts_all
+                        #posts_all = get_foreign_posts_t17()
+                        #print(posts_all)
                         all_data = serializer.data + posts_all
 
                     else:
@@ -638,7 +643,7 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
 def get_foreign_posts_t17():
-    r = requests.get(grp17_url + "/authors/",auth=HTTPBasicAuth('t18user1','Password123!'))
+    r = requests.get(grp17_url + "/posts/",auth=HTTPBasicAuth('t18user1','Password123!'))
     
     authors = json.loads(r.content)['items']
     #print(authors)
@@ -657,13 +662,3 @@ def get_foreign_posts_t17():
         except Exception as e:
             return posts_list  
     return posts_list
-#get foregin posts
-# def get_foreign_posts():
-#     posts_list = []
-#     try:
-#         posts_list.extend(get_foreign_posts_t17())
-#     except:
-#         pass
-#     posts_list.sort(key=lambda x:x['published'],reverse=True)
-#     data = {'posts_list':posts_list}
-#     return posts_list
