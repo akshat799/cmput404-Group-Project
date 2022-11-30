@@ -6,8 +6,20 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
 import "./Post.css";
+import { getPostLikes } from "../features/posts";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 export default function Post({ post }) {
+  const state = useSelector((state) => state);
+  const dispatch = useDispatch();
+
+  const authorId = state.auth.author.id;
+  const postId = post.id;
+
+  const getLikeCount = async() => {
+    await dispatch(getPostLikes(authorId,postId))
+  }
   const [like, setLike] = useState(post.like);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -17,7 +29,7 @@ export default function Post({ post }) {
   };
 
   useEffect(() => {
-
+    getLikeCount();
   }, [])
 
   return (
@@ -45,6 +57,7 @@ export default function Post({ post }) {
       <div className="postBottom">
         <div className="postBottomLeft">
           <ThumbUpIcon className="likes" onClick={likeHandler} />
+          <span style={{color: "gray"}}> {state.posts.postLikeCount}</span>
         </div>
         <div className="postBottomRight">
           <span className="postCommentText">{post.count} Comments</span>

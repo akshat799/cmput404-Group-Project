@@ -3,6 +3,7 @@ import * as api from "../api";
 
 const initialState = {
   posts: [],
+  postlikeCount: 0,
   error: false,
 };
 
@@ -13,6 +14,9 @@ export const authorSlice = createSlice({
     updatePosts: (state, action) => {
       state.posts = action.payload;
     },
+    updatePostLikes: (state, action) => {
+      state.postlikesCount = action.payload;
+    }
   },
 });
 
@@ -30,6 +34,19 @@ export const getPublicPosts = () => async (dispatch) => {
   }
 };
 
-export const { updatePosts } = authorSlice.actions;
+export const getPostLikes = (author_id, post_id) => async (dispatch) => {
+  try{
+    const resp = await api.getPostLikes(author_id, post_id);
+
+    if (resp.status == 200) {
+      // TODO: check resp object and fix
+      dispatch(updatePostLikes(resp.data))
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export const { updatePosts, updatePostLikes } = authorSlice.actions;
 
 export default authorSlice.reducer;
