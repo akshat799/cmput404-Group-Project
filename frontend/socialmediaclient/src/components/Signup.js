@@ -8,14 +8,13 @@ import { signUp } from '../features/auth';
 
 const Signup=({handleChange}) => {
 
-    const { isSignedIn } = useSelector((state) => state.auth.isSignedIn);
     const dispatch = useDispatch();
 
     const [username, setUsername] = useState("")
-    const [firstName, setFirstName] = useState("")
-    const [lastName, setLastName] = useState("")
+    const [fullName, setFullName] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [email, setEmail] = useState("")
     const [isError, setError] = useState(false)
     const [githubName, setGithubName] = useState("")
 
@@ -33,16 +32,18 @@ const Signup=({handleChange}) => {
     const formFieldStyle ={margin: '10px 0px 0px 0px'}
     const headerStyle = {margin:0}
     const handleSubmit = async(e) => {
+        e.preventDefault();
         if(!isError){
             let formData = {
               "username" : username,
-              "displayName" : firstName + lastName,
+              "displayName" : fullName,
               "password" : password,
-              "githubName" : githubName
+              "githubName" : githubName,
+              "email" : email
             }
 
             const status = await dispatch(signUp(formData));
-            if(status == 200){
+            if(status == 201){
               handleChange(e, 0);
             } else{
               //DISPLAY 
@@ -74,22 +75,23 @@ const Signup=({handleChange}) => {
                         fullWidth 
                         required/>
                     <TextField 
-                        className='firstName'
-                        value = {firstName} 
-                        onChange={(e) => setFirstName(e.target.value)}
+                        className='fullName'
+                        value = {fullName} 
+                        onChange={(e) => setFullName(e.target.value)}
                         variant="standard" 
-                        label='First Name' 
-                        placeholder="Enter First Name" 
+                        label='Full Name' 
+                        placeholder="Enter Full Name" 
                         style={formFieldStyle} 
                         fullWidth 
                         required/>
-                    <TextField 
-                        className='lastName'
-                        value = {lastName}
-                        onChange={(e) => setLastName(e.target.value)} 
+                    <TextField
+                        type="email"
+                        className='email'
+                        value = {email}
+                        onChange={(e) => setEmail(e.target.value)} 
                         variant="standard" 
-                        label='Last Name' 
-                        placeholder="Enter Last Name" 
+                        label='Email' 
+                        placeholder="Enter email" 
                         style={formFieldStyle} 
                         fullWidth 
                         required/>

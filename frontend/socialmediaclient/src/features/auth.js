@@ -36,6 +36,7 @@ export const authorSlice = createSlice({
 export const signUp = (data) => async(dispatch) => {
   try{
     const responseData = await api.register(data);
+    console.log(responseData);
     return responseData.status;
   }
   catch(e){

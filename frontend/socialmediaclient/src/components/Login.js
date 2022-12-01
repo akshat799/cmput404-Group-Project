@@ -15,8 +15,6 @@ const Login=({handleChange}) => {
    
     const navigate = useNavigate()
 
-    
-
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [isError, setIsError] = useState(false)
