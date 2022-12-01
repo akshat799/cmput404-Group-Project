@@ -395,8 +395,10 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
             elif post_id == None:
                 postData = request.data
                 author = get_object_or_404(models.Users,id=postData["author"])
-                
-                postData["object"] =  url + f"/authors/{author.id}/posts/{postData['post']}"
+                if("comment" not in postData):                  
+                    postData["object"] =  url + f"/authors/{author.id}/posts/{postData['post']}"
+                elif("comment" in postData):
+                    postData["object"] =  url + f"/authors/{author.id}/posts/{postData['post']}/comments/{postData['comment']}"
                 postData["author"] = author_id
 
                 serializer = serializers.LikesSerializer(data=postData)
@@ -436,8 +438,6 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                             "github": f'http://github.com/{newAuthor.githubName}',
                             "profileImage": newAuthor.profileImage
                         }
-                        
-                        entry["object"] = f"{url}/authors/{author_id}/posts/{post_id}/comments/{comment_id}"
                     return Response(data, status=status.HTTP_200_OK)
                 elif comment_id == None:
                     likes = models.LikeModel.objects.filter(post = post_id)
@@ -454,7 +454,6 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                             "github": f'http://github.com/{newAuthor.githubName}',
                             "profileImage": newAuthor.profileImage
                         }          
-                        entry["object"] = f"{url}/authors/{author_id}/posts/{post_id}"
                     return Response(data, status=status.HTTP_200_OK)
             elif post_id == None:
                 data = {'error': 'This method is not allowed'}
