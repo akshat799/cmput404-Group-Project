@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import django_heroku
 import dj_database_url
+import os
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -101,19 +102,31 @@ WSGI_APPLICATION = 'socialnetwork.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'de1b86uvqk46ss',
+#         'USER': 'kpojbbqntfxped',
+#         'PASSWORD': '5794ad12307a1f80591c6d8177d27b6dd3a79a1120a05288332854c2f1bf4026',
+#         'HOST': 'ec2-3-227-68-43.compute-1.amazonaws.com',
+#         'PORT': '5432',
+#         #'OPTIONS': {'sslmode': 'require'},
+
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'de1b86uvqk46ss',
-        'USER': 'kpojbbqntfxped',
-        'PASSWORD': '5794ad12307a1f80591c6d8177d27b6dd3a79a1120a05288332854c2f1bf4026',
-        'HOST': 'ec2-3-227-68-43.compute-1.amazonaws.com',
+        'NAME': 'd4b5fgdrjrpj8',
+        'USER': 'avtnmjowlbloaa',
+        'PASSWORD': '3bdf0bd02e65a4de3ded354e5c7136f04b7f3e02f25372bc60fe0cf834ab67e2',
+        'HOST': 'ec2-54-209-66-211.compute-1.amazonaws.com',
         'PORT': '5432',
         #'OPTIONS': {'sslmode': 'require'},
 
     }
 }
-
+#DATABASES = {'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

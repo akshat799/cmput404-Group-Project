@@ -137,7 +137,7 @@ class PostModel(models.Model):
     
     categories = ArrayField(models.TextField(), blank=True, default=list, null=True) # e.g. ["web","tutorial"]
     count =  models.PositiveIntegerField(default=0)       # for comments
-    comments = models.TextField(null=True) #area to add comments
+    comments = models.URLField(null=True)  #link for add comments
     size =  models.PositiveIntegerField(default=0)        # page size for comments
     published = models.DateTimeField(default=timezone.now)
     PUBLIC = 'PUBLIC'
@@ -154,6 +154,7 @@ class PostModel(models.Model):
 class CommentModel(models.Model):
     # ID of the Comment (UUID)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    url_id = models.URLField(blank=True)
     post = models.ForeignKey(PostModel, on_delete=models.CASCADE)
     author = models.ForeignKey(Users, on_delete=models.PROTECT)
     

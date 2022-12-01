@@ -514,18 +514,29 @@ class UUIDEncoder(json.JSONEncoder):
 @permission_classes([IsAuthenticated])
 def CommentViewSet(request, author_id, post_id):
 
-    paginator = PageNumberPagination()
-    paginator.page_size = 10
-    page_query_param = 'page'
-    page_size_query_param = 'size'
+    paginator = CustomPagiantor()
 
     if(request.method == 'GET'):
         try:
             comments = models.CommentModel.objects.filter(post = post_id)
             result_page = paginator.paginate_queryset(comments, request)
             serializer = serializers.CommentSerializer(result_page, many = True)
+            paginator_reulst = paginator.get_paginated_response(serializer.data).data
+            page = paginator_reulst.get("page")
+            if page == None:
+                page = 1
+            size = paginator_reulst.get("count")
+            comments = serializer.data
+            result = {
+                    "type": "comments",
+                    "page": page,
+                    "size": size,
+                    "post": post_id,
+                    "id": post_id + "/comments",
+                    'comments': comments
+            }
             # return Response(serializer.data, status = status.HTTP_200_OK)
-            return paginator.get_paginated_response(serializer.data)
+            return Response(result, status = status.HTTP_200_OK)
         except Exception as e:
             data = {'error' : str(e)}
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
@@ -552,6 +563,7 @@ def CommentViewSet(request, author_id, post_id):
 
             #get post origin author for post id
             post = models.PostModel.objects.get(id=post_id)
+            print(post.author.displayName)
             comments_id = serializer.data["id"]
             comments_url = f"{url}/authors/{post.author.id}/posts/{post.id}/comments/{comments_id}"
             responseData = {
@@ -560,12 +572,18 @@ def CommentViewSet(request, author_id, post_id):
                 "comment" : serializer.data["comment"],
                 "contentType" : serializer.data["contentType"],
                 "published" : serializer.data["published"],
-                "id" : comments_url,
+                "id": comments_id,
+                "url_id" : comments_url,
             }
+            com_obj = models.CommentModel.objects.get(id=comments_id)
+            com_obj.url_id = comments_url
+            com_obj.save(update_fields=["url_id"])
+
             message = json.dumps(responseData, cls=UUIDEncoder)
             # try to add comment in post table
-            post.comments = str(responseData) + '/n'+ str(post.comments)
+            post.comments = f"{url}/authors/{post.author.id}/posts/{post.id}/comments"
             post.count += 1
+            post.save(update_fields=["comments","count"])
             receiver_url = f"{url}/authors/{post.author.id}"
             
             # add this comment to the post's owner's inbox
