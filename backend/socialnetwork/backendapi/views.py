@@ -477,12 +477,9 @@ def LikedViewSet(requests,author_id):
         all_post = []
         for entry in data:
             authorCheck = entry["object"].split("/")[5]
-            print("HI ",authorCheck)
-            print("Hello ",author_id)
             if(authorCheck == author_id):
                 post = models.PostModel.objects.get(id = entry["post"])
                 if(post.visibility == 'PUBLIC'):
-                    print('hi')
                     if(entry["comment"] is None):
                         newAuthor = get_object_or_404(models.Users,id = entry["author"])
                         entry["author"] = {
