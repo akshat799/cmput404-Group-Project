@@ -36,13 +36,14 @@ export default function Post({ post }) {
     <div className="post">
       <div className="postTop">
         <div className="postTopLeft">
-          <img
+          {/* <img
             className="postProfileImg"
             src={post.author.profileImage}
             alt=""
-          />
+          /> */}
           <span className="postUsername">
-            {post.author.displayName}
+            {/* {post.author.displayName} */}
+            
           </span>
         </div>
         <div className="postTopRight">
