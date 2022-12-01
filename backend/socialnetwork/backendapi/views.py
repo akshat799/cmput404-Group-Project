@@ -19,6 +19,8 @@ import uuid
 from .auth import *
 import requests
 from requests.auth import HTTPBasicAuth
+import json
+from uuid import UUID
 
 url = "https://cmput404team18-backend.herokuapp.com/backendapi"
 grp17_url = "https://cmput404f22t17.herokuapp.com"
@@ -468,30 +470,40 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
 @permission_classes([IsAuthenticated])
 def LikedViewSet(requests,author_id):
     try:
-        likes = models.LikeModel.objects.filter(author = author_id)
+        likes = models.LikeModel.objects.all()
+
         serializer = serializers.LikesSerializer(likes,many=True)
         data = serializer.data
+        all_post = []
         for entry in data:
-            newAuthor = get_object_or_404(models.Users,id = entry["author"])
-            entry["author"] = {
-                "type": newAuthor.type,
-                "id": newAuthor.id,
-                "host": newAuthor.host,
-                "displayName": newAuthor.displayName,
-                "url": newAuthor.url,
-                "github": f'http://github.com/{newAuthor.githubName}',
-                "profileImage": newAuthor.profileImage
-            }
+            authorCheck = entry["object"].split("/")[5]
+            print("HI ",authorCheck)
+            print("Hello ",author_id)
+            if(authorCheck == author_id):
+                post = models.PostModel.objects.get(id = entry["post"])
+                if(post.visibility == 'PUBLIC'):
+                    print('hi')
+                    if(entry["comment"] is None):
+                        newAuthor = get_object_or_404(models.Users,id = entry["author"])
+                        entry["author"] = {
+                            "type": newAuthor.type,
+                            "id": newAuthor.id,
+                            "host": newAuthor.host,
+                            "displayName": newAuthor.displayName,
+                            "url": newAuthor.url,
+                            "github": f'http://github.com/{newAuthor.githubName}',
+                            "profileImage": newAuthor.profileImage
+                        }
+                        all_post.append(entry)
         return Response({
             "type": "liked",
-            "items": data
+            "items": all_post
         }, status=status.HTTP_200_OK)  
     except Exception as e:
         data = {'error': str(e)}
         return Response(data,status=status.HTTP_400_BAD_REQUEST)
 
-import json
-from uuid import UUID
+
 
 
 class UUIDEncoder(json.JSONEncoder):
