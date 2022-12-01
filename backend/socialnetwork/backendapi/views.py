@@ -395,11 +395,14 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
             elif post_id == None:
                 postData = request.data
                 author = get_object_or_404(models.Users,id=postData["author"])
-                postData.update({"object": url + f"authors/{author_id}/inbox"})
-                print("HI ",postData)
+                
+                postData["object"] =  url + f"/authors/{author.id}/posts/{postData['post']}"
+                postData["author"] = author_id
+
                 serializer = serializers.LikesSerializer(data=postData)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
+
                 data = serializer.data
                 data["author"] = {
                     "type": author.type,
@@ -410,8 +413,11 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                     "github": f'http://github.com/{author.githubName}',
                     "profileImage": author.profileImage
                 }
-                idPost = data["post"]
-                data["object"] = f"{url}/authors/{author_id}/posts/{idPost}"
+
+                data.pop("post")
+                data.pop("comment")
+                data.pop("id")
+
                 return Response(data , status=status.HTTP_201_CREATED)
         elif(request.method == 'GET'):
             if post_id != None:

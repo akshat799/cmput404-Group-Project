@@ -191,7 +191,7 @@ class LikeModel(models.Model):
     type = models.TextField(default="like", editable=False)
     at_context = models.CharField(max_length=200)
     author = models.ForeignKey(Users, related_name=("author"), on_delete=models.CASCADE)
-    post = models.ForeignKey(PostModel,default=None,on_delete=models.CASCADE)
+    post = models.ForeignKey(PostModel,default=None,null=True,on_delete=models.CASCADE)
     comment = models.ForeignKey(CommentModel,default=None,on_delete=models.CASCADE, null=True,blank=True)
     object = models.CharField(max_length=200)   # linked to an author's posts and comments
     summary = models.CharField(max_length=200)

@@ -52,6 +52,7 @@ class PostSerializer(serializers.ModelSerializer):
 class LikesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.LikeModel
+        # fields = ["type", "author", "summary", "object"]
         fields = '__all__'   
 
 class CommentSerializer(serializers.ModelSerializer):
