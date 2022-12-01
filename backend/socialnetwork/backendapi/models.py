@@ -137,6 +137,7 @@ class PostModel(models.Model):
     
     categories = ArrayField(models.TextField(), blank=True, default=list, null=True) # e.g. ["web","tutorial"]
     count =  models.PositiveIntegerField(default=0)       # for comments
+    comments = models.TextField(null=True) #area to add comments
     size =  models.PositiveIntegerField(default=0)        # page size for comments
     published = models.DateTimeField(default=timezone.now)
     PUBLIC = 'PUBLIC'
@@ -206,11 +207,14 @@ class ShareModel(models.Model):
 #     author = models.CharField(max_length=200)
 #     models.ForeignKey(PostModel, related_name=("inbox"), on_delete=models.CASCADE)
 
+def default_list():
+    return []
 ######### InboxObject #########
 class InboxObject(models.Model):
     type = models.CharField(default="inbox", max_length=100)
-    author = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True)
-    object = models.JSONField(null=True, blank=True)
+    #author = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True)
+    author = models.CharField(max_length=256, default="")
+    object = models.JSONField(null=True, blank=True,default=default_list)
 
 class Node(models.Model):
     username = models.CharField(max_length=200)

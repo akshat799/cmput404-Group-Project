@@ -390,16 +390,8 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
     try:
         if(request.method == 'POST'):
             if post_id != None:
-                author = get_object_or_404(models.Users,id = author_id)
-                serializer = serializers.LikesSerializer(data=requests.data)
-                if serializer.is_valid():
-                    instance = models.LikeModel(author = author)
-                    instance.summary = data["summary"]
-                    instance.object = data["object"]
-                    instance.save()
-                return Response(serializers.LikesSerializer(instance).data, status=status.HTTP_200_OK)
-                #data = {'error': 'This method is not allowed'}
-                #return Response(data , status = status.HTTP_405_METHOD_NOT_ALLOWED)
+                data = {'error': 'This method is not allowed'}
+                return Response(data , status = status.HTTP_405_METHOD_NOT_ALLOWED)
             elif post_id == None:
                 postData = request.data
                 author = get_object_or_404(models.Users,id=postData["author"])
@@ -493,7 +485,16 @@ def LikedViewSet(requests,author_id):
         data = {'error': str(e)}
         return Response(data,status=status.HTTP_400_BAD_REQUEST)
 
+import json
+from uuid import UUID
 
+
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            # if the obj is uuid, we simply return the value of uuid
+            return obj.hex
+        return json.JSONEncoder.default(self, obj)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -523,6 +524,7 @@ def CommentViewSet(request, author_id, post_id):
             serializer = serializers.CommentSerializer(data = data)
             serializer.is_valid(raise_exception = True)
             serializer.save()
+            #this is the author who made the comment
             authorData = {
                 "type": author.type,
                 "id": author.id,
@@ -533,14 +535,30 @@ def CommentViewSet(request, author_id, post_id):
                 "profileImage": author.profileImage
             }
 
+
+            #get post origin author for post id
+            post = models.PostModel.objects.get(id=post_id)
+            comments_id = serializer.data["id"]
+            comments_url = f"{url}/authors/{post.author.id}/posts/{post.id}/comments/{comments_id}"
             responseData = {
                 "type" : "comment",
                 "author" : authorData,
                 "comment" : serializer.data["comment"],
                 "contentType" : serializer.data["contentType"],
                 "published" : serializer.data["published"],
-                "id" : serializer.data["id"],
+                "id" : comments_url,
             }
+            message = json.dumps(responseData, cls=UUIDEncoder)
+            # try to add comment in post table
+            post.comments = str(responseData) + '/n'+ str(post.comments)
+            post.count += 1
+            receiver_url = f"{url}/authors/{post.author.id}"
+            
+            # add this comment to the post's owner's inbox
+            models.InboxObject.objects.create(
+            author= receiver_url,
+            object= message
+            )
             return Response(responseData, status = status.HTTP_200_OK)
         except Exception as e:
             data = {'error' : str(e)}
@@ -685,7 +703,6 @@ def InboxViewSet(request,authorID):
     if(request.method == "GET"):
         try:
             author = get_object_or_404(models.Users,id = authorID)
-            #author = models.Users.objects.get(id=authorID)
             queryset = models.InboxObject.objects.filter(author=author)
             pagination = CustomPagiantor()
             qs = pagination.paginate_queryset(queryset, request)
@@ -702,9 +719,6 @@ def InboxViewSet(request,authorID):
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
     
-    # @api_view(['POST'])
-    # #@action(methods=[methods.POST], detail=True)
-    # def add_item_to_inbox(self, request, authorID):
     if(request.method == "POST"):
         author = get_object_or_404(models.Users,id = authorID)
 
@@ -757,13 +771,9 @@ def InboxViewSet(request,authorID):
 
         return Response(serializers.InboxObjectSerializer(instance).data, status=status.HTTP_200_OK)
     
-    # @api_view(['DELETE'])
-    # #@action(methods=[methods.DELETE], detail=True)
-    # def clear_inbox(self, request, authorID):
+
     if(request.method == "DELETE"):
         author = get_object_or_404(models.Users,id = authorID)
-        # if author_not_found(authorID):
-        #     return Response(status=status.HTTP_404_NOT_FOUND)
 
         author = models.Users.objects.get(id=authorID)
         models.InboxObject.objects.filter(author=author).delete()
