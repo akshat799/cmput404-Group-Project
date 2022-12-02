@@ -422,6 +422,23 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                 data.pop("comment")
                 data.pop("id")
 
+                #send like to inbox
+                actorName = author.displayName
+                summary = str(actorName) + 'liked your post'
+                #get post' author
+                post = models.PostModel.objects.get(id=post_id)
+                receiver_url = f"{url}/authors/{post.author.id}"
+                post_url = url + f"/authors/{author.id}/posts/{postData['post']}"
+                # add this like to the post's owner's inbox
+                models.InboxObject.objects.create(
+                author= receiver_url,
+                object={
+                    "type" : "like",
+                    "summary":summary,
+                    "author" : author.url,
+                    "object": post_url,
+                    }
+                )
                 return Response(data , status=status.HTTP_201_CREATED)
         elif(request.method == 'GET'):
             if post_id != None:
