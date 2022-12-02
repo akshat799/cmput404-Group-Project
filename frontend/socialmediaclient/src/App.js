@@ -4,6 +4,7 @@ import LoginSignUpContainer from "./containers/LoginSignUpContainer";
 import Home from "./pages/Home.jsx";
 import Inbox from "./pages/Inbox/Inbox";
 import Profile from "./pages/profile/Profile";
+import Pprofile from "./pages/profile/Pprofile";
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
           <Route exact path="/home" element={<Home />} />
           <Route exact path="/profile" element={<Profile />} />
           <Route exact path="/inbox" element={<Inbox />} />
+          {/* This is for search bar profile */}
+          <Route exact path="/pprofile" element={<Pprofile />} />
         </Routes>
       </div>
     </Router>

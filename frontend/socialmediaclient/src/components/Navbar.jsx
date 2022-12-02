@@ -39,7 +39,7 @@ export default function Navbar() {
           options={suggestionsSearch}
           onChange={(event, value) => {
             console.log(value);
-            navigate("/profile");
+            navigate("/pprofile");
           }}
           sx={{ width: 300, borderRadius: '10px', background: 'white' }}
           renderInput={(params) => <TextField {...params} placeholder="search🔍" />} />
