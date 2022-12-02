@@ -56,7 +56,7 @@ export default function Navbar() {
         </li>
 
         <li className="sym">
-          <Link>
+          <Link to = "/inbox">
             <InboxRoundedIcon className="icon"></InboxRoundedIcon>
           </Link>
         </li>
