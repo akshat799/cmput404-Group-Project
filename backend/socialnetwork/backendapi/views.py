@@ -589,7 +589,15 @@ def CommentViewSet(request, author_id, post_id):
             # add this comment to the post's owner's inbox
             models.InboxObject.objects.create(
             author= receiver_url,
-            object= message
+            object= {
+                "type" : "comment",
+                "author" : author.url,
+                "comment" : serializer.data["comment"],
+                "contentType" : serializer.data["contentType"],
+                "published" : serializer.data["published"],
+                "id": comments_id,
+                "url_id" : comments_url,
+            }
             )
             return Response(responseData, status = status.HTTP_200_OK)
         except Exception as e:
@@ -731,19 +739,19 @@ def author_not_found(authorID):
 
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def InboxViewSet(request,authorID):
+def InboxViewSet(request,author_id):
     if(request.method == "GET"):
         try:
-            author = get_object_or_404(models.Users,id = authorID)
-            queryset = models.InboxObject.objects.filter(author=author)
+            author = get_object_or_404(models.Users,id = author_id)
+            queryset = models.InboxObject.objects.filter(author=author.url)
             pagination = CustomPagiantor()
             qs = pagination.paginate_queryset(queryset, request)
-            serializers = serializers.InboxObjectSerializer(qs, many=True)
+            serializer = serializers.InboxObjectSerializer(qs, many=True)
 
             res = {
                 "type": "inbox",
                 "author": author.url,
-                "items": [io["object"] for io in serializers.data]
+                "items": [io["object"] for io in serializer.data]
             }
             return Response(res, status=status.HTTP_200_OK)
         except Exception as e:
@@ -751,63 +759,63 @@ def InboxViewSet(request,authorID):
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
     
-    if(request.method == "POST"):
-        author = get_object_or_404(models.Users,id = authorID)
+    # if(request.method == "POST"):
+    #     author = get_object_or_404(models.Users,id = authorID)
 
-        if request.data["type"] == "post":
-            """ required: {"type", "postID" }"""
-            postID = request.data["id"]
-            post = models.PostModel.objects.get(id=postID)
-            serialized_post = serializers.PostSerializer(post)
+    #     if request.data["type"] == "post":
+    #         """ required: {"type", "postID" }"""
+    #         postID = request.data["id"]
+    #         post = models.PostModel.objects.get(id=postID)
+    #         serialized_post = serializers.PostSerializer(post)
 
-            instance = models.InboxObject(type="post")
-            instance.author = models.Users.objects.get(id=authorID)
-            instance.object = serialized_post.data
-            instance.save()
+    #         instance = models.InboxObject(type="post")
+    #         instance.author = models.Users.objects.get(id=authorID)
+    #         instance.object = serialized_post.data
+    #         instance.save()
 
-        elif request.data["type"] == "like":
-            """ required: {"type", "object", "actor"} """
-            actor = models.Users.objects.get(id=request.data["actor"])
-            obj_type = "comment" if (
-                "comment" in request.data["object"]) else "post"
+    #     elif request.data["type"] == "like":
+    #         """ required: {"type", "object", "actor"} """
+    #         actor = models.Users.objects.get(id=request.data["actor"])
+    #         obj_type = "comment" if (
+    #             "comment" in request.data["object"]) else "post"
 
-            like = {
-                "type": "like",
-                "author": models.Users(actor).data,
-                "summary": actor.displayName + " likes your " + obj_type,
-                "object": request.data["object"]
-            }
+    #         like = {
+    #             "type": "like",
+    #             "author": models.Users(actor).data,
+    #             "summary": actor.displayName + " likes your " + obj_type,
+    #             "object": request.data["object"]
+    #         }
 
-            instance = models.InboxObject(type="like")
-            instance.author = models.Users.objects.get(id=authorID)
-            instance.object = like
-            instance.save()
+    #         instance = models.InboxObject(type="like")
+    #         instance.author = models.Users.objects.get(id=authorID)
+    #         instance.object = like
+    #         instance.save()
 
-        elif request.data["type"] == "follow":
-            """ required: {"type", "follower"} """
-            followee = models.Users.objects.get(id=authorID)
-            follower = models.Users.objects.get(
-                authorID=request.data["follower"])
+    #     elif request.data["type"] == "follow":
+    #         """ required: {"type", "follower"} """
+    #         followee = models.Users.objects.get(id=authorID)
+    #         follower = models.Users.objects.get(
+    #             authorID=request.data["follower"])
 
-            req = {
-                "type": "follow",
-                "summary": follower.displayName + " wants to follow " + followee.displayName,
-                "actor": serializers.UserSerializer(follower).data,
-                "object": serializers.UserSerializer(followee).data
-            }
+    #         req = {
+    #             "type": "follow",
+    #             "summary": follower.displayName + " wants to follow " + followee.displayName,
+    #             "actor": serializers.UserSerializer(follower).data,
+    #             "object": serializers.UserSerializer(followee).data
+    #         }
 
-            instance = models.InboxObject(type="follow")
-            instance.author = followee
-            instance.object = req
-            instance.save()
+    #         instance = models.InboxObject(type="follow")
+    #         instance.author = followee
+    #         instance.object = req
+    #         instance.save()
 
-        return Response(serializers.InboxObjectSerializer(instance).data, status=status.HTTP_200_OK)
+    #     return Response(serializers.InboxObjectSerializer(instance).data, status=status.HTTP_200_OK)
     
 
     if(request.method == "DELETE"):
-        author = get_object_or_404(models.Users,id = authorID)
+        author = get_object_or_404(models.Users,id = author_id)
 
-        author = models.Users.objects.get(id=authorID)
+        author = models.Users.objects.get(id=author_id)
         models.InboxObject.objects.filter(author=author).delete()
 
         return Response(status=status.HTTP_200_OK)

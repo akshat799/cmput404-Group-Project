@@ -70,4 +70,5 @@ class FollowerSerializer(serializers.ModelSerializer):
 class InboxObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.InboxObject
-        fields = ["type", "author", "object"]
+        #fields = ["type", "author", "object"]
+        fields = '__all__'

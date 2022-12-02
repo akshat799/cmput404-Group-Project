@@ -31,5 +31,6 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/posts/<post_id>/comments', views.CommentViewSet),
     path('backendapi/authors/<author_id>/followers/<foreign_author_id>', views.FollowerViewSet),
     path('backendapi/authors/<author_id>/followers', views.FollowerViewSet),
+    path('backendapi/authors/<author_id>/inbox',views.InboxViewSet),
     *routes.urls
 ]
