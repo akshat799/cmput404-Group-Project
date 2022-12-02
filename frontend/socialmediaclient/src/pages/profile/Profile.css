@@ -1,39 +1,58 @@
+/** @format */
+
 .profile {
     display: flex;
 }
-.profileCover{
+
+.profileCover {
     height: 320px;
     position: relative;
     margin-left: 10%;
     margin-right: 10%;
-    padding: 10px; 
+    padding: 10px;
 }
-.profileCoverImg{
+
+.profileCoverImg {
     width: 100%;
     height: 250px;
     object-fit: cover;
 }
-.profilePhoto{
+
+.profilePhoto {
     width: 150px;
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
     position: absolute;
-    left:0;
+    left: 0;
     right: 0;
     margin: auto;
-    top:150px;
-    border:5px solid white;
+    top: 150px;
+    border: 5px solid white;
 }
-.profileInfo{
+
+.profileInfo {
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
 }
-.profileName{
+
+.profileName {
     font-size: 24px;
 }
-.profileDescription{
+
+.profileDescription {
     font-weight: 300;
+}
+
+.nameAdd {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.addIcon:hover {
+    cursor: pointer;
+    color: rgb(120, 230, 84);
 }

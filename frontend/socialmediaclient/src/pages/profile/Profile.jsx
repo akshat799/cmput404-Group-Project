@@ -1,15 +1,17 @@
-import "./Profile.css";
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import React from 'react';
+import { useSelector } from "react-redux";
 import AuthorPosts from "../../components/AuthorPosts";
 import Navbar from "../../components/Navbar";
-import { useSelector } from "react-redux";
-
+import "./Profile.css";
 export default function Profile() {
 
-  const state = useSelector((state) => state)
+  const state = useSelector((state) => state);
+  const [req, setReq] = React.useState(false);
+  const ProfilePhoto = state.auth.author.profileImage;
+  const Username = state.auth.author.displayName;
 
-  const ProfilePhoto = state.auth.author.profileImage
-  const Username = state.auth.author.displayName
-  
   return (
     <>
       <Navbar />
@@ -22,10 +24,15 @@ export default function Profile() {
         <img className="profilePhoto" src={ProfilePhoto} alt="" />
       </div>
       <div className="profileInfo">
-        <h4 className="profileName">{Username}</h4>
+        <div className='nameAdd'>
+          <h4 className="profileName">{Username} </h4>
+          {req ?
+            <PersonAddIcon color="action" sx={{ fontSize: 30 }} className="addIcon" onClick={() => { setReq(prev => !prev); }} /> : <HowToRegIcon color="action" sx={{ fontSize: 30 }} onClick={() => { setReq(prev => !prev); }} className="addIcon" />
+          }
+        </div>
         <span className="profileDescription">Welcome to my profile! </span>
       </div>
-      <AuthorPosts/>
+      <AuthorPosts />
     </>
   );
 }

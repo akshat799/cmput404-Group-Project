@@ -1,8 +1,9 @@
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginSignUpContainer from "./containers/LoginSignUpContainer";
-import Profile from "./pages/profile/Profile";
 import Home from "./pages/Home.jsx";
+import Inbox from "./pages/Inbox/Inbox";
+import Profile from "./pages/profile/Profile";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<LoginSignUpContainer />} />
           <Route exact path="/home" element={<Home />} />
           <Route exact path="/profile" element={<Profile />} />
+          <Route exact path="/inbox" element={<Inbox />} />
         </Routes>
       </div>
     </Router>
