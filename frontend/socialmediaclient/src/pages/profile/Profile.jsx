@@ -14,29 +14,9 @@ import Navbar from "../../components/Navbar";
 import "./Profile.css";
 
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 500,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
-const formStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 300,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+
+
 
 export default function Profile() {
 
@@ -48,33 +28,6 @@ export default function Profile() {
   const ProfilePhoto = state.auth.author.profileImage;
   const Username = state.auth.author.displayName;
 
-  const handleImageOpen = () => setImageOpen(true);
-  const handleFormOpen = () => setFormOpen(true);
-  const handleImageClose = () => setImageOpen(false);
-  const handleFormClose = () => setFormOpen(false);
-  const [selectedFile, setSelectedFile] = React.useState();
-  const [preview, setPreview] = React.useState();
-  React.useEffect(() => {
-    if (!selectedFile) {
-      setPreview(undefined);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
-  const onSelectFile = e => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedFile(undefined);
-      return;
-    }
-
-    // I've kept this example simple by using the first image instead of multiple
-    setSelectedFile(e.target.files[0]);
-  };
 
   return (
     <>

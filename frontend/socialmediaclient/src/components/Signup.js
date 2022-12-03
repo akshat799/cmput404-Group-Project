@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { toast } from 'react-toastify';
 import { signUp } from '../features/auth';
 
-const Signup = ( {handleChange} ) => {
+const Signup = ({ handleChange }) => {
 
     const dispatch = useDispatch();
 

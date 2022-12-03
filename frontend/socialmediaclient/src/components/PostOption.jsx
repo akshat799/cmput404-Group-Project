@@ -125,13 +125,13 @@ export default function PostOption() {
   };
 
   const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "2px solid #000",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 300,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
   };
@@ -174,13 +174,9 @@ export default function PostOption() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            style={{ textAlign: "center", color: "black" }}
-          >
+          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }}>
             <div className="option">Enter what you would like to post</div>
+
           </Typography>
           <TextField
             id="outlined-multiline-static"
@@ -188,7 +184,8 @@ export default function PostOption() {
             multiline
             rows={2}
             placeholder="write something..."
-            style={{ width: 400, marginTop: 20 }}
+            style={{ width: 280, marginTop: 20 }}
+
           />
           <Box textAlign="center" style={{ marginTop: 10 }}>
             <Button variant="contained">Post</Button>
@@ -283,5 +280,6 @@ export default function PostOption() {
         </Box>
       </Modal>
     </div>
+
   );
 }

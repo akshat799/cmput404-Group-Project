@@ -23,20 +23,8 @@ const Comment = () => {
                             luctus ut est sed faucibus. Duis bibendum ac ex vehicula laoreet.
 
                         </p>
-
-                        <p style={{ textAlign: "left", marginTop: 10 }}>
-                            <div style={{
-                                display: 'flex',
-                                gap: '5px'
-                            }}>
-                                <ThumbUpAltIcon color="primary" />
-                                <span>Michel and 26 others </span>
-                            </div>
-
-                        </p>
-                        <hr />
                         <p className="commentLikeDiv">
-                            <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>   Dislike</p>}</span>  <span>posted 1 minute ago</span>
+                            <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>Dislike</p>}</span>  <span>posted 1 minute ago</span>
                         </p>
                     </Grid>
                 </Grid>
@@ -53,17 +41,6 @@ const Comment = () => {
                             luctus ut est sed faucibus. Duis bibendum ac ex vehicula laoreet.
 
                         </p>
-                        <p style={{ textAlign: "left", marginTop: 10 }}>
-                            <div style={{
-                                display: 'flex',
-                                gap: '5px'
-                            }}>
-                                <ThumbUpAltIcon color="primary" />
-                                <span>Michel and 26 others </span>
-                            </div>
-
-                        </p>
-                        <hr />
                         <p className="commentLikeDiv">
                             <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>Dislike</p>}</span>  <span>posted 1 minute ago</span>
                         </p>
