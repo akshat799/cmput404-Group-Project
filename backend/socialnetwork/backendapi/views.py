@@ -75,40 +75,46 @@ def AuthorsListView(request):
     else:
         return response
 
-@api_view(['GET'])
+@api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def AuthorsView(request,author_id):
-    #return specific author
-    response = check_auth(request)
-    if response == None:
-        message = {"Error": "Authorization Required"}
-        return Response(message , status.HTTP_401_UNAUTHORIZED)
-    try:
-        authors = models.Users.objects.get(id=author_id)
-        serializer = serializers.UserSerializer(authors)
-        return Response(serializer.data)
-    except Exception as e:
-        message = {'error':str(e)}
-        return Response(message,status=status.HTTP_400_BAD_REQUEST)
+    if(request.method == 'GET'):
+        #return specific author
+        response = check_auth(request)
+        if response == None:
+            message = {"Error": "Authorization Required"}
+            return Response(message , status.HTTP_401_UNAUTHORIZED)
+        try:
+            authors = models.Users.objects.get(id=author_id)
+            serializer = serializers.UserSerializer(authors)
+            return Response(serializer.data)
+        except Exception as e:
+            message = {'error':str(e)}
+            return Response(message,status=status.HTTP_400_BAD_REQUEST)
+    if(request.method == 'POST'):
+        response = check_auth(request)
+        if(response != 'local' and response != 'remote'):
+            return response
+        if(response == 'remote'):
+            message = {'message','You do not have authorization to edit this profile.'}
+            return Response(message,status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            data = request.data
+            try:
+                authors = models.Users.objects.get(id=author_id)
+                authors.displayName = data['displayName']
+                authors.githubName = data['githubName']
+                authors.profileImage = data['profileImage']
+                authors.save()
+                
+                message = {'message','successfully update profile'}
+                messages.success(request,'Profile is update successfully!')
+                return Response(message,status=status.HTTP_200_OK)
+            except Exception as e:
+                message = {'error',e}
+                messages.error(request,'Fail to update profile')
+                return Response(message,status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def editProfielView(request,author_id):
-    data = request.data
-    try:        
-        authors = models.Users.objects.get(id=author_id)
-        authors.displayName = data['displayName']
-        authors.githubName = data['githubName']
-        authors.profileImage = data['profileImage']
-        authors.save()
-        
-        message = {'message','successfully update profile'}
-        messages.success(request,'Profile is update successfully!')
-        return Response(message,status=status.HTTP_200_OK)
-    except Exception as e:
-        message = {'error',e}
-        messages.error(request,'Fail to update profile')
-        return Response(message,status=status.HTTP_400_BAD_REQUEST)
 
 # @api_view(['GET'])
 # def ProfileView(request,id):

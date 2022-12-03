@@ -26,7 +26,7 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/posts/<post_id>/likes', views.LikeViewSet),
     path('backendapi/authors/<author_id>/posts/<post_id>/comments/<comment_id>/likes',views.LikeViewSet),
     path('backendapi/authors/<author_id>/liked', views.LikedViewSet),
-    path('backendapi/editprofile/<author_id>',views.editProfielView),
+    #path('backendapi/editprofile/<author_id>',views.editProfielView),
     path('backendapi/authors/', views.AuthorsListView),
     path('backendapi/authors/<author_id>/posts/<post_id>/comments', views.CommentViewSet),
     path('backendapi/authors/<author_id>/followers/<foreign_author_id>', views.FollowerViewSet),
