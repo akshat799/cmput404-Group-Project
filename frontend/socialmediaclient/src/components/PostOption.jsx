@@ -8,14 +8,25 @@ import Button from '@mui/material/Button';
 import TextField from "@mui/material/TextField";
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useSelector } from "react-redux";
+import { createNewPost } from "../features/posts";
 import "./PostOption.css";
 
 export default function PostOption() {
+
+  const state = useSelector((state) => state);
+  const dispatch = useDispatch();
+
+  const authorId = state.auth.author.id; 
 
   const [textOpen, setTextOpen] = React.useState(false);
   const [imageOpen, setImageOpen] = React.useState(false);
   const [linkOpen, setLinkOpen] = React.useState(false);
   const [markOpen, setMarkOpen] = React.useState(false);
+  const [postContent, setPostContent] = React.useState("");
+  const [postTitle, setPostTitle] = React.useState("");
+
   const handleTextOpen = () => setTextOpen(true);
   const handleImageOpen = () => setImageOpen(true);
   const handleLinkOpen = () => setLinkOpen(true);
@@ -71,6 +82,38 @@ export default function PostOption() {
     boxShadow: 24,
     p: 4,
   };
+
+  var formdata = {
+    "type" : "post",
+    "title" : "",
+    "description": "",
+    "contentType": "",
+    "categories": ["web","tutorial"],
+    "visibility": "PUBLIC",
+    "unlisted": "false",
+    "content": ""
+}
+
+  const handleTextSubmit = async() => {
+    formdata["content"] = postContent
+
+    const resp = await dispatch(createNewPost(formdata, authorId));
+  }
+  // const handleImageSubmit = async() => {
+  //   formdata["content"] = postContent
+
+  //   const resp = await dispatch(createNewPost(formdata, authorId));
+  // }
+  // const handleCommonMarkSubmit = async() => {
+  //   formdata["content"] = postContent
+
+  //   const resp = await dispatch(createNewPost(formdata, authorId));
+  // }
+  // const handleImagelinkSubmit = async() => {
+  //   formdata["content"] = postContent
+
+  //   const resp = await dispatch(createNewPost(formdata, authorId));
+  // }
   return (
     <div className="post">
       <div className="what-to-post">
@@ -109,6 +152,14 @@ export default function PostOption() {
             <div className="option">Enter what you would like to post</div>
             
           </Typography>
+          <TextField 
+            id= "title"
+            label = "Enter title"
+            placeholder="Enter the Title"
+            style={{ height: '50px', width: 400, marginTop: 10, marginBottom: 10 }}
+            value={postTitle}
+            onChange = {(e)=> setPostTitle(e.target.value)}
+          />
           <TextField
             id="outlined-multiline-static"
             label="Enter your post"
@@ -116,11 +167,12 @@ export default function PostOption() {
             rows={2}
             placeholder="write something..."
             style={{ width: 400, marginTop: 20 }}
-
+            onChange = {(e) => setPostContent(e.target.value)}
+            value = {postContent}
           />
 
           <Box textAlign='center' style={{ marginTop: 10 }}>
-            <Button variant='contained'>
+            <Button variant='contained' onClick={handleTextSubmit}>
               Post
             </Button>
           </Box>
@@ -135,7 +187,14 @@ export default function PostOption() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-
+          <TextField 
+              id= "title"
+              label = "Enter title"
+              placeholder="Enter the Title"
+              style={{ width: 400, marginTop: 20, marginBottom: 5 }}
+              value={postTitle}
+              onChange = {(e)=> setPostTitle(e.target.value)}
+            />
           <input type='file' accept="image/*" onChange={onSelectFile} />
           <Box textAlign='center' style={{ marginTop: 10 }}>
             {selectedFile && <img alt="nothing" style={{ height: '150px', width: '300px' }} src={preview} />}
@@ -160,6 +219,14 @@ export default function PostOption() {
           <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center' }}>
             Enter the Link of the Image
           </Typography>
+          <TextField 
+            id= "title"
+            label = "Enter title"
+            placeholder="Enter the Title"
+            style={{ width: 400, marginTop: 20, marginBottom: 5 }}
+            value={postTitle}
+            onChange = {(e)=> setPostTitle(e.target.value)}
+          />
           <TextField
             id="outlined-multiline-static"
             label="Enter your link"
@@ -189,8 +256,16 @@ export default function PostOption() {
       >
         <Box sx={style}>
 
-          <input type='file' />
+        <TextField 
+            id= "title"
+            label = "Enter title"
+            placeholder="Enter Title"
+            style={{ width: 400, marginTop: 20, marginBottom: 5 }}
+            value={postTitle}
+            onChange = {(e)=> setPostTitle(e.target.value)}
+          />
 
+          <input type='file' />
           <Box textAlign='center' style={{ marginTop: 10 }}>
             <Button variant='contained'>
               Post
