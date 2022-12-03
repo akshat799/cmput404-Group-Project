@@ -19,7 +19,7 @@ import { getPostLikes } from "../features/posts";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
 import "./Post.css";
-
+import PostContent from "./PostContent";
 
 const StyledMenu = styled((props) => (
   <Menu
