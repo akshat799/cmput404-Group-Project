@@ -65,7 +65,7 @@ export default function PostOption() {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 300,
+    width: 400,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -109,17 +109,18 @@ export default function PostOption() {
             <div className="option">Enter what you would like to post</div>
 
           </Typography>
-          <TextField
-            id="outlined-multiline-static"
-            label="Enter your post"
-            multiline
-            rows={2}
-            placeholder="write something..."
-            style={{ width: 280, marginTop: 20 }}
 
-          />
 
           <Box textAlign='center' style={{ marginTop: 10 }}>
+            <TextField
+              id="outlined-multiline-static"
+              label="Enter your post"
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 280, marginTop: 20, marginBottom: 15 }}
+
+            />
             <Button variant='contained'>
               Post
             </Button>
@@ -158,18 +159,19 @@ export default function PostOption() {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center' }}>
-            Enter the Link of the Image
+            <div className="option">Enter the Link of the Image</div>
           </Typography>
-          <TextField
-            id="outlined-multiline-static"
-            label="Enter your link"
-            multiline
-            rows={2}
-            placeholder="write something..."
-            style={{ width: 400, marginTop: 20 }}
-            onChange={changeLinkHandler}
-          />
+
           <Box textAlign='center' style={{ marginTop: 10 }}>
+            <TextField
+              id="outlined-multiline-static"
+              label="Enter your link"
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 280, marginTop: 20, marginBottom: 15 }}
+              onChange={changeLinkHandler}
+            />
             {<img alt="Enter correct link" style={{ height: '150px', width: '300px' }} src={linkPreview} />}
           </Box>
           <Box textAlign='center' style={{ marginTop: 10 }}>
