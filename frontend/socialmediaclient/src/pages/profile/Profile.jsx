@@ -5,12 +5,19 @@ import { useSelector } from "react-redux";
 import AuthorPosts from "../../components/AuthorPosts";
 import Navbar from "../../components/Navbar";
 import "./Profile.css";
+
+
+
+
+
+
 export default function Profile() {
 
   const state = useSelector((state) => state);
   const [req, setReq] = React.useState(false);
   const ProfilePhoto = state.auth.author.profileImage;
   const Username = state.auth.author.displayName;
+
 
   return (
     <>
