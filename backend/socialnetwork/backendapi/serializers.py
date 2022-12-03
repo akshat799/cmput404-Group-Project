@@ -43,12 +43,23 @@ class RegisterSerializer(UserSerializer):
         except ObjectDoesNotExist:
             user = models.Users.objects.create_user(**validated_data)
         return user
+class LimitedAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Users
+        fields = ['id','host','displayName','url',
+        'githubName','profileImage', 'type']
+        extra_kwargs = {
+            'type': {'read_only': True},
+            'id': {'read_only': True},
+        }
 
 
 class PostSerializer(serializers.ModelSerializer):
+    author =  LimitedAuthorSerializer(required=False, many=False, allow_null=True)
     class Meta:
         model = models.PostModel
         fields = '__all__'
+
 class LikesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.LikeModel

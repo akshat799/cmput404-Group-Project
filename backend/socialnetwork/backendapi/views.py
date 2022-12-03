@@ -544,6 +544,7 @@ def CommentViewSet(request, author_id, post_id):
             if page == None:
                 page = 1
             size = paginator_reulst.get("count")
+            #print(str(serializer.data["author"]))
             comments = serializer.data
             result = {
                     "type": "comments",
@@ -607,9 +608,19 @@ def CommentViewSet(request, author_id, post_id):
             # add this comment to the post's owner's inbox
             models.InboxObject.objects.create(
             author= receiver_url,
+            #object = responseData
             object= {
                 "type" : "comment",
-                "author" : author.url,
+                #"author" : authorData,
+                "author" : {
+                "type": author.type,
+                "id": str(author.id),
+                "host": author.host,
+                "displayName": author.displayName,
+                "url": author.url,
+                "github": f'http://github.com/{author.githubName}',
+                "profileImage": author.profileImage
+                },
                 "comment" : serializer.data["comment"],
                 "contentType" : serializer.data["contentType"],
                 "published" : serializer.data["published"],
