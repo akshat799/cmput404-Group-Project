@@ -61,8 +61,6 @@ class Users(AbstractBaseUser, PermissionsMixin):
     displayName = models.CharField(max_length=200, default="")
     githubName = models.CharField(max_length = 100,verbose_name='githubName',default="",blank=True)
     profileImage = models.URLField(max_length=500,default="https://cdn.pixabay.com/photo/2017/07/18/23/23/user-2517433_1280.png")
-    
-    
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -171,17 +169,21 @@ class CommentModel(models.Model):
         ordering = ['published']
         db_table = 'commentInformation'
 
-# class FriendModel(models.Model):
+
+# class FriendRequest(models.Model):
+#     type = models.CharField(max_length=6, default="Follow")
 #     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     user1 = models.CharField(max_length=40)
-#     user2 = models.CharField(max_length=40)
-#     #local = models.BooleanField(default=True)
+#     summary = models.CharField(max_length=200)
+#     actor = models.ForeignKey(Users, related_name='sent_friend_request', on_delete = models.CASCADE, blank=True, null=True)
+#     object = models.ForeignKey(Users, related_name='recieve_friend_request', on_delete = models.CASCADE, blank=True, null=True)
+#     def __str__(self):
+#         return self.summary
 
 class FollowerModel(models.Model):
     id = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False)
     type = models.CharField(max_length = 20, default = 'follow')
-    follower = models.ForeignKey(Users, related_name = ("follower"), on_delete = models.CASCADE)
-    followedAuthor = models.ForeignKey(Users, related_name = "followedAuthor", on_delete = models.CASCADE)
+    follower = models.ForeignKey(Users, related_name = "followers", on_delete = models.CASCADE)
+    followedAuthor = models.ForeignKey(Users, related_name = "followedAuthors", on_delete = models.CASCADE)
     true_friends = models.BooleanField(default = False)
 
     class Meta:

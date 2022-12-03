@@ -520,12 +520,7 @@ def LikedViewSet(requests,author_id):
 
 
 
-class UUIDEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, UUID):
-            # if the obj is uuid, we simply return the value of uuid
-            return obj.hex
-        return json.JSONEncoder.default(self, obj)
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -596,7 +591,7 @@ def CommentViewSet(request, author_id, post_id):
             com_obj.url_id = comments_url
             com_obj.save(update_fields=["url_id"])
 
-            message = json.dumps(responseData, cls=UUIDEncoder)
+
             # try to add comment in post table
             post.comments = f"{url}/authors/{post.author.id}/posts/{post.id}/comments"
             post.count += 1
@@ -614,12 +609,14 @@ def CommentViewSet(request, author_id, post_id):
                 "published" : serializer.data["published"],
                 "id": comments_id,
                 "url_id" : comments_url,
+                "summary": str(author.displayName) + " comments on your post " + str(post.title) 
             }
             )
             return Response(responseData, status = status.HTTP_200_OK)
         except Exception as e:
             data = {'error' : str(e)}
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -630,12 +627,12 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
             try:
                 followers = models.FollowerModel.objects.filter(followedAuthor = author_id)
                 serializer = serializers.FollowerSerializer(followers, many = True)
-                print('PRINTING SERIALZER DATA : ',serializer.data)
+                #print('PRINTING SERIALZER DATA : ',serializer.data)
                 authorList = []
                 for follower in serializer.data:
-                    print(follower)
-                    author = get_object_or_404(models.Users, id = follower.follower_id)
-                    print(author)
+                    #print(follower['follower'])
+                    author = get_object_or_404(models.Users, id = follower['follower'])
+                    #print(author)
                     authorData = {
                         "type": author.type,
                         "id": author.id,
@@ -671,16 +668,18 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
 
         elif(request.method == 'PUT'):
             try:
-                data = request.body
-                jsonResponse = json.loads(data.decode('utf-8'))
-                author = models.Users.objects.get(id = foreign_author_id)
-                jsonResponse.update({"followedAuthor" : author_id, "follower" : foreign_author_id})
-                serializer = serializers.FollowerSerializer(data = jsonResponse)
-                serializer.is_valid(raise_exception = True)
-                serializer.save()
+                #check if it's follow himself
+                if author_id == foreign_author_id:
+                    return Response("You cannot follow yourself", status=400)
+                #check if already follow this author
+                if models.FollowerModel.objects.filter(follower = foreign_author_id, followedAuthor = author_id).exists():
+                    result = {
+                        "detail": "You already followed this use!"
+                    }
+                    return Response(result,status=status.HTTP_400_BAD_REQUEST)
                 follower = get_object_or_404(models.Users, id = foreign_author_id)
                 followedAuthor = models.Users.objects.get(id = author_id)
-
+                models.FollowerModel.objects.create(follower = follower,followedAuthor=followedAuthor)
                 followerData = {
                     "type": follower.type,
                     "id": follower.id,
@@ -706,13 +705,16 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                     "follower" : followerData,
                     "followed author" : followedAuthorData
                 }
-                return Response(returnVal, status = status.HTTP_201_CREATED)
+                result={
+                    "detail": "Following request has been accpected! "+str(follower.displayName) +" is now following you! "
+                    }
+                return Response(result, status = status.HTTP_201_CREATED)
             except Exception as e:
                 data = {'error' : str(e)}
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
         elif(request.method == 'DELETE'):
-            
+            #unfollow the author
             try:
                 follow = get_object_or_404(models.FollowerModel, follower = foreign_author_id, followedAuthor = author_id)
                 print('FOLLOW OBJECT:', follow)
@@ -745,14 +747,6 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
 #             return posts_list  
 #     return posts_list
 
-def author_not_found(authorID):
-    """ check existence of an author """
-    try:
-        if models.Users.objects.get(id=authorID):
-            return False
-    except models.Users.DoesNotExist:
-        return True
-
 
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -776,63 +770,72 @@ def InboxViewSet(request,author_id):
             return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
     
-    # if(request.method == "POST"):
-    #     author = get_object_or_404(models.Users,id = authorID)
+    if(request.method == "POST"):
+        author = get_object_or_404(models.Users,id = author_id)
 
-    #     if request.data["type"] == "post":
-    #         """ required: {"type", "postID" }"""
-    #         postID = request.data["id"]
-    #         post = models.PostModel.objects.get(id=postID)
-    #         serialized_post = serializers.PostSerializer(post)
+        # if request.data["type"] == "post":
+        #     """ required: {"type", "postID" }"""
+        #     postID = request.data["id"]
+        #     post = models.PostModel.objects.get(id=postID)
+        #     serialized_post = serializers.PostSerializer(post)
 
-    #         instance = models.InboxObject(type="post")
-    #         instance.author = models.Users.objects.get(id=authorID)
-    #         instance.object = serialized_post.data
-    #         instance.save()
+        #     instance = models.InboxObject(type="post")
+        #     instance.author = models.Users.objects.get(id=author_id)
+        #     instance.object = serialized_post.data
+        #     instance.save()
 
-    #     elif request.data["type"] == "like":
-    #         """ required: {"type", "object", "actor"} """
-    #         actor = models.Users.objects.get(id=request.data["actor"])
-    #         obj_type = "comment" if (
-    #             "comment" in request.data["object"]) else "post"
+        # elif request.data["type"] == "like":
+        #     """ required: {"type", "object", "actor"} """
+        #     actor = models.Users.objects.get(id=request.data["actor"])
+        #     obj_type = "comment" if (
+        #         "comment" in request.data["object"]) else "post"
 
-    #         like = {
-    #             "type": "like",
-    #             "author": models.Users(actor).data,
-    #             "summary": actor.displayName + " likes your " + obj_type,
-    #             "object": request.data["object"]
-    #         }
+        #     like = {
+        #         "type": "like",
+        #         "author": models.Users(actor).data,
+        #         "summary": actor.displayName + " likes your " + obj_type,
+        #         "object": request.data["object"]
+        #     }
 
-    #         instance = models.InboxObject(type="like")
-    #         instance.author = models.Users.objects.get(id=authorID)
-    #         instance.object = like
-    #         instance.save()
+        #     instance = models.InboxObject(type="like")
+        #     instance.author = models.Users.objects.get(id=author_id)
+        #     instance.object = like
+        #     instance.save()
 
-    #     elif request.data["type"] == "follow":
-    #         """ required: {"type", "follower"} """
-    #         followee = models.Users.objects.get(id=authorID)
-    #         follower = models.Users.objects.get(
-    #             authorID=request.data["follower"])
+        if request.data["type"].lower() == "follow":
+            """ required: {"type", "follower"} """
+            author_name = str(author.displayName)
+            follower_url = request.data['object']['id']
+            follower_uuid = follower_url.split('authors/')[1]
+            follower_obj = get_object_or_404(models.Users,id = follower_uuid)
+            
+            #check if its already a follower
+            if models.FollowerModel.objects.filter(follower = follower_uuid, followedAuthor = author_id).exists():
+                result = {
+                    "detail": str(follower_obj.displayName) +" is already following "+ author_name
+                }
+                return Response(result,status=status.HTTP_400_BAD_REQUEST)
+            # add follow request to the author' inbox
+            models.InboxObject.objects.create(
+            author= author.url,
+            object= {
+                "type" : "follow",
+                "summary" : str(follower_obj.displayName) + " wants to follow " + author_name,
+                "actor": serializers.UserSerializer(follower_obj).data,
+                "object":serializers.UserSerializer(author).data
+            }
+            )
+            result={
+                "detail": str(follower_obj.displayName) +" sent a follow request to "+ author_name
+            }
 
-    #         req = {
-    #             "type": "follow",
-    #             "summary": follower.displayName + " wants to follow " + followee.displayName,
-    #             "actor": serializers.UserSerializer(follower).data,
-    #             "object": serializers.UserSerializer(followee).data
-    #         }
-
-    #         instance = models.InboxObject(type="follow")
-    #         instance.author = followee
-    #         instance.object = req
-    #         instance.save()
-
-    #     return Response(serializers.InboxObjectSerializer(instance).data, status=status.HTTP_200_OK)
+        return Response(result, status=status.HTTP_200_OK)
     
 
     if(request.method == "DELETE"):
         author = get_object_or_404(models.Users,id = author_id)
 
-        author = models.Users.objects.get(id=author_id)
-        models.InboxObject.objects.filter(author=author).delete()
+        #author = models.Users.objects.get(id=author_id)
+        models.InboxObject.objects.filter(author=author.url).delete()
 
         return Response(status=status.HTTP_200_OK)
