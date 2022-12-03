@@ -129,7 +129,7 @@ export default function PostOption() {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 300,
+    width: 400,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -178,17 +178,21 @@ export default function PostOption() {
             <div className="option">Enter what you would like to post</div>
 
           </Typography>
-          <TextField
-            id="outlined-multiline-static"
-            label="Enter your post"
-            multiline
-            rows={2}
-            placeholder="write something..."
-            style={{ width: 280, marginTop: 20 }}
 
-          />
-          <Box textAlign="center" style={{ marginTop: 10 }}>
-            <Button variant="contained">Post</Button>
+
+          <Box textAlign='center' style={{ marginTop: 10 }}>
+            <TextField
+              id="outlined-multiline-static"
+              label="Enter your post"
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 280, marginTop: 20, marginBottom: 15 }}
+
+            />
+            <Button variant='contained'>
+              Post
+            </Button>
           </Box>
         </Box>
       </Modal>

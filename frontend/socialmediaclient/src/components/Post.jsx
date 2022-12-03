@@ -210,6 +210,10 @@ export default function Post({ post, comp }) {
               placeholder="write something..."
               style={{ width: 330, marginTop: 10, marginBottom: 10 }}
             />
+            <div className="option">Upload File</div>
+            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
+              <input type='file' />
+            </Box>
           </Typography>
 
 
