@@ -1,8 +1,13 @@
 import { Avatar, Grid, Paper } from "@material-ui/core";
 import React from 'react';
+import './Comment.css';
 const Comment = () => {
     const imgLink =
         "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
+    const [commentLike, setCommentLike] = React.useState(true);
+    const handleLike = () => {
+        setCommentLike((prevState) => !prevState);
+    };
     return (
         <>
             <Paper style={{ padding: "10px 10px", marginTop: 60 }}>
@@ -17,8 +22,8 @@ const Comment = () => {
                             luctus ut est sed faucibus. Duis bibendum ac ex vehicula laoreet.
 
                         </p>
-                        <p style={{ textAlign: "left", color: "gray" }}>
-                            posted 1 minute ago
+                        <p className="commentLikeDiv">
+                            <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>Dislike</p>}</span>  <span>posted 1 minute ago</span>
                         </p>
                     </Grid>
                 </Grid>
@@ -35,8 +40,8 @@ const Comment = () => {
                             luctus ut est sed faucibus. Duis bibendum ac ex vehicula laoreet.
 
                         </p>
-                        <p style={{ textAlign: "left", color: "gray" }}>
-                            posted 1 minute ago
+                        <p className="commentLikeDiv">
+                            <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>Dislike</p>}</span>  <span>posted 1 minute ago</span>
                         </p>
                     </Grid>
                 </Grid>
