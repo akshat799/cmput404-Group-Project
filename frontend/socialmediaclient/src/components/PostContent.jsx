@@ -45,7 +45,8 @@ function PostContent(post) {
         ) : textType === "markdown" ? (
           <ReactMarkdown>{content}</ReactMarkdown>
         ) : (
-          <div dangerouslySetInnerHTML={createHTML()}></div>
+          // <div dangerouslySetInnerHTML={createHTML()}></div>
+          <div>{content.replace(/(<([^>]+)>)/gi, "")} </div>
         )
       ) : otherType === "application" ? (
         <div>{atob(content)}</div>

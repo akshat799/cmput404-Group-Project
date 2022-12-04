@@ -51,6 +51,7 @@ export default function PostOption() {
   };
 
 
+  const [contentType, setContentType] = React.useState("");
   const handleTextOpen = () => setTextOpen(true);
   const handleImageOpen = () => setImageOpen(true);
   const handleMarkOpen = () => setMarkOpen(true);
@@ -145,13 +146,13 @@ export default function PostOption() {
   };
 
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
   };
@@ -505,6 +506,5 @@ export default function PostOption() {
         </Box>
       </Modal>
     </div>
-
   );
 }
