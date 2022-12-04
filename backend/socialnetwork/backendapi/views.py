@@ -890,11 +890,14 @@ def InboxViewSet(request,author_id):
     if(request.method == "GET"):
         try:
             author = get_object_or_404(models.Users,id = author_id)
-            queryset = models.InboxObject.objects.filter(author=author.url)
+            queryset = models.InboxObject.objects.filter(author=author)
             pagination = CustomPagiantor()
             qs = pagination.paginate_queryset(queryset, request)
             serializer = serializers.InboxObjectSerializer(qs, many=True)
 
+            # for io in serializer.data:
+            #     print(json.loads(io["object"]))
+            #print(json.loads(serializer.data["object"]))
             res = {
                 "type": "inbox",
                 "author": author.url,
