@@ -9,6 +9,7 @@ import "./Post.css";
 import { getPostLikes } from "../features/posts";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import PostContent from "./PostContent";
 
 export default function Post({ post }) {
   const state = useSelector((state) => state);
@@ -52,6 +53,7 @@ export default function Post({ post }) {
       </div>
       <div className="postCenter">
         <span className="postText">{post?.title}</span>
+        <PostContent contentType={post}/>
         <img className="postImg" src={post?.img} alt="" />
         <span className="postText">{post?.description}</span>
       </div>
