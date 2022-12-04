@@ -56,3 +56,7 @@
     cursor: pointer;
     color: rgb(120, 230, 84);
 }
+
+.profilePhoto {
+    cursor: pointer;
+}
