@@ -13,6 +13,9 @@ export const authorSlice = createSlice({
     updatePosts: (state, action) => {
       state.posts = action.payload;
     },
+    addPost : (state, action) => {
+      state.posts = [action.payload, ...state.posts];
+    }
   },
 });
 
@@ -29,6 +32,15 @@ export const getAuthorPosts = (data) => async (dispatch) => {
   }
 };
 
-export const { updatePosts } = authorSlice.actions;
+export const makePost = (data, author_id) => async (dispatch) => {
+  try{
+    const res = await api.createNewPost(data, author_id);
+    console.log(res);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export const { updatePosts, addPost } = authorSlice.actions;
 
 export default authorSlice.reducer;
