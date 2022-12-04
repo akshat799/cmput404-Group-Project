@@ -214,6 +214,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                             post = models.PostModel.objects.get(id=post_id,visibility='PUBLIC', author = author)
                             serializer = serializers.PostSerializer(post)
                             serial_data = serializer.data
+                            serial_data["id"] = url + f'/authors/{post.author.id}/posts/{serial_data["post"]}'
                             serial_data["author"] = {
                                 "type": post.author.type,
                                 "id": f'{url}/authors/{post.author.id}',
@@ -231,9 +232,9 @@ def PostViewSet(request,author_id = None,post_id = None):
                                 posts = json.loads(r.content)['items']
                                 print(grp17_url + f'authors/{author_id}/posts/{post_id}')
                                 return Response(posts , status=status.HTTP_200_OK )
-                            except http.Http404 as e:
-                                message = {'error':str(e)}
-                                return Response(message , status.HTTP_404_NOT_FOUND)
+                            # except http.Http404 as e:
+                            #     message = {'error':str(e)}
+                            #     return Response(message , status.HTTP_404_NOT_FOUND)
                             except Exception as e:
                                 message = {'error':str(e)}
                                 return Response(message , status.HTTP_400_BAD_REQUEST)
@@ -249,6 +250,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                             data = serializer.data
 
                             for entry in data:
+                                entry["id"] = url + f'/authors/{author_id}/posts/{entry["id"]}'
                                 entry["author"] = {
                                     "type": author.type,
                                     "id": f'{url}/authors/{author.id}',
@@ -277,15 +279,31 @@ def PostViewSet(request,author_id = None,post_id = None):
                 try:
                     post_obj = models.PostModel.objects.filter(visibility='PUBLIC')
                     serializer =  serializers.PostSerializer(post_obj,many=True)
-                    posts_all = []
+
+                    data = serializer.data
+
+                    for entry in data:
+                        entry["id"] = url + f'/authors/{entry["author"]}/posts/{entry["id"]}'
+                        author = get_object_or_404(models.Users , id = entry["author"])
+                        print(entry["author"])
+                        entry["author"] = {
+                            "type": author.type,
+                            "id": f'{url}/authors/{str(author.id)}',
+                            "host": author.host,
+                            "displayName": author.displayName,
+                            "url": author.url,
+                            "github": f'http://github.com/{author.githubName}',
+                            "profileImage": author.profileImage
+                        }
+
                     if(response == 'local'):
                         try:
                             r = requests.get(grp17_url+"/posts",auth=HTTPBasicAuth(grp17_username,grp17_password))
-                            posts_all.append(json.loads(r.content)['items'])
+                            posts_all = json.loads(r.content)['items']
                         except Exception as e:
+                            posts_all = []
                             return posts_all
-                        #posts_all = get_foreign_posts_t17()
-                        #print(posts_all)
+
                         all_data = serializer.data + posts_all
 
                     else:
@@ -314,7 +332,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                 postData.update({"author": author})
                 serializer.update(post,postData)
                 data = serializer.data
-                data["id"] = post_id
+                data["id"] = url + f'/authors/{author_id}/posts/{data["id"]}'
                 data["author"] = {
                     "type": author.type,
                     "id": author.id,
@@ -333,6 +351,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 data = serializer.data
+                data["id"] = url + f'/authors/{author_id}/posts/{data["id"]}'
                 data["author"] = {
                     "type": author.type,
                     "id": author.id,
@@ -359,6 +378,7 @@ def PostViewSet(request,author_id = None,post_id = None):
             postData.update({"author": author})
             serializer.update(instance , postData)
             data = serializer.data
+            data["id"] = url + f'/authors/{author_id}/posts/{data["id"]}'
             data["author"] = {
                 "type": author.type,
                 "id": author.id,
@@ -403,20 +423,24 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
             elif post_id == None:
                 postData = request.data
                 author = get_object_or_404(models.Users,id=postData["author"])
+    
                 if("comment" not in postData):                  
                     postData["object"] =  url + f"/authors/{author.id}/posts/{postData['post']}"
                 elif("comment" in postData):
                     postData["object"] =  url + f"/authors/{author.id}/posts/{postData['post']}/comments/{postData['comment']}"
+                
                 postData["author"] = author_id
+
 
                 serializer = serializers.LikesSerializer(data=postData)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
 
                 data = serializer.data
+
                 data["author"] = {
                     "type": author.type,
-                    "id": author.id,
+                    "id": str(author.id),
                     "host": author.host,
                     "displayName": author.displayName,
                     "url": author.url,
@@ -428,31 +452,35 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                 data.pop("comment")
                 data.pop("id")
 
-                #send like to inbox
-                actorName = author.displayName
-                summary = str(actorName) + 'liked your post'
-                #get post' author
-                post = models.PostModel.objects.get(id=post_id)
-                receiver_url = f"{url}/authors/{post.author.id}"
-                post_url = url + f"/authors/{author.id}/posts/{postData['post']}"
-                # add this like to the post's owner's inbox
-                models.InboxObject.objects.create(
-                author= receiver_url,
-                object={
-                    "type" : "like",
-                    "summary":summary,
-                    "author" : author.url,
-                    "object": post_url,
+                try:
+                    inbox = models.InboxObject.objects.get(author = author_id)
+                    data_list = []
+                    data_list.append(json.dumps(data))
+                    inbox.object = inbox.object + data_list
+                    inbox.save(update_fields=["object"])
+
+                except Exception as e:
+                    inboxAuthor = get_object_or_404(models.Users , id = author_id)
+                    inbox = {
+                        "type" : "inbox",
+                        "author" : inboxAuthor.id,
+                        "object" : [json.dumps(data , indent=10)]
                     }
-                )
+
+                    inboxSerializer = serializers.InboxObjectSerializer(data = inbox)
+                    inboxSerializer.is_valid(raise_exception = True)
+                    inboxSerializer.save()
+               
                 return Response(data , status=status.HTTP_201_CREATED)
+
         elif(request.method == 'GET'):
             if post_id != None:
                 if comment_id != None:
                     likes = models.LikeModel.objects.filter(post = post_id , comment = comment_id)
                     serializer = serializers.LikesSerializer(likes,many=True)
                     data = serializer.data
-                    for entry in data:
+                    
+                    for entry in data:   
                         newAuthor = get_object_or_404(models.Users,id = entry["author"])
                         entry["author"] = {
                             "type": newAuthor.type,
@@ -463,23 +491,30 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                             "github": f'http://github.com/{newAuthor.githubName}',
                             "profileImage": newAuthor.profileImage
                         }
+                            
                     return Response(data, status=status.HTTP_200_OK)
+
                 elif comment_id == None:
                     likes = models.LikeModel.objects.filter(post = post_id)
                     serializer = serializers.LikesSerializer(likes,many=True)
                     data = serializer.data
+                    all_nonComment = []
+
                     for entry in data:
-                        newAuthor = get_object_or_404(models.Users,id = entry["author"])
-                        entry["author"] = {
-                            "type": newAuthor.type,
-                            "id": newAuthor.id,
-                            "host": newAuthor.host,
-                            "displayName": newAuthor.displayName,
-                            "url": newAuthor.url,
-                            "github": f'http://github.com/{newAuthor.githubName}',
-                            "profileImage": newAuthor.profileImage
-                        }          
-                    return Response(data, status=status.HTTP_200_OK)
+                        if(entry["comment"] is None):
+                            newAuthor = get_object_or_404(models.Users,id = entry["author"])
+                            entry["author"] = {
+                                "type": newAuthor.type,
+                                "id": newAuthor.id,
+                                "host": newAuthor.host,
+                                "displayName": newAuthor.displayName,
+                                "url": newAuthor.url,
+                                "github": f'http://github.com/{newAuthor.githubName}',
+                                "profileImage": newAuthor.profileImage
+                            } 
+                            all_nonComment.append(entry)   
+
+                    return Response(all_nonComment, status=status.HTTP_200_OK)
             elif post_id == None:
                 data = {'error': 'This method is not allowed'}
                 return Response(data , status = status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -524,10 +559,6 @@ def LikedViewSet(requests,author_id):
         return Response(data,status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def CommentViewSet(request, author_id, post_id):
@@ -537,24 +568,44 @@ def CommentViewSet(request, author_id, post_id):
     if(request.method == 'GET'):
         try:
             comments = models.CommentModel.objects.filter(post = post_id)
+            post = get_object_or_404(models.PostModel , id = post_id)
+
             result_page = paginator.paginate_queryset(comments, request)
             serializer = serializers.CommentSerializer(result_page, many = True)
-            paginator_reulst = paginator.get_paginated_response(serializer.data).data
-            page = paginator_reulst.get("page")
+            paginator_result = paginator.get_paginated_response(serializer.data).data
+            page = paginator_result.get("page")
             if page == None:
                 page = 1
-            size = paginator_reulst.get("count")
-            #print(str(serializer.data["author"]))
+            size = paginator_result.get("count")
+            
             comments = serializer.data
+
+            for entry in comments:
+                commentAuthor = get_object_or_404(models.Users , id = entry["author"])
+                entry["id"] = url + f'/authors/{post.author.id}/posts/{post_id}/comments/{entry["id"]}'
+
+                entry["author"] = {
+                    "type": commentAuthor.type,
+                    "id": commentAuthor.id,
+                    "host": commentAuthor.host,
+                    "displayName": commentAuthor.displayName,
+                    "url": commentAuthor.url,
+                    "github": f'http://github.com/{commentAuthor.githubName}',
+                    "profileImage": commentAuthor.profileImage
+                }
+
+                entry.pop("post")
+                
+
             result = {
                     "type": "comments",
                     "page": page,
                     "size": size,
-                    "post": post_id,
+                    "post": url + f'/authors/{post.author.id}/posts/{post_id}',
                     "id": post_id + "/comments",
                     'comments': comments
             }
-            # return Response(serializer.data, status = status.HTTP_200_OK)
+            
             return Response(result, status = status.HTTP_200_OK)
         except Exception as e:
             data = {'error' : str(e)}
@@ -568,10 +619,12 @@ def CommentViewSet(request, author_id, post_id):
             serializer = serializers.CommentSerializer(data = data)
             serializer.is_valid(raise_exception = True)
             serializer.save()
+
+            commentData = serializer.data
             #this is the author who made the comment
-            authorData = {
+            commentData["author"] = {
                 "type": author.type,
-                "id": author.id,
+                "id": str(author.id),
                 "host": author.host,
                 "displayName": author.displayName,
                 "url": author.url,
@@ -582,54 +635,82 @@ def CommentViewSet(request, author_id, post_id):
 
             #get post origin author for post id
             post = models.PostModel.objects.get(id=post_id)
-            print(post.author.displayName)
-            comments_id = serializer.data["id"]
-            comments_url = f"{url}/authors/{post.author.id}/posts/{post.id}/comments/{comments_id}"
-            responseData = {
-                "type" : "comment",
-                "author" : authorData,
-                "comment" : serializer.data["comment"],
-                "contentType" : serializer.data["contentType"],
-                "published" : serializer.data["published"],
-                "id": comments_id,
-                "url_id" : comments_url,
-            }
-            com_obj = models.CommentModel.objects.get(id=comments_id)
-            com_obj.url_id = comments_url
-            com_obj.save(update_fields=["url_id"])
-
 
             # try to add comment in post table
-            post.comments = f"{url}/authors/{post.author.id}/posts/{post.id}/comments"
+            if(post.comments is None):
+                post.comments = f"{url}/authors/{post.author.id}/posts/{post.id}/comments"
+                updateField = ["comments", "count"]
+            else:
+                updateField = ["count"]
+            
+            commentData["post"] = url + f'/authors/{post.author.id}/posts/{post_id}'
             post.count += 1
-            post.save(update_fields=["comments","count"])
-            receiver_url = f"{url}/authors/{post.author.id}"
+            post.save(update_fields= updateField)
             
             # add this comment to the post's owner's inbox
-            models.InboxObject.objects.create(
-            author= receiver_url,
-            #object = responseData
-            object= {
-                "type" : "comment",
-                #"author" : authorData,
-                "author" : {
-                "type": author.type,
-                "id": str(author.id),
-                "host": author.host,
-                "displayName": author.displayName,
-                "url": author.url,
-                "github": f'http://github.com/{author.githubName}',
-                "profileImage": author.profileImage
-                },
-                "comment" : serializer.data["comment"],
-                "contentType" : serializer.data["contentType"],
-                "published" : serializer.data["published"],
-                "id": comments_id,
-                "url_id" : comments_url,
-                "summary": str(author.displayName) + " comments on your post " + str(post.title) 
-            }
-            )
-            return Response(responseData, status = status.HTTP_200_OK)
+            if(post.visibility == "FRIENDS"):
+                try:
+                    inboxreceiver = models.InboxObject.objects.get(author = post.author.id)
+                    data_listreceiver = []
+                    data_listreceiver.append(json.dumps(commentData))
+                    inboxreceiver.object = inboxreceiver.object + data_listreceiver
+                    inboxreceiver.save(update_fields=["object"])
+                
+                except Exception as e:
+                    inboxAuthorreceiver = get_object_or_404(models.Users , id = author_id)
+                    inboxReciever = {
+                        "type" : "inbox",
+                        "author" : inboxAuthorreceiver.id,
+                        "object" : [json.dumps(commentData , indent=10)]
+                    }
+
+                    inboxrecieverSerializer = serializers.InboxObjectSerializer(data = inboxReciever)
+                    inboxrecieverSerializer.is_valid(raise_exception = True)
+                    inboxrecieverSerializer.save()
+
+                try:
+                    inboxsender = models.InboxObject.objects.get(author = author_id)
+                    data_listsender = []
+                    data_listsender.append(json.dumps(commentData))
+                    inboxsender.object = inboxsender.object + data_listsender
+                    inboxsender.save(update_fields=["object"])
+                
+                except Exception as e:
+                    inboxAuthorsender = get_object_or_404(models.Users , id = author_id)
+                    inboxSender = {
+                        "type" : "inbox",
+                        "author" : inboxAuthorsender.id,
+                        "object" : [json.dumps(commentData , indent=10)]
+                    }
+
+                    inboxsenderSerializer = serializers.InboxObjectSerializer(data = inboxSender)
+                    inboxsenderSerializer.is_valid(raise_exception = True)
+                    inboxsenderSerializer.save()
+
+            # models.InboxObject.objects.create(
+            # author= receiver_url,
+            # #object = responseData
+            # object= {
+            #     "type" : "comment",
+            #     #"author" : authorData,
+            #     "author" : {
+            #     "type": author.type,
+            #     "id": str(author.id),
+            #     "host": author.host,
+            #     "displayName": author.displayName,
+            #     "url": author.url,
+            #     "github": f'http://github.com/{author.githubName}',
+            #     "profileImage": author.profileImage
+            #     },
+            #     "comment" : serializer.data["comment"],
+            #     "contentType" : serializer.data["contentType"],
+            #     "published" : serializer.data["published"],
+            #     "id": comments_id,
+            #     "url_id" : comments_url,
+            #     "summary": str(author.displayName) + " comments on your post " + str(post.title) 
+            # }
+            # )
+            return Response(commentData, status = status.HTTP_200_OK)
         except Exception as e:
             data = {'error' : str(e)}
             return Response(data, status = status.HTTP_400_BAD_REQUEST)

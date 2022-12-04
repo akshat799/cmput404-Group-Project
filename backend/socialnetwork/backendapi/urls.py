@@ -22,7 +22,7 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/posts/', views.PostViewSet),
     path('backendapi/authors/posts/', views.PostViewSet),
     #add slash on the end as sample for post like
-    path('backendapi/authors/<author_id>/inbox/', views.LikeViewSet),
+    path('backendapi/authors/<author_id>/inbox/like', views.LikeViewSet),
     path('backendapi/authors/<author_id>/posts/<post_id>/likes', views.LikeViewSet),
     path('backendapi/authors/<author_id>/posts/<post_id>/comments/<comment_id>/likes',views.LikeViewSet),
     path('backendapi/authors/<author_id>/liked', views.LikedViewSet),
@@ -31,6 +31,6 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/posts/<post_id>/comments', views.CommentViewSet),
     path('backendapi/authors/<author_id>/followers/<foreign_author_id>', views.FollowerViewSet),
     path('backendapi/authors/<author_id>/followers', views.FollowerViewSet),
-    path('backendapi/authors/<author_id>/inbox',views.InboxViewSet),
+    # path('backendapi/authors/<author_id>/inbox',views.InboxViewSet),
     *routes.urls
 ]

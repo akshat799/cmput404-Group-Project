@@ -152,7 +152,7 @@ class PostModel(models.Model):
 class CommentModel(models.Model):
     # ID of the Comment (UUID)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    url_id = models.URLField(blank=True)
+    type = models.CharField(default="comment",editable=False , max_length =300) 
     post = models.ForeignKey(PostModel, on_delete=models.CASCADE)
     author = models.ForeignKey(Users, on_delete=models.PROTECT)
     
@@ -215,8 +215,8 @@ def default_list():
 ######### InboxObject #########
 class InboxObject(models.Model):
     type = models.CharField(default="inbox", max_length=100)
-    #author = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True)
-    author = models.CharField(max_length=256, default="")
+    author = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True)
+    # author = models.CharField(max_length=256, default="")
     object = models.JSONField(null=True, blank=True,default=default_list)
 
 class Node(models.Model):
