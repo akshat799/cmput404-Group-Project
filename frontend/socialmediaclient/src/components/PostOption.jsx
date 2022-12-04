@@ -148,18 +148,10 @@ export default function PostOption() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color:'black' }}>
+          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }}>
             <div className="option">Enter what you would like to post</div>
-            
+
           </Typography>
-          <TextField 
-            id= "title"
-            label = "Enter title"
-            placeholder="Enter the Title"
-            style={{ height: '50px', width: 400, marginTop: 10, marginBottom: 10 }}
-            value={postTitle}
-            onChange = {(e)=> setPostTitle(e.target.value)}
-          />
           <TextField
             id="outlined-multiline-static"
             label="Enter your post"
@@ -167,12 +159,11 @@ export default function PostOption() {
             rows={2}
             placeholder="write something..."
             style={{ width: 400, marginTop: 20 }}
-            onChange = {(e) => setPostContent(e.target.value)}
-            value = {postContent}
+
           />
 
           <Box textAlign='center' style={{ marginTop: 10 }}>
-            <Button variant='contained' onClick={handleTextSubmit}>
+            <Button variant='contained'>
               Post
             </Button>
           </Box>
@@ -217,16 +208,8 @@ export default function PostOption() {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center' }}>
-            Enter the Link of the Image
+            <div className="option">Enter the Link of the Image</div>
           </Typography>
-          <TextField 
-            id= "title"
-            label = "Enter title"
-            placeholder="Enter the Title"
-            style={{ width: 400, marginTop: 20, marginBottom: 5 }}
-            value={postTitle}
-            onChange = {(e)=> setPostTitle(e.target.value)}
-          />
           <TextField
             id="outlined-multiline-static"
             label="Enter your link"
@@ -274,6 +257,6 @@ export default function PostOption() {
         </Box>
       </Modal>
     </div>
-   
+
   );
 }
