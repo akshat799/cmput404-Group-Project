@@ -24,12 +24,15 @@ from uuid import UUID
 
 url = "https://cmput404team18-backend.herokuapp.com/backendapi"
 grp17_url = "https://cmput404f22t17.herokuapp.com"
-grp15_url = ""
+grp15_url = "https://fallsocialuahank.herokuapp.com/service"
+grp05_url = "https://fallprojback.herokuapp.com"
 
 grp17_username = 't18user1'
 grp17_password = 'Password123!'
-grp15_username = ""
-grp15_password = ""
+grp15_username = "18fifteen"
+grp15_password = "18fifteen"
+grp05_username = "admin"
+grp05_password = "admin"
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -48,9 +51,23 @@ def AuthorsListView(request):
         #get and return all the authors
         try:
             req = requests.get(grp17_url + '/authors', auth=HTTPBasicAuth(grp17_username,grp17_password))
+            req2 = requests.get(grp15_url + '/authors', auth=HTTPBasicAuth(grp15_username,grp15_password))
+            req3 = requests.get(grp05_url + '/authors', auth=HTTPBasicAuth(grp05_username,grp05_password))
+            
             if(req.status_code == 200):
-                node_data = json.loads(req.content.decode('utf-8'))
-                items_data = serializer.data + node_data['items']
+                node_dataGrp17 = json.loads(req.content.decode('utf-8'))["items"]
+            else:
+                node_dataGrp17 = []
+                #print(items_data)
+            if(req2.status_code == 200):
+                node_dataGrp15 = json.loads(req2.content.decode('utf-8'))["items"]
+            else:
+                node_dataGrp15 = []
+            if(req3.status_code == 200):
+                node_dataGrp05 = json.loads(req3.content.decode('utf-8'))["items"]
+            else:
+                node_dataGrp05 = []
+            items_data = serializer.data + node_dataGrp17 + node_dataGrp15 + node_dataGrp05
         except http.Http404 as e:
             message = {'error':str(e)}
             return Response(message , status.HTTP_404_NOT_FOUND)
@@ -226,18 +243,25 @@ def PostViewSet(request,author_id = None,post_id = None):
                             }
                             return Response(serial_data, status.HTTP_200_OK)
                         except Exception as e:
-                            try:    
-                                
-                                req = requests.get(grp17_url + f'authors/{author_id}/posts/{post_id}', auth=HTTPBasicAuth(grp17_username,grp17_password))
-                                posts = json.loads(r.content)['items']
-                                print(grp17_url + f'authors/{author_id}/posts/{post_id}')
+                            try:      
+                                req = requests.get(grp17_url + f'/authors/{author_id}/posts/{post_id}/', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                                posts = json.loads(req.content)
+                                #print(grp17_url + f'authors/{author_id}/posts/{post_id}')
                                 return Response(posts , status=status.HTTP_200_OK )
-                            # except http.Http404 as e:
-                            #     message = {'error':str(e)}
-                            #     return Response(message , status.HTTP_404_NOT_FOUND)
-                            except Exception as e:
-                                message = {'error':str(e)}
-                                return Response(message , status.HTTP_400_BAD_REQUEST)
+                            except:
+                                try:
+                                    req = requests.get(grp15_url + f'/authors/{author_id}/posts/{post_id}', auth=HTTPBasicAuth(grp15_username,grp15_password))
+                                    posts = json.loads(req.content)
+                                    return Response(posts , status=status.HTTP_200_OK )
+                                except:
+                                    try:
+                                        req = requests.get(grp05_url+ f'/authors/{author_id}/posts/{post_id}', auth=HTTPBasicAuth(grp05_username,grp05_password))
+                                        posts = json.loads(req.content)
+                                        return Response(posts , status=status.HTTP_200_OK)
+                                    except http.Http404 as e:
+                                        message = {'error':str(e)}
+                                        return Response(message , status.HTTP_404_NOT_FOUND)
+
 
                     elif post_id == None:
                         
@@ -265,15 +289,25 @@ def PostViewSet(request,author_id = None,post_id = None):
                         except Exception as e:
                             
                             try:
-                                req = requests.get(grp17_url + f'/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                                req = requests.get(grp15_url + f'/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp15_username,grp15_password))
                                 node_data = json.loads(req.content)
                                 return Response(node_data, status=status.HTTP_200_OK )
-                            except http.Http404 as e:
-                                message = {'error':str(e)}
-                                return Response(message , status.HTTP_404_NOT_FOUND)
-                            except Exception as e:
-                                message = {'error':str(e)}
-                                return Response(message , status.HTTP_400_BAD_REQUEST)
+                            except:
+                                try:
+                                    req = requests.get(grp17_url + f'/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                                    node_data = json.loads(req.content)
+                                    return Response(node_data, status=status.HTTP_200_OK )
+                                except:
+                                    try:
+                                        req = requests.get(grp05_url + f'/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp05_username,grp05_password))
+                                        node_data = json.loads(req.content)
+                                        return Response(node_data, status=status.HTTP_200_OK )
+                                    except http.Http404 as e:
+                                        message = {'error':str(e)}
+                                        return Response(message , status.HTTP_404_NOT_FOUND)
+                                    except Exception as e:
+                                        message = {'error':str(e)}
+                                        return Response(message , status.HTTP_400_BAD_REQUEST)
                     
             elif author_id == None:
                 try:
@@ -295,15 +329,19 @@ def PostViewSet(request,author_id = None,post_id = None):
                             "github": f'http://github.com/{author.githubName}',
                             "profileImage": author.profileImage
                         }
-
+                    posts_all = []
                     if(response == 'local'):
                         try:
                             r = requests.get(grp17_url+"/posts",auth=HTTPBasicAuth(grp17_username,grp17_password))
-                            posts_all = json.loads(r.content)['items']
+                            r2 = requests.get(grp15_url+"/posts",auth=HTTPBasicAuth(grp15_username,grp15_password))
+                            if(r.status_code == 200 ):
+                                posts_all.append(json.loads(r.content)['items'])
+                            if(r2.status_code == 200):
+                                posts_all.append(json.loads(r2.content)['items'])
                         except Exception as e:
-                            posts_all = []
                             return posts_all
-
+                        #posts_all = get_foreign_posts_t17()
+                        #print(posts_all)
                         all_data = serializer.data + posts_all
 
                     else:
