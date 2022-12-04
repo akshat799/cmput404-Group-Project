@@ -334,10 +334,13 @@ def PostViewSet(request,author_id = None,post_id = None):
                         try:
                             r = requests.get(grp17_url+"/posts",auth=HTTPBasicAuth(grp17_username,grp17_password))
                             r2 = requests.get(grp15_url+"/posts",auth=HTTPBasicAuth(grp15_username,grp15_password))
+                            r3 = requests.get(grp05_url+"/authors/posts_all",auth=HTTPBasicAuth(grp05_username,grp05_password))
                             if(r.status_code == 200 ):
                                 posts_all.append(json.loads(r.content)['items'])
                             if(r2.status_code == 200):
                                 posts_all.append(json.loads(r2.content)['items'])
+                            if(r3.status_code == 200):
+                                posts_all.append(json.loads(r3.content)['items'])
                         except Exception as e:
                             return posts_all
                         #posts_all = get_foreign_posts_t17()
@@ -695,7 +698,7 @@ def CommentViewSet(request, author_id, post_id):
                     inboxreceiver.save(update_fields=["object"])
                 
                 except Exception as e:
-                    inboxAuthorreceiver = get_object_or_404(models.Users , id = author_id)
+                    inboxAuthorreceiver = get_object_or_404(models.Users , id =post.author.id)
                     inboxReciever = {
                         "type" : "inbox",
                         "author" : inboxAuthorreceiver.id,
@@ -776,7 +779,8 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                         "displayName": author.displayName,
                         "url": author.url,
                         "github": f'http://github.com/{author.githubName}',
-                        "profileImage": author.profileImage
+                        "profileImage": author.profileImage,
+                        "isTrueFriend":follower['true_friends']
                     }
                     authorList.append(authorData)
 
@@ -813,9 +817,17 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                         "detail": "You already followed this use!"
                     }
                     return Response(result,status=status.HTTP_400_BAD_REQUEST)
+                
+                TrueFirend_check = False
+                #check if the author is also following the actor
+                if models.FollowerModel.objects.filter(follower = author_id, followedAuthor = foreign_author_id).exists():
+                    TrueFirend_check = True
+                    models.FollowerModel.objects.filter(follower = author_id, followedAuthor = foreign_author_id).update(true_friends=TrueFirend_check)
+
+                
                 follower = get_object_or_404(models.Users, id = foreign_author_id)
                 followedAuthor = models.Users.objects.get(id = author_id)
-                models.FollowerModel.objects.create(follower = follower,followedAuthor=followedAuthor)
+                models.FollowerModel.objects.create(follower = follower,followedAuthor=followedAuthor,true_friends=TrueFirend_check)
                 followerData = {
                     "type": follower.type,
                     "id": follower.id,
@@ -895,13 +907,15 @@ def InboxViewSet(request,author_id):
             qs = pagination.paginate_queryset(queryset, request)
             serializer = serializers.InboxObjectSerializer(qs, many=True)
 
-            # for io in serializer.data:
-            #     print(json.loads(io["object"]))
+            items = []
+            for io in serializer.data:
+                for i in io["object"]:
+                    items.append(json.loads(i))
             #print(json.loads(serializer.data["object"]))
             res = {
                 "type": "inbox",
                 "author": author.url,
-                "items": [io["object"] for io in serializer.data]
+                "items": items#[io["object"] for io in serializer.data]
             }
             return Response(res, status=status.HTTP_200_OK)
         except Exception as e:
@@ -943,29 +957,46 @@ def InboxViewSet(request,author_id):
 
         if request.data["type"].lower() == "follow":
             """ required: {"type", "follower"} """
-            author_name = str(author.displayName)
-            follower_url = request.data['object']['id']
+            InboxAuthor_name = str(author.displayName)
+            follower_url = request.data['object']
             follower_uuid = follower_url.split('authors/')[1]
             follower_obj = get_object_or_404(models.Users,id = follower_uuid)
             
             #check if its already a follower
             if models.FollowerModel.objects.filter(follower = follower_uuid, followedAuthor = author_id).exists():
                 result = {
-                    "detail": str(follower_obj.displayName) +" is already following "+ author_name
+                    "detail": str(follower_obj.displayName) +" is already following "+ InboxAuthor_name
                 }
                 return Response(result,status=status.HTTP_400_BAD_REQUEST)
+            
             # add follow request to the author' inbox
-            models.InboxObject.objects.create(
-            author= author.url,
-            object= {
+            data= {
                 "type" : "follow",
-                "summary" : str(follower_obj.displayName) + " wants to follow " + author_name,
+                "summary" : str(follower_obj.displayName) + " wants to follow " + InboxAuthor_name,
                 "actor": serializers.UserSerializer(follower_obj).data,
                 "object":serializers.UserSerializer(author).data
             }
-            )
+            try:
+                inbox = models.InboxObject.objects.get(author = author_id)
+                data_list = []
+                data_list.append(json.dumps(data))
+                inbox.object = inbox.object + data_list
+                inbox.save(update_fields=["object"])
+
+            except Exception as e:
+                inboxAuthor = get_object_or_404(models.Users , id = author_id)
+                inbox = {
+                    "type" : "inbox",
+                    "author" : inboxAuthor.id,
+                    "object" : [json.dumps(data , indent=10)]
+                }
+
+                inboxSerializer = serializers.InboxObjectSerializer(data = inbox)
+                inboxSerializer.is_valid(raise_exception = True)
+                inboxSerializer.save()
+            
             result={
-                "detail": str(follower_obj.displayName) +" sent a follow request to "+ author_name
+                "detail": str(follower_obj.displayName) +" sent a follow request to "+ InboxAuthor_name
             }
 
         return Response(result, status=status.HTTP_200_OK)
