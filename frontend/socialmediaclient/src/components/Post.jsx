@@ -16,8 +16,7 @@ export default function Post({ post }) {
   const dispatch = useDispatch();
 
   const authorId = post.author;
-  const postId = post.id;
-
+  // const postId = post.id;
 
   // const getLikeCount = async() => {
   //   await dispatch(getPostLikes(authorId,postId))
@@ -27,14 +26,21 @@ export default function Post({ post }) {
 
   const likeHandler = async() => {
 
-    const resp = await dispatch(sendLikeOnPost(authorId, state.auth.author))
-    if (resp.status == 200){
-      setIsLiked(true)    
-  }        
+    const data = {
+      "at_context": "https://www.w3.org/ns/activitystreams",
+      "type": "Like",
+      "summary": state.auth.author.displayName + " likes your post",
+      "author" : state.auth.author.id,
+      "post" : post.id
+    }
+    console.log(data)
+    const resp = await dispatch(sendLikeOnPost(authorId, data))
+    if (resp?.status == 200){
+      setIsLiked(true)
+    }        
     // setLike(isLiked ? like - 1 : like + 1);
     // setIsLiked(!isLiked);
   };
-
 
   return (
     <div className="post">

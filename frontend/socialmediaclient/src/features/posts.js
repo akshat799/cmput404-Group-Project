@@ -45,7 +45,7 @@ export const getPostLikes = (author_id, post_id) => async (dispatch) => {
   } catch (e) {
     console.log(e);
   }
-}
+};
 
 export const createNewPost = (data, author_id) => async() => {
   try{
@@ -57,11 +57,13 @@ export const createNewPost = (data, author_id) => async() => {
   } catch (e) {
     console.log(e)
   }
-}
+};
 
 export const sendLikeOnPost = (authorId, data) => async() => {
   try{
     const resp = await api.sendLike(data, authorId);
+    console.log(authorId)
+    console.log(data)
 
     if (resp.status == 200){
       return resp.status
@@ -69,7 +71,7 @@ export const sendLikeOnPost = (authorId, data) => async() => {
   } catch (e) {
     console.log(e)
   }
-}
+};
 // export const getComments = (author_id, post_id) => async(dispatch) => {
 //   try{
 //     const resp = await api.getComments(author_id, post_id)
@@ -79,7 +81,6 @@ export const sendLikeOnPost = (authorId, data) => async() => {
 //       // TODO check resp object and update this
 //       dispatch(fetchComments(resp.data.items));
 //     }
-
 //   } catch(e) {
 //     console.log(e)
 //   }
