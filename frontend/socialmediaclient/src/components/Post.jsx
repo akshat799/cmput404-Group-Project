@@ -82,18 +82,17 @@ export default function Post({ post }) {
   const dispatch = useDispatch();
 
   const currentAuthorId = state.auth.author.id;
-  console.log(currentAuthorId)
   const postId = post.id.split("/").reverse()[0];
 
   const postAuthorId = post.author.id.split("/").reverse()[0]
 
   const getLikeCount = async () => {
-    console.log(currentAuthorId)
-    console.log(postId)
-    await dispatch(getPostLikes(currentAuthorId, postId));
+    const resp = await dispatch(getPostLikes(currentAuthorId, postId));
+    await setLikeCount(resp)
+    await console.log("posts"+resp)
   };
 
-  const [like, setLike] = useState(post.like);
+  const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
   const [commentsList, setCommentsList] = useState([])
@@ -112,14 +111,13 @@ export default function Post({ post }) {
   }
 
   const likeHandler = async() => {
-    console.log(data)
-    console.log(postAuthorId)
-    const resp = await dispatch(sendLiketoAuthor(postAuthorId, data))
-    if (resp?.status == 200){
-      setIsLiked(true)
-    }        
-    // setLike(isLiked ? like - 1 : like + 1);
-    // setIsLiked(!isLiked);
+    if (isLiked === false) {
+      const resp = await dispatch(sendLiketoAuthor(postAuthorId, data))
+      if (resp == 201){
+        setIsLiked(true)
+        getLikeCount()
+    }  
+    }      
   };
 
   useEffect(() => {
@@ -149,13 +147,13 @@ export default function Post({ post }) {
     <div className="post">
       <div className="postTop">
         <div className="postTopLeft">
-          {/* <img
+          <img
             className="postProfileImg"
             src={post.author.profileImage}
             alt=""
-          /> */}
+          />
           <span className="postUsername">
-            {/* {post.author.displayName} */}
+            {post.author.displayName}
 
           </span>
         </div>
@@ -192,8 +190,8 @@ export default function Post({ post }) {
       </div>
       <div className="postBottom">
         <div className="postBottomLeft">
-          <ThumbUpIcon className="likes" onClick={likeHandler} />
-          <span style={{ color: "gray" }}> {state.posts.postLikeCount}</span>
+          <ThumbUpIcon className="likes" style={{ color: isLiked? "blue":"gray" }} onClick={likeHandler} />
+          <span style={{ color: "gray"}}> {likeCount}</span>
         </div>
         <div className="postBottomRight">
           <span className="postCommentText"><Button variant="text" onClick={handleGetComments} style={{color:"gray"}}> Show Comments </Button></span>
