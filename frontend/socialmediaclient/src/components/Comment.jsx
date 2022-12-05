@@ -4,25 +4,51 @@ import React from 'react';
 import './Comment.css';
 import { useDispatch } from "react-redux";
 import { sendLiketoAuthor } from "../features/posts";
+import { getLikesOnComment } from '../features/posts';
+import { useEffect } from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+
 const Comment = ({data, comment, postAuthorId}) => {
+    const state = useSelector((state) => state);
     const dispatch = useDispatch()
     const imgLink = comment.author.profileImage
     const commentText = comment.comment
     const commentAuthor = comment.author.displayName
-    const [commentLike, setCommentLike] = React.useState(true);
+    const commentAuthorId = comment.author.id.split("/").reverse()[0]
+    const commentId = comment.id.split("/").reverse()[0]
+
+    const postId = data["post"];
+    const currentAuthorId = state.auth.author.id;
+
+
+    const [likeCount, setLikeCount] = useState(0);
+    const [isLiked, setIsLiked] = useState(false);
+
+    const getCommentLikes = async () => {
+        const resp = await dispatch(getLikesOnComment(postAuthorId, postId, commentId));
+        await setLikeCount(resp)
+    };
     
     const handleLike = async() => {
-        
-        data["comment"] = comment.id
-          console.log(data)
-          console.log(postAuthorId)
-          const resp = await dispatch(sendLiketoAuthor(postAuthorId, data))
-          if (resp?.status == 200){
-            setCommentLike((prevState) => !prevState);
-          }        
-          // setLike(isLiked ? like - 1 : like + 1);
-          // setIsLiked(!isLiked);
-        };
+        if (isLiked === false) {
+            data["comment"] = commentId
+            data["summary"] = state.auth.author.displayName + " likes your comment";
+            data["author"] = currentAuthorId
+            const resp = await dispatch(sendLiketoAuthor(commentAuthorId, data))
+            await console.log(resp)
+            if (resp == 201){
+                console.log(resp)
+                setIsLiked(true)
+                getCommentLikes()
+            }
+        }
+    };
+
+    useEffect(() => {
+        getCommentLikes();
+    }, []);
+
     return (
         <>
             <Paper style={{ padding: "10px 10px", marginTop: 60 }}>
@@ -41,15 +67,15 @@ const Comment = ({data, comment, postAuthorId}) => {
                                 display: 'flex',
                                 gap: '5px'
                             }}>
-                                <ThumbUpAltIcon color="primary" />
-                                <span>Michel and 26 others </span>
+                                <ThumbUpAltIcon style={{ color: isLiked? "blue":"gray" }} onClick={handleLike} />
+                                <span style={{ color: "gray"}}> {likeCount}</span>
                             </div>
 
                         </p>
                         <hr />
-                        <p className="commentLikeDiv">
+                        {/* <p className="commentLikeDiv">
                             <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>   Dislike</p>}</span>
-                        </p>
+                        </p> */}
                     </Grid>
                 </Grid>
             </Paper> 
