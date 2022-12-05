@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import TextField from "@mui/material/TextField";
 import Typography from '@mui/material/Typography';
 
@@ -112,10 +113,54 @@ export default function Post({ post, comp }) {
     handleTextOpen();
   };
 
+  const [postType, setPostType] = useState('none');
   const [textOpen, setTextOpen] = useState(false);
+  const [imageOpen, setImageOpen] = useState(false);
+
   const handleTextOpen = () => setTextOpen(true);
   const handleTextClose = () => setTextOpen(false);
+  const handleImageOpen = () => setImageOpen(true);
+  const handleImageClose = () => setImageOpen(false);
+  const [privacy, setPrivacy] = useState('public');
 
+  const [selectedFile, setSelectedFile] = useState();
+  const [preview, setPreview] = useState();
+
+
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreview(undefined);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreview(objectUrl);
+
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
+
+  const onSelectFile = e => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedFile(undefined);
+      return;
+    }
+
+    // I've kept this example simple by using the first image instead of multiple
+    setSelectedFile(e.target.files[0]);
+  };
+
+  const handlePostTypeChange = (event) => {
+    setPostType(event.target.value);
+    if (event.target.value !== 'none') {
+      setTextOpen(false);
+      setImageOpen(true);
+    }
+  };
+  const handleChange = (event) => {
+    setPrivacy(event.target.value);
+  };
   return (
     <div className="post">
       <div className="postTop">
@@ -170,6 +215,7 @@ export default function Post({ post, comp }) {
           <span className="postCommentText">{post.count} Comments</span>
         </div>
       </div>
+      {/* for selecting */}
       <Modal
         open={textOpen}
         onClose={handleTextClose}
@@ -178,50 +224,125 @@ export default function Post({ post, comp }) {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }}>
-            <div className="option">Title</div>
-
-            <TextField
-              id="outlined-multiline-static"
-              defaultValue={post?.title}
-              multiline
-              rows={1}
-              placeholder="write something..."
-              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-
-            />
-
-            <div className="option">Description</div>
-
-            <TextField
-              id="outlined-multiline-static"
-              defaultValue={post?.description}
-              multiline
-              rows={2}
-              placeholder="write something..."
-              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-            />
-            <div className="option">Content</div>
-
-            <TextField
-              id="outlined-multiline-static"
-
-              multiline
-              rows={2}
-              placeholder="write something..."
-              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-            />
-            <div className="option">Upload File</div>
-            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
-              <input type='file' />
-            </Box>
+            <div className="option">Select what you would like to post</div>
           </Typography>
 
+          <Box textAlign="center">
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={postType}
+              // label="select an item"
+              onChange={handlePostTypeChange}
+            >
+              <MenuItem value={'none'}>Select an item</MenuItem>
+              <MenuItem value={'html'}>HTML</MenuItem>
+              <MenuItem value={'text'} >Plain Text</MenuItem>
+              <MenuItem value={'markdown'}>Markdown</MenuItem>
+              <MenuItem value={'image'}>Image</MenuItem>
+              <MenuItem value={'base64'}>base64</MenuItem>
+
+            </Select>
+          </Box>
+        </Box>
+
+      </Modal>
+
+      {/* for final edit */}
+      <Modal
+        open={imageOpen}
+        onClose={handleImageClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Box sx={style} textAlign='center'>
+            <Box>
+              <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }} />
+              <div className="option">Title</div>
+
+              <TextField
+                id="outlined-multiline-static"
+
+                multiline
+                rows={1}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+
+              />
+
+              <div className="option">Description</div>
+
+              <TextField
+                id="outlined-multiline-static"
+
+                multiline
+                rows={1}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              />
+
+              <div className="option">Category</div>
+
+              <TextField
+                id="outlined-multiline-static"
+                rows={1}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              />
+
+              <div className="option">Content</div>
+
+              <TextField
+                id="outlined-multiline-static"
+
+                multiline
+                rows={2}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              />
+              <div className="option">Choose Privacy</div>
+              <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
+
+              </Box>
+
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={privacy}
+                // label="Age"
+                onChange={handleChange}
+              >
+                <MenuItem value={'public'} selected>Public</MenuItem>
+                <MenuItem value={'private'}>Private</MenuItem>
+
+              </Select>
+
+              {postType === 'image' && <>
+                <div className="option" style={{ marginTop: 10 }} >Upload image</div>
+                <input type='file' accept="image/*" onChange={onSelectFile} />
+                <Box textAlign='center' style={{ marginTop: 10 }}>
+                  {selectedFile && <img alt="nothing" style={{ height: '100px', width: '100px', borderRadius: '50%' }} src={preview} />}
+                </Box>
+              </>}
+              <Box textAlign='center' style={{ marginTop: 10 }}>
+                <Button variant='contained'>
+                  Update
+                </Button>
+              </Box>
+            </Box>
+
+          </Box>
+          {/* <input type='file' accept="image/*" onChange={onSelectFile} />
+          <Box textAlign='center' style={{ marginTop: 10 }}>
+            {selectedFile && <img alt="nothing" style={{ height: '150px', width: '300px' }} src={preview} />}
+          </Box>
 
           <Box textAlign='center' style={{ marginTop: 10 }}>
             <Button variant='contained'>
-              Update
+              Post
             </Button>
-          </Box>
+          </Box> */}
         </Box>
       </Modal>
       <Comment />

@@ -26,7 +26,7 @@ const Signup = ({ handleChange }) => {
         }
     }, [confirmPassword]);
 
-    const paperStyle = { padding: 20, height: '70vh', width: 300, margin: "0px auto" };
+    const paperStyle = { padding: 20, height: '80vh', width: 300, margin: "0px auto" };
     const avatarStyle = { backgroundColor: '#9494de' };
     const formFieldStyle = { margin: '10px 0px 0px 0px' };
     const headerStyle = { margin: 0 };
@@ -128,6 +128,8 @@ const Signup = ({ handleChange }) => {
                         required
                         type='password' />
                     {isError && <div className='dispError' style={{ color: "red" }}> Error:Passwords Don't Match!</div>}
+                    <p style={{ textAlign: 'center', marginTop: 15, marginBottom: 10 }}>upload file for profile picture</p>
+                    <input type="file" id="myfile" />
                     <Button
                         className='submit'
                         style={{ margin: '25px 0px 10px 0px' }}
