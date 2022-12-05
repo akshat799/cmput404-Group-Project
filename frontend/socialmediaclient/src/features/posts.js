@@ -3,7 +3,7 @@ import * as api from "../api";
 
 const initialState = {
   posts: [],
-  postlikeCount: [],
+  postlikeCount: 0,
   error: false,
 };
 
@@ -57,7 +57,8 @@ export const getPostLikes = (author_id, post_id) => async (dispatch) => {
 
     if (resp.status == 200) {
       // TODO: check resp object and fix
-      dispatch(updatePostLikes(resp.data));
+      dispatch(updatePostLikes(resp.data.length))
+      return resp.data.length
     }
   } catch (e) {
     console.log(e);
