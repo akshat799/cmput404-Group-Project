@@ -2,13 +2,27 @@ import { Avatar, Grid, Paper } from "@material-ui/core";
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import React from 'react';
 import './Comment.css';
-const Comment = () => {
-    const imgLink =
-        "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
+import { useDispatch } from "react-redux";
+import { sendLiketoAuthor } from "../features/posts";
+const Comment = ({data, comment, postAuthorId}) => {
+    const dispatch = useDispatch()
+    const imgLink = comment.author.profileImage
+    const commentText = comment.comment
+    const commentAuthor = comment.author.displayName
     const [commentLike, setCommentLike] = React.useState(true);
-    const handleLike = () => {
-        setCommentLike((prevState) => !prevState);
-    };
+    
+    const handleLike = async() => {
+        
+        data["comment"] = comment.id
+          console.log(data)
+          console.log(postAuthorId)
+          const resp = await dispatch(sendLiketoAuthor(postAuthorId, data))
+          if (resp?.status == 200){
+            setCommentLike((prevState) => !prevState);
+          }        
+          // setLike(isLiked ? like - 1 : like + 1);
+          // setIsLiked(!isLiked);
+        };
     return (
         <>
             <Paper style={{ padding: "10px 10px", marginTop: 60 }}>
@@ -17,10 +31,11 @@ const Comment = () => {
                         <Avatar alt="Remy Sharp" src={imgLink} />
                     </Grid>
                     <Grid justifyContent="left" item xs zeroMinWidth>
-                        <h4 style={{ margin: 0, textAlign: "left" }}>Michel Michel</h4>
+                        <h4 style={{ margin: 0, textAlign: "left" }}>Michel Michel {commentAuthor}</h4>
                         <p style={{ textAlign: "left" }}>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
                             luctus ut est sed faucibus. Duis bibendum ac ex vehicula laoreet.
+                            {commentText}
 
                         </p>
 
