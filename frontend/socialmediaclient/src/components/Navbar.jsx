@@ -10,14 +10,18 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../features/auth";
+import { resetPosts } from "../features/posts";
+import { resetUserPosts } from "../features/userposts";
 import "./navbar.css";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [badgeNumber, setBadgeNumber] = React.useState(3);
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async() => {
+    await dispatch(logout());
+    await dispatch(resetPosts());
+    await dispatch(resetUserPosts());
     navigate("/");
   };
   const suggestionsSearch = [
@@ -42,7 +46,7 @@ export default function Navbar() {
             navigate("/pprofile");
           }}
           sx={{ width: 300, borderRadius: '10px', background: 'white' }}
-          renderInput={(params) => <TextField {...params} placeholder="search🔍" />} />
+          renderInput={(params) => <TextField {...params} placeholder="search 🔍" />} />
       </div>
 
       <ul className="main-nav">

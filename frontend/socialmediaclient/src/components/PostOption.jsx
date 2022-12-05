@@ -10,7 +10,9 @@ import Typography from "@mui/material/Typography";
 import React from "react";
 import "./PostOption.css";
 import { makePost } from "../features/userposts";
+import { addNewPost } from "../features/posts";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 export default function PostOption() {
   let requestData = {
@@ -23,6 +25,7 @@ export default function PostOption() {
     unlisted: false,
   };
   const dispatch = useDispatch();
+  const location = useLocation();
   const state = useSelector((state) => state);
   const [textOpen, setTextOpen] = React.useState(false);
   const [imageOpen, setImageOpen] = React.useState(false);
@@ -112,8 +115,13 @@ export default function PostOption() {
     requestData.contentType = contentType;
     requestData.content = data;
 
-    console.log(requestData);
-    const res = await dispatch(makePost(requestData, state.auth.author.id));
+    let res;
+
+    if (location.pathname == "/home")
+      res = await dispatch(addNewPost(requestData, state.auth.author.id));
+    else res = await dispatch(makePost(requestData, state.auth.author.id));
+
+    if (type == "image") handleImageClose();
   };
 
   const style = {

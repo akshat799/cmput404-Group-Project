@@ -40,7 +40,7 @@ export const createPostWithImage = (author_id, post_id) => api.get(`backendapi/a
 
 //COMMENTS
 export const getComments = (author_id, post_id) => api.get(`backendapi/authors/${author_id}/posts/${post_id}/comments/`);
-export const postComment = (author_id, post_id) => api.post(`backendapi/authors/${author_id}/posts/${post_id}/comments/`);
+export const postComment = (author_id, post_id, data) => api.post(`backendapi/authors/${author_id}/posts/${post_id}/comments/`);
 
 //LIKES
 export const sendLike = (data, author_id) => api.post(`backendapi/authors/${author_id}/inbox/`, data);

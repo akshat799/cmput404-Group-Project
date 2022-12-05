@@ -21,7 +21,7 @@ export default function AuthorPosts() {
     <div className="authorPosts">
       <PostOption />
       {state.userposts.posts.map((p) => (
-        <Post key={p.id} post={p} />
+        <Post key={p.id} post={p} comp="profile"/>
       ))}
     </div>
   );

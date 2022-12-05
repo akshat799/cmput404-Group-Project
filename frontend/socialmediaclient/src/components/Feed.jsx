@@ -28,7 +28,7 @@ export default function Feed() {
         <Post post={state.posts.posts[0]} />
       )} */}
       {state.posts.posts != [] && state.posts.posts.slice(0, 9).map((p) => (
-          <Post key={p.id} post={p} />
+          <Post key={p.id} post={p} comp="home"/>
         ))}
     </div>
   );

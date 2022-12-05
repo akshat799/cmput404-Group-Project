@@ -13,9 +13,12 @@ export const authorSlice = createSlice({
     updatePosts: (state, action) => {
       state.posts = action.payload;
     },
-    addPost : (state, action) => {
+    addPost: (state, action) => {
       state.posts = [action.payload, ...state.posts];
-    }
+    },
+    resetUserPost: (state) => {
+      state.posts = [];
+    },
   },
 });
 
@@ -33,14 +36,19 @@ export const getAuthorPosts = (data) => async (dispatch) => {
 };
 
 export const makePost = (data, author_id) => async (dispatch) => {
-  try{
+  try {
     const res = await api.createNewPost(data, author_id);
+    dispatch(addPost(res.data));
     console.log(res);
   } catch (e) {
     console.log(e);
   }
-}
+};
 
-export const { updatePosts, addPost } = authorSlice.actions;
+export const resetUserPosts = () => (dispatch) => {
+  dispatch(resetUserPost());
+};
+
+export const { updatePosts, addPost, resetUserPost } = authorSlice.actions;
 
 export default authorSlice.reducer;

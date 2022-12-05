@@ -1,17 +1,17 @@
 import Modal from "@material-ui/core/Modal";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
-import Typography from '@mui/material/Typography';
+import Typography from "@mui/material/Typography";
 
-import { alpha, styled } from '@mui/material/styles';
+import { alpha, styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPostLikes } from "../features/posts";
@@ -20,62 +20,62 @@ import Comment from "./Comment";
 import "./Post.css";
 import PostContent from "./PostContent";
 
-
 const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
     anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
+      vertical: "bottom",
+      horizontal: "right",
     }}
     transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
+      vertical: "top",
+      horizontal: "right",
     }}
     {...props}
   />
 ))(({ theme }) => ({
-  '& .MuiPaper-root': {
+  "& .MuiPaper-root": {
     borderRadius: 6,
     marginTop: theme.spacing(1),
     minWidth: 180,
     color:
-      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+      theme.palette.mode === "light"
+        ? "rgb(55, 65, 81)"
+        : theme.palette.grey[300],
     boxShadow:
-      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
-    '& .MuiMenu-list': {
-      padding: '4px 0',
+      "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
+    "& .MuiMenu-list": {
+      padding: "4px 0",
     },
-    '& .MuiMenuItem-root': {
-      '& .MuiSvgIcon-root': {
+    "& .MuiMenuItem-root": {
+      "& .MuiSvgIcon-root": {
         fontSize: 18,
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },
-      '&:active': {
+      "&:active": {
         backgroundColor: alpha(
           theme.palette.primary.main,
-          theme.palette.action.selectedOpacity,
+          theme.palette.action.selectedOpacity
         ),
       },
     },
   },
 }));
 
-
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
+  bgcolor: "background.paper",
+  border: "2px solid #000",
   boxShadow: 24,
   p: 4,
 };
 
-export default function Post({ post }) {
+export default function Post({ post, comp }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
 
@@ -87,6 +87,7 @@ export default function Post({ post }) {
   };
   const [like, setLike] = useState(post.like);
   const [isLiked, setIsLiked] = useState(false);
+  const [display, setDisplay] = useState("visible");
 
   const likeHandler = () => {
     setLike(isLiked ? like - 1 : like + 1);
@@ -95,8 +96,8 @@ export default function Post({ post }) {
 
   useEffect(() => {
     getLikeCount();
+    if(comp == "home") setDisplay("hidden")
   }, []);
-
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -127,15 +128,17 @@ export default function Post({ post }) {
           /> */}
           <span className="postUsername">
             {/* {post.author.displayName} */}
-
           </span>
         </div>
         <div className="postTopRight">
-          <MoreHorizIcon onClick={handleClick} />
+          <MoreHorizIcon
+            onClick={handleClick}
+            style={{ visibility : display}}
+          />
           <StyledMenu
             id="demo-customized-menu"
             MenuListProps={{
-              'aria-labelledby': 'demo-customized-button',
+              "aria-labelledby": "demo-customized-button",
             }}
             anchorEl={anchorEl}
             open={open}
@@ -150,14 +153,12 @@ export default function Post({ post }) {
               <DeleteIcon />
               Delete
             </MenuItem>
-
           </StyledMenu>
-
         </div>
       </div>
       <div className="postCenter">
         <span className="postText">{post?.title}</span>
-        <PostContent contentType={post}/>
+        <PostContent contentType={post} />
         <img className="postImg" src={post?.img} alt="" />
         <span className="postText">{post?.description}</span>
       </div>
@@ -177,7 +178,12 @@ export default function Post({ post }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }}>
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            style={{ textAlign: "center", color: "black" }}
+          >
             <div className="option">Title</div>
 
             <TextField
@@ -187,7 +193,6 @@ export default function Post({ post }) {
               rows={1}
               placeholder="write something..."
               style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-
             />
 
             <div className="option">Description</div>
@@ -204,23 +209,19 @@ export default function Post({ post }) {
 
             <TextField
               id="outlined-multiline-static"
-
               multiline
               rows={2}
               placeholder="write something..."
               style={{ width: 330, marginTop: 10, marginBottom: 10 }}
             />
             <div className="option">Upload File</div>
-            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
-              <input type='file' />
+            <Box textAlign="center" style={{ marginTop: 10, marginBottom: 10 }}>
+              <input type="file" />
             </Box>
           </Typography>
 
-
-          <Box textAlign='center' style={{ marginTop: 10 }}>
-            <Button variant='contained'>
-              Update
-            </Button>
+          <Box textAlign="center" style={{ marginTop: 10 }}>
+            <Button variant="contained">Update</Button>
           </Box>
         </Box>
       </Modal>
