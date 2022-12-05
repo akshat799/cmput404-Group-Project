@@ -5,6 +5,7 @@ const initialState = {
   posts: [],
   postlikeCount: 0,
   error: false,
+  allLiked: []
 };
 
 export const authorSlice = createSlice({
@@ -90,6 +91,7 @@ export const getCommentsOnPost = (author_id, post_id) => async(dispatch) => {
     return []
   }
 }
-export const { updatePosts, updatePostLikes } = authorSlice.actions;
+
+export const { updatePosts, updatePostLikes} = authorSlice.actions;
 
 export default authorSlice.reducer;

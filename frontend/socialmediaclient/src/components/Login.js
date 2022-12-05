@@ -1,10 +1,13 @@
 import LockIcon from '@mui/icons-material/Lock';
 import { Avatar, Button, Grid, Link, Paper, TextField, Typography } from '@mui/material';
 import React, { useState } from "react";
-import { useDispatch, useStore } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { login } from "../features/auth";
+import { getAllLiked } from '../features/auth';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 
 const Login = ({ handleChange }) => {
@@ -20,8 +23,14 @@ const Login = ({ handleChange }) => {
     const [isError, setIsError] = useState(false);
     const dispatch = useDispatch();
 
-    const store = useStore();
-    const state = store.getState();
+    
+    const state = useSelector((state) => state)
+    const isSignedIn = state.auth.isSignedIn
+    const currentAuthorId = state.auth.author?.id
+
+    const getAllLikedPosts = async() => {
+        await dispatch(getAllLiked(currentAuthorId))
+      }
 
     const handleSubmit = async (e) => {
 
@@ -47,6 +56,10 @@ const Login = ({ handleChange }) => {
             setPassword("");
         }
     };
+    useEffect(() => {
+        getAllLikedPosts();
+      }, [isSignedIn]);
+    
 
     return (
         <Grid>

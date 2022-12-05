@@ -8,6 +8,7 @@ const initialState = {
     profileImage: process.env.PUBLIC_URL + "/images/ProfileIcon.png",
   },
   error: false,
+  allLiked: []
 }
 
 export const authorSlice = createSlice({
@@ -29,6 +30,9 @@ export const authorSlice = createSlice({
       },
       authError: (state) => {
         state.error = true
+      },
+      updateAllLiked: (state, action)  => {
+        state.allLiked = action.payload;
       }
     },
   })
@@ -69,8 +73,22 @@ export const login = (data) => async(dispatch) => {
 export const logout = () => async(dispatch) =>{
   dispatch(signOut());
   localStorage.removeItem('token')
-}  
+}
 
-export const { signIn, signOut, editProfile, authError } = authorSlice.actions
+export const getAllLiked = (author_id) => async(dispatch) => {
+  try{
+    const resp = await api.getLiked(author_id)
+    console.log(resp)
+
+    if (resp.status == 200) {
+      console.log("getting all liked")
+      dispatch(updateAllLiked(resp.data.items))
+    }
+  } catch(e) {
+    console.log(e)
+  }
+}
+
+export const { signIn, signOut, editProfile, authError, updateAllLiked } = authorSlice.actions
 
 export default authorSlice.reducer

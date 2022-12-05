@@ -89,11 +89,23 @@ export default function Post({ post }) {
   const getLikeCount = async () => {
     const resp = await dispatch(getPostLikes(currentAuthorId, postId));
     await setLikeCount(resp)
-    await console.log("posts"+resp)
   };
 
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+
+  const allLikedPosts = state.auth.allLiked;
+
+  const getIsLiked = () => {
+    for (let p of allLikedPosts){
+      if( p.post == postId){
+        setIsLiked(true)
+        break;
+      }
+    }
+  }
+  
+
 
   const [commentsList, setCommentsList] = useState([])
 
@@ -125,6 +137,7 @@ export default function Post({ post }) {
 
   useEffect(() => {
     getLikeCount();
+    getIsLiked();
   }, []);
 
 
