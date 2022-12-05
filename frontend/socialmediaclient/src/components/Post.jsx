@@ -10,7 +10,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import Typography from '@mui/material/Typography';
+import { getCommentsOnPost } from "../features/posts";
+
 import { alpha, styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
