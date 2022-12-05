@@ -109,8 +109,6 @@ export default function Post({ post }) {
   const handleGetComments = async() => {
     const resp = await dispatch(getCommentsOnPost(postAuthorId, postId))
     await setCommentsList(resp)
-    console.log("waiting for resp")
-    await console.log(resp[0])
   }
 
   const data = {
@@ -254,8 +252,6 @@ export default function Post({ post }) {
               <input type='file' />
             </Box>
           </Typography>
-
-
           <Box textAlign='center' style={{ marginTop: 10 }}>
             <Button variant='contained'>
               Update

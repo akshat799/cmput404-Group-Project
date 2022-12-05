@@ -10,8 +10,6 @@ const Comment = ({data, comment, postAuthorId}) => {
     const commentText = comment.comment
     const commentAuthor = comment.author.displayName
     const [commentLike, setCommentLike] = React.useState(true);
-
-    console.log("in comment"+ commentAuthor)
     
     const handleLike = async() => {
         
@@ -36,7 +34,6 @@ const Comment = ({data, comment, postAuthorId}) => {
                         <h4 style={{ margin: 0, textAlign: "left" }}>{commentAuthor}</h4>
                         <p style={{ textAlign: "left" }}>
                             {commentText}
-
                         </p>
 
                         <p style={{ textAlign: "left", marginTop: 10 }}>
@@ -51,7 +48,7 @@ const Comment = ({data, comment, postAuthorId}) => {
                         </p>
                         <hr />
                         <p className="commentLikeDiv">
-                            <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>   Dislike</p>}</span>  <span>posted 1 minute ago</span>
+                            <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>   Dislike</p>}</span>
                         </p>
                     </Grid>
                 </Grid>
