@@ -92,7 +92,6 @@ export default function Post({ post, comp, index }) {
   const getLikeCount = async () => {
     const resp = await dispatch(getPostLikes(currentAuthorId, postId));
     await setLikeCount(resp)
-    await console.log("posts"+resp)
   };
 
   const [likeCount, setLikeCount] = useState(0);
@@ -100,7 +99,20 @@ export default function Post({ post, comp, index }) {
   const [display, setDisplay] = useState("visible");
   const [followerModal, setFollowerModal] = useState(false);
 
-  const [commentsList, setCommentsList] = useState([]);
+  const allLikedPosts = state.auth.allLiked;
+
+  const getIsLiked = () => {
+    for (let p of allLikedPosts){
+      if( p.post == postId){
+        setIsLiked(true)
+        break;
+      }
+    }
+  }
+  
+
+
+  const [commentsList, setCommentsList] = useState([])
 
   const handleGetComments = async () => {
     const resp = await dispatch(getCommentsOnPost(postAuthorId, postId));
@@ -128,6 +140,7 @@ export default function Post({ post, comp, index }) {
   useEffect(() => {
     getLikeCount();
     if (comp != "profile") setDisplay("hidden");
+    getIsLiked();
   }, []);
 
   const [anchorEl, setAnchorEl] = useState(null);

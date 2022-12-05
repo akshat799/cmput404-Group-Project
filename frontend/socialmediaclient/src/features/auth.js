@@ -77,10 +77,23 @@ export const getOwnFollowers = (author_id) => async (dispatch) => {
 
 export const logout = () => async (dispatch) => {
   dispatch(signOut());
-  localStorage.removeItem("token");
-};
+  localStorage.removeItem('token')
+}
 
-export const { signIn, signOut, editProfile, updateFollowers, authError } =
-  authorSlice.actions;
+export const getAllLiked = (author_id) => async(dispatch) => {
+  try{
+    const resp = await api.getLiked(author_id)
+    console.log(resp)
+
+    if (resp.status == 200) {
+      console.log("getting all liked")
+      dispatch(updateAllLiked(resp.data.items))
+    }
+  } catch(e) {
+    console.log(e)
+  }
+}
+
+export const { signIn, signOut, editProfile, authError, updateAllLiked } = authorSlice.actions
 
 export default authorSlice.reducer;

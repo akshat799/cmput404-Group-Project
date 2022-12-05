@@ -3,11 +3,13 @@ import Button from '@mui/material/Button';
 import TextField from "@mui/material/TextField";
 import { addComment } from '../features/posts';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 const AddComment = ({authorId, postId}) => {
 
+    const state = useSelector((state) => state);
     const dispatch = useDispatch();
-    const imgLink =
-        "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
+    const imgLink = state.auth.profileImage
+        
 
         const sendComment = async () => {
             await dispatch(addComment(authorId, postId))

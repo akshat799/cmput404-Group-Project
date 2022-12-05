@@ -5,6 +5,7 @@ const initialState = {
   posts: [],
   postlikeCount: 0,
   error: false,
+  allLiked: []
 };
 
 export const authorSlice = createSlice({
