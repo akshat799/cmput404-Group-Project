@@ -5,14 +5,16 @@ import { addComment } from '../features/posts';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
+
+
 const AddComment = ({authorId, postId}) => {
 
     const state = useSelector((state) => state);
     const dispatch = useDispatch();
-    const imgLink = state.auth.profileImage
+    const imgLink = state.auth.profileImage;
+    
 
     const [commentText, setCommentText] = useState("")
-
     
     const sendComment = async () => {
         let data = {
@@ -24,8 +26,7 @@ const AddComment = ({authorId, postId}) => {
         
         if( status == 200){
             setCommentText("")
-        }
-    }
+        }}
     return (
     <>
         <div style={{ marginTop: 15 }} className="postTop">
@@ -36,7 +37,6 @@ const AddComment = ({authorId, postId}) => {
                     alt=""
                     style={{ marginLeft: 10 }}
                 />
-
                 <TextField
                     id="outlined-multiline-static"
                     label="Enter your comment"
