@@ -23,14 +23,10 @@ export const updateAuthor = (data, author_id) =>
   api.post(`backendapi/authors/${author_id}/`, data);
 
 //FOLLOWERS
-export const getFollowerList = (author_id) =>
-  api.get(`backendapi/authors/${author_id}/followers`);
-export const checkFollower = (author_id, foreign_author_id) =>
-  api.get(`backendapi/authors/${author_id}/followers/${foreign_author_id}`);
-export const addFollower = (author_id, foreign_author_id) =>
-  api.put(`backendapi/authors/${author_id}/followers/${foreign_author_id}`);
-export const removeFollower = (author_id, foreign_author_id) =>
-  api.delete(`backendapi/authors/${author_id}/followers/${foreign_author_id}/`);
+export const getFollowerList = (author_id) => api.get(`backendapi/authors/${author_id}/followers/`) 
+export const checkFollower = (author_id, foreign_author_id) => api.get(`backendapi/authors/${author_id}/followers/${foreign_author_id}`) 
+export const addFollower = (author_id, foreign_author_id) => api.put(`backendapi/authors/${author_id}/followers/${foreign_author_id}`)
+export const removeFollower = (author_id, foreign_author_id) => api.delete(`backendapi/authors/${author_id}/followers/${foreign_author_id}`)
 
 // POST
 export const getPublicPost = (author_id, post_id) =>
@@ -53,13 +49,13 @@ export const createPostWithImage = (author_id, post_id) =>
   api.get(`backendapi/authors/${author_id}/posts/${post_id}/image/`);
 
 //COMMENTS
-export const getComments = (author_id, post_id) => api.get(`backendapi/authors/${author_id}/posts/${post_id}/comments/`);
-export const postComment = (author_id, post_id, data) => api.post(`backendapi/authors/${author_id}/posts/${post_id}/comments/`, data);
+export const getComments = (author_id, post_id) => api.get(`backendapi/authors/${author_id}/posts/${post_id}/comments`);
+export const postComment = (author_id, post_id, data) => api.post(`backendapi/authors/${author_id}/posts/${post_id}/comments`, data);
 
 //LIKES
 export const sendLike = (data, author_id) => api.post(`backendapi/authors/${author_id}/inbox/like`, data);
 export const getPostLikes = (author_id, post_id) => api.get(`backendapi/authors/${author_id}/posts/${post_id}/likes`);
-export const getCommentLikes = (author_id, post_id, comment_id) => api.get(`backendapi/authors/${author_id}/posts/${post_id}/comments/${comment_id}/likes/`)
+export const getCommentLikes = (author_id, post_id, comment_id) => api.get(`backendapi/authors/${author_id}/posts/${post_id}/comments/${comment_id}/likes`)
 
 //LIKED
 export const getLiked = (author_id) =>
