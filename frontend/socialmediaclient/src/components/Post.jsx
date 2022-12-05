@@ -1,6 +1,6 @@
 import Modal from "@material-ui/core/Modal";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Box from "@mui/material/Box";
@@ -11,13 +11,10 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { getCommentsOnPost } from "../features/posts";
-
-import { alpha, styled } from '@mui/material/styles';
+import { alpha, styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPostLikes } from "../features/posts";
-import { sendLiketoAuthor } from "../features/posts";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
 import "./Post.css";
@@ -29,52 +26,53 @@ const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
     anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
+      vertical: "bottom",
+      horizontal: "right",
     }}
     transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
+      vertical: "top",
+      horizontal: "right",
     }}
     {...props}
   />
 ))(({ theme }) => ({
-  '& .MuiPaper-root': {
+  "& .MuiPaper-root": {
     borderRadius: 6,
     marginTop: theme.spacing(1),
     minWidth: 180,
     color:
-      theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+      theme.palette.mode === "light"
+        ? "rgb(55, 65, 81)"
+        : theme.palette.grey[300],
     boxShadow:
-      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
-    '& .MuiMenu-list': {
-      padding: '4px 0',
+      "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
+    "& .MuiMenu-list": {
+      padding: "4px 0",
     },
-    '& .MuiMenuItem-root': {
-      '& .MuiSvgIcon-root': {
+    "& .MuiMenuItem-root": {
+      "& .MuiSvgIcon-root": {
         fontSize: 18,
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },
-      '&:active': {
+      "&:active": {
         backgroundColor: alpha(
           theme.palette.primary.main,
-          theme.palette.action.selectedOpacity,
+          theme.palette.action.selectedOpacity
         ),
       },
     },
   },
 }));
 
-
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
+  bgcolor: "background.paper",
+  border: "2px solid #000",
   boxShadow: 24,
   p: 4,
 };
@@ -83,65 +81,26 @@ export default function Post({ post, comp, index }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  const currentAuthorId = state.auth.author.id;
-  const postId = post.id.split("/").reverse()[0];
-
-  const postAuthorId = post.author.id.split("/").reverse()[0];
+  const authorId = state.auth.author.id;
+  const postId = post.id;
 
   const getLikeCount = async () => {
-    const resp = await dispatch(getPostLikes(currentAuthorId, postId));
-    await setLikeCount(resp)
+    await dispatch(getPostLikes(authorId, postId));
   };
-
-
-
-  const [likeCount, setLikeCount] = useState(0);
+  const [like, setLike] = useState(post.like);
   const [isLiked, setIsLiked] = useState(false);
   const [display, setDisplay] = useState("visible");
   const [followerModal, setFollowerModal] = useState(false);
 
-  const allLikedPosts = state.auth.allLiked;
-
-  const getIsLiked = () => {
-    for (let p of allLikedPosts){
-      if( p.post == postId){
-        setIsLiked(true)
-        break;
-      }
-    }
-  }
-  const [commentsList, setCommentsList] = useState([])
-
-  const handleGetComments = async() => {
-    const resp = await dispatch(getCommentsOnPost(postAuthorId, postId))
-    await setCommentsList(resp)
-  }
-
-  const data = {
-    at_context: "https://www.w3.org/ns/activitystreams",
-    type: "Like",
-    summary: state.auth.author.displayName + " likes your post",
-    author: currentAuthorId,
-    post: postId,
-  };
-
-  const likeHandler = async() => {
-    if (isLiked === false) {
-      const resp = await dispatch(sendLiketoAuthor(postAuthorId, data))
-      if (resp == 201){
-        setIsLiked(true)
-        getLikeCount()
-    }  
-    }      
+  const likeHandler = () => {
+    setLike(isLiked ? like - 1 : like + 1);
+    setIsLiked(!isLiked);
   };
 
   useEffect(() => {
     getLikeCount();
     if (comp != "profile") setDisplay("hidden");
-    getIsLiked();
-    if(comp == "home") setDisplay("hidden")
   }, []);
-
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -297,7 +256,7 @@ export default function Post({ post, comp, index }) {
           <StyledMenu
             id="demo-customized-menu"
             MenuListProps={{
-              'aria-labelledby': 'demo-customized-button',
+              "aria-labelledby": "demo-customized-button",
             }}
             anchorEl={anchorEl}
             open={open}
@@ -312,9 +271,7 @@ export default function Post({ post, comp, index }) {
               <DeleteIcon />
               Delete
             </MenuItem>
-
           </StyledMenu>
-
         </div>
       </div>
       <div className="postCenter">
@@ -325,20 +282,11 @@ export default function Post({ post, comp, index }) {
       </div>
       <div className="postBottom">
         <div className="postBottomLeft">
-          <ThumbUpIcon className="likes" style={{ color: isLiked? "blue":"gray" }} onClick={likeHandler} />
-          <span style={{ color: "gray"}}> {likeCount}</span>
+          <ThumbUpIcon className="likes" onClick={likeHandler} />
+          <span style={{ color: "gray" }}> {state.posts.postLikeCount}</span>
         </div>
         <div className="postBottomRight">
-          <span className="postCommentText">
-            <Button
-              variant="text"
-              onClick={handleGetComments}
-              style={{ color: "gray" }}
-            >
-              {" "}
-              Show Comments{" "}
-            </Button>
-          </span>
+          <span className="postCommentText">{post.count} Comments</span>
         </div>
       </div>
       {/* for selecting */}
@@ -349,43 +297,13 @@ export default function Post({ post, comp, index }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }}>
-            <div className="option">Title</div>
-
-            <TextField
-              id="outlined-multiline-static"
-              defaultValue={post?.title}
-              multiline
-              rows={1}
-              placeholder="write something..."
-              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-
-            />
-
-            <div className="option">Description</div>
-
-            <TextField
-              id="outlined-multiline-static"
-              defaultValue={post?.description}
-              multiline
-              rows={2}
-              placeholder="write something..."
-              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-            />
-            <div className="option">Content</div>
-
-            <TextField
-              id="outlined-multiline-static"
-
-              multiline
-              rows={2}
-              placeholder="write something..."
-              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-            />
-            <div className="option">Upload File</div>
-            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
-              <input type='file' />
-            </Box>
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            style={{ textAlign: "center", color: "black" }}
+          >
+            <div className="option">Select what you would like to post</div>
           </Typography>
 
           <Box textAlign="center">
@@ -528,16 +446,8 @@ export default function Post({ post, comp, index }) {
           </Box>
         </Box>
       </Modal>
-      {commentsList != [] &&
-        commentsList.map((c) => (
-          <Comment
-            key={c.id}
-            data={data}
-            comment={c}
-            postAuthorId={postAuthorId}
-          />
-        ))}
-      <AddComment authorId={postAuthorId} postId={postId} />
+      <Comment />
+      <AddComment />
       <FollowerModal
         open={followerModal}
         handleCloseFollowerModal={handleCloseFollowerModal}

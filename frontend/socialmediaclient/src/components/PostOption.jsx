@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+
 export default function PostOption() {
   let requestData = {
     title: "Image Post",
@@ -526,6 +527,85 @@ export default function PostOption() {
               </Button>
             </Box>
           </Box>
+
+        </Box>
+      </Modal>
+      {/* upload final text type */}
+      <Modal
+        open={finalTextOpen}
+        onClose={handleFinalTextClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} textAlign='center'>
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }} />
+            <div className="option">Title</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={1}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+
+            />
+
+            <div className="option">Description</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+
+            <div className="option">Category</div>
+
+            <TextField
+              id="outlined-multiline-static"
+              rows={1}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+
+            <div className="option">Content</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+            <div className="option">Choose Privacy</div>
+            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
+
+            </Box>
+
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={privacy}
+              // label="Age"
+              onChange={handleChange}
+            >
+              <MenuItem value={'public'} selected>Public</MenuItem>
+              <MenuItem value={'private'}>Private</MenuItem>
+
+            </Select>
+
+            <Box textAlign='center' style={{ marginTop: 10 }}>
+              <Button variant='contained'>
+                Post
+              </Button>
+            </Box>
+          </Box>
+
         </Box>
       </Modal>
     </div>
