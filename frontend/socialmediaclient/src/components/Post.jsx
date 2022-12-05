@@ -109,15 +109,14 @@ export default function Post({ post, comp, index }) {
       }
     }
   }
-  
-
-
   const [commentsList, setCommentsList] = useState([])
 
-  const handleGetComments = async () => {
-    const resp = await dispatch(getCommentsOnPost(postAuthorId, postId));
-    setCommentsList = resp;
-  };
+  const handleGetComments = async() => {
+    const resp = await dispatch(getCommentsOnPost(postAuthorId, postId))
+    await setCommentsList(resp)
+    console.log("waiting for resp")
+    await console.log(resp[0])
+  }
 
   const data = {
     at_context: "https://www.w3.org/ns/activitystreams",
