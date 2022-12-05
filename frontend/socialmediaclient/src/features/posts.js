@@ -79,14 +79,15 @@ export const addComment = (author_id, post_id, data) => async() =>{
 export const getCommentsOnPost = (author_id, post_id) => async(dispatch) => {
   try{
     const resp = await api.getComments(author_id, post_id)
+    console.log(resp)
 
     if (resp.status == 200) {
       console.log(resp)
       return resp.data.items
     }
   } catch(e) {
-    return []
     console.log(e)
+    return []
   }
 }
 export const { updatePosts, updatePostLikes } = authorSlice.actions;

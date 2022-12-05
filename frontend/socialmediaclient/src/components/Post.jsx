@@ -98,6 +98,9 @@ export default function Post({ post }) {
   const [commentsList, setCommentsList] = useState([])
 
   const handleGetComments = async() => {
+
+    console.log("here")
+    console.log(postAuthorId, postId)
     const resp = await dispatch(getCommentsOnPost(postAuthorId, postId))
     setCommentsList = resp
   }
