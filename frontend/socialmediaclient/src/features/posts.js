@@ -121,6 +121,6 @@ export const getLikesOnComment = (author_id, post_id, comment_id) => async () =>
   }
 };
 
-export const { updatePosts, updatePostLikes, setError, reset} = authorSlice.actions;
+export const { updatePosts, addPost, updatePostLikes, reset, setError } = authorSlice.actions;
 
 export default authorSlice.reducer;

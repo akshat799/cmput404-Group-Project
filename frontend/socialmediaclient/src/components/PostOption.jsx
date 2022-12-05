@@ -153,8 +153,6 @@ export default function PostOption() {
     requestData.contentType = postType;
     requestData.visibility = privacy;
 
-    console.log(requestData);
-
     let res;
 
     if (location.pathname == "/home")

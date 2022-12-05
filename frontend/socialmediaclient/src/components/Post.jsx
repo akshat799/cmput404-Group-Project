@@ -140,6 +140,7 @@ export default function Post({ post, comp, index }) {
     getLikeCount();
     if (comp != "profile") setDisplay("hidden");
     getIsLiked();
+    if(comp == "home") setDisplay("hidden")
   }, []);
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -352,7 +353,40 @@ export default function Post({ post, comp, index }) {
             component="h2"
             style={{ textAlign: "center", color: "black" }}
           >
-            <div className="option">Select what you would like to post</div>
+            <div className="option">Title</div>
+
+            <TextField
+              id="outlined-multiline-static"
+              defaultValue={post?.title}
+              multiline
+              rows={1}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+
+            <div className="option">Description</div>
+
+            <TextField
+              id="outlined-multiline-static"
+              defaultValue={post?.description}
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+            <div className="option">Content</div>
+
+            <TextField
+              id="outlined-multiline-static"
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+            <div className="option">Upload File</div>
+            <Box textAlign="center" style={{ marginTop: 10, marginBottom: 10 }}>
+              <input type="file" />
+            </Box>
           </Typography>
 
           <Box textAlign="center">
