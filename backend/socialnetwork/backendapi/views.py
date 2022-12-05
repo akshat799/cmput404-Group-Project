@@ -21,6 +21,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 from uuid import UUID
+from django.forms.models import model_to_dict
 
 url = "https://cmput404team18-backend.herokuapp.com/backendapi"
 grp17_url = "https://cmput404f22t17.herokuapp.com"
@@ -246,7 +247,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                             try:      
                                 req = requests.get(grp17_url + f'/authors/{author_id}/posts/{post_id}/', auth=HTTPBasicAuth(grp17_username,grp17_password))
                                 posts = json.loads(req.content)
-                                #print(grp17_url + f'authors/{author_id}/posts/{post_id}')
+                                
                                 return Response(posts , status=status.HTTP_200_OK )
                             except:
                                 try:
@@ -261,6 +262,9 @@ def PostViewSet(request,author_id = None,post_id = None):
                                     except http.Http404 as e:
                                         message = {'error':str(e)}
                                         return Response(message , status.HTTP_404_NOT_FOUND)
+                                    except Exception as e:
+                                        message = {'error':str(e)}
+                                        return Response(message , status.HTTP_400_BAD_REQUEST)
 
 
                     elif post_id == None:
@@ -319,7 +323,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                     for entry in data:
                         entry["id"] = url + f'/authors/{entry["author"]}/posts/{entry["id"]}'
                         author = get_object_or_404(models.Users , id = entry["author"])
-                        print(entry["author"])
+
                         entry["author"] = {
                             "type": author.type,
                             "id": f'{url}/authors/{str(author.id)}',
@@ -329,18 +333,19 @@ def PostViewSet(request,author_id = None,post_id = None):
                             "github": f'http://github.com/{author.githubName}',
                             "profileImage": author.profileImage
                         }
-                    posts_all = []
+
                     if(response == 'local'):
                         try:
                             r = requests.get(grp17_url+"/posts",auth=HTTPBasicAuth(grp17_username,grp17_password))
                             r2 = requests.get(grp15_url+"/posts",auth=HTTPBasicAuth(grp15_username,grp15_password))
                             r3 = requests.get(grp05_url+"/authors/posts_all",auth=HTTPBasicAuth(grp05_username,grp05_password))
                             if(r.status_code == 200 ):
-                                posts_all.append(json.loads(r.content)['items'])
+                                posts_all = (json.loads(r.content)['items'])
+                                print(posts_all)
                             if(r2.status_code == 200):
-                                posts_all.append(json.loads(r2.content)['items'])
+                                posts_all += (json.loads(r2.content)['items'])
                             if(r3.status_code == 200):
-                                posts_all.append(json.loads(r3.content)['items'])
+                                posts_all += (json.loads(r3.content)['items'])
                         except Exception as e:
                             return posts_all
                         #posts_all = get_foreign_posts_t17()
@@ -368,22 +373,78 @@ def PostViewSet(request,author_id = None,post_id = None):
                 post = get_object_or_404(models.PostModel, id=post_id)
                 postData = request.data
                 postData.update({"id": post_id, "author": author.id})
-                serializer = serializers.PostSerializer(data=postData,partial=True)
-                serializer.is_valid(raise_exception=True)
-                postData.update({"author": author})
-                serializer.update(post,postData)
-                data = serializer.data
-                data["id"] = url + f'/authors/{author_id}/posts/{data["id"]}'
+               
+
+                post.title = postData["title"]
+                post.description = postData["description"]
+                post.contentType = postData["contentType"]
+                post.content = postData["content"]
+                post.categories = postData["categories"]
+                post.visibility = postData["visibility"]
+
+                post.save(update_fields=["title" , "description", "contentType", "content", "categories", "visibility"])
+                
+                data = model_to_dict(post)
+                data["published"] = str(data["published"])
+                data["id"] = url + f'/authors/{author_id}/posts/{post_id}'
                 data["author"] = {
                     "type": author.type,
-                    "id": author.id,
+                    "id": str(author.id),
                     "host": author.host,
                     "displayName": author.displayName,
                     "url": author.url,
                     "github": f'http://github.com/{author.githubName}',
                     "profileImage": author.profileImage
                 }
+
+                if data["visibility"] == "FRIENDS":
+                    try:
+                        followerList = models.FollowerModel.objects.filter(followedAuthor = author_id)
+
+                        for followers in followerList:
+                            try:
+                                inboxreceiver = models.InboxObject.objects.get(author = followers.follower.id)
+                                data_listreceiver = []
+                                data_listreceiver.append(json.dumps(data))
+                                inboxreceiver.object = inboxreceiver.object + data_listreceiver
+                                inboxreceiver.save(update_fields=["object"])
+                            
+                            except Exception as e:
+                                inboxAuthorreceiver = get_object_or_404(models.Users , id =followers.follower.id)
+                                inboxReciever = {
+                                    "type" : "inbox",
+                                    "author" : inboxAuthorreceiver.id,
+                                    "object" : [json.dumps(data , indent=10)]
+                                }
+
+                                inboxrecieverSerializer = serializers.InboxObjectSerializer(data = inboxReciever)
+                                inboxrecieverSerializer.is_valid(raise_exception = True)
+                                inboxrecieverSerializer.save()
+
+                        try:
+                            inboxsender = models.InboxObject.objects.get(author = author_id)
+                            data_listsender = []
+                            data_listsender.append(json.dumps(data))
+                            inboxsender.object = inboxsender.object + data_listsender
+                            inboxsender.save(update_fields=["object"])
+                        
+                        except Exception as e:
+                            inboxAuthorsender = get_object_or_404(models.Users , id = author_id)
+                            inboxSender = {
+                                "type" : "inbox",
+                                "author" : inboxAuthorsender.id,
+                                "object" : [json.dumps(data , indent=10)]
+                            }
+
+                            inboxsenderSerializer = serializers.InboxObjectSerializer(data = inboxSender)
+                            inboxsenderSerializer.is_valid(raise_exception = True)
+                            inboxsenderSerializer.save()
+                    except Exception as e:
+                        data = {'error': str(e)}
+                        return Response(data,status=status.HTTP_404_NOT_FOUND)
+
                 return Response(data , status=status.HTTP_201_CREATED)
+
             elif post_id == None:
                 author = get_object_or_404(models.Users,id=author_id)
                 postData = request.data
@@ -392,16 +453,64 @@ def PostViewSet(request,author_id = None,post_id = None):
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 data = serializer.data
+                data["published"] = str(data["published"])
                 data["id"] = url + f'/authors/{author_id}/posts/{data["id"]}'
                 data["author"] = {
                     "type": author.type,
-                    "id": author.id,
+                    "id": str(author.id),
                     "host": author.host,
                     "displayName": author.displayName,
                     "url": author.url,
                     "github": f'http://github.com/{author.githubName}',
                     "profileImage": author.profileImage
                 }
+
+                if data["visibility"] == "FRIENDS":
+                    try:
+                        followerList = models.FollowerModel.objects.filter(followedAuthor = author_id)
+
+                        for followers in followerList:
+                            try:
+                                inboxreceiver = models.InboxObject.objects.get(author = followers.follower.id)
+                                data_listreceiver = []
+                                data_listreceiver.append(json.dumps(data))
+                                inboxreceiver.object = inboxreceiver.object + data_listreceiver
+                                inboxreceiver.save(update_fields=["object"])
+                            
+                            except Exception as e:
+                                inboxAuthorreceiver = get_object_or_404(models.Users , id =followers.follower.id)
+                                inboxReciever = {
+                                    "type" : "inbox",
+                                    "author" : inboxAuthorreceiver.id,
+                                    "object" : [json.dumps(data , indent=10)]
+                                }
+
+                                inboxrecieverSerializer = serializers.InboxObjectSerializer(data = inboxReciever)
+                                inboxrecieverSerializer.is_valid(raise_exception = True)
+                                inboxrecieverSerializer.save()
+
+                        try:
+                            inboxsender = models.InboxObject.objects.get(author = author_id)
+                            data_listsender = []
+                            data_listsender.append(json.dumps(data))
+                            inboxsender.object = inboxsender.object + data_listsender
+                            inboxsender.save(update_fields=["object"])
+                        
+                        except Exception as e:
+                            inboxAuthorsender = get_object_or_404(models.Users , id = author_id)
+                            inboxSender = {
+                                "type" : "inbox",
+                                "author" : inboxAuthorsender.id,
+                                "object" : [json.dumps(data , indent=10)]
+                            }
+
+                            inboxsenderSerializer = serializers.InboxObjectSerializer(data = inboxSender)
+                            inboxsenderSerializer.is_valid(raise_exception = True)
+                            inboxsenderSerializer.save()
+                    except Exception as e:
+                        data = {'error': str(e)}
+                        return Response(data,status=status.HTTP_404_NOT_FOUND)
+
                 return Response(data , status=status.HTTP_201_CREATED)
                 
         except Exception as e:
@@ -414,21 +523,69 @@ def PostViewSet(request,author_id = None,post_id = None):
             postData = request.data
             postData.update({"id": post_id, "author": author.id})
             serializer = serializers.PostSerializer(data=postData)
-            instance = models.PostModel()
             serializer.is_valid(raise_exception=True)
-            postData.update({"author": author})
-            serializer.update(instance , postData)
+            serializer.save(id=post_id)
+            
             data = serializer.data
+            
+            data["published"] = str(data["published"])
             data["id"] = url + f'/authors/{author_id}/posts/{data["id"]}'
             data["author"] = {
                 "type": author.type,
-                "id": author.id,
+                "id": str(author.id),
                 "host": author.host,
                 "displayName": author.displayName,
                 "url": author.url,
                 "github": f'http://github.com/{author.githubName}',
                 "profileImage": author.profileImage
             }
+
+            if data["visibility"] == "FRIENDS":
+                    try:
+                        followerList = models.FollowerModel.objects.filter(followedAuthor = author_id)
+
+                        for followers in followerList:
+                            try:
+                                inboxreceiver = models.InboxObject.objects.get(author = followers.follower.id)
+                                data_listreceiver = []
+                                data_listreceiver.append(json.dumps(data))
+                                inboxreceiver.object = inboxreceiver.object + data_listreceiver
+                                inboxreceiver.save(update_fields=["object"])
+                            
+                            except Exception as e:
+                                inboxAuthorreceiver = get_object_or_404(models.Users , id =followers.follower.id)
+                                inboxReciever = {
+                                    "type" : "inbox",
+                                    "author" : inboxAuthorreceiver.id,
+                                    "object" : [json.dumps(data , indent=10)]
+                                }
+
+                                inboxrecieverSerializer = serializers.InboxObjectSerializer(data = inboxReciever)
+                                inboxrecieverSerializer.is_valid(raise_exception = True)
+                                inboxrecieverSerializer.save()
+
+                        try:
+                            inboxsender = models.InboxObject.objects.get(author = author_id)
+                            data_listsender = []
+                            data_listsender.append(json.dumps(data))
+                            inboxsender.object = inboxsender.object + data_listsender
+                            inboxsender.save(update_fields=["object"])
+                        
+                        except Exception as e:
+                            inboxAuthorsender = get_object_or_404(models.Users , id = author_id)
+                            inboxSender = {
+                                "type" : "inbox",
+                                "author" : inboxAuthorsender.id,
+                                "object" : [json.dumps(data , indent=10)]
+                            }
+
+                            inboxsenderSerializer = serializers.InboxObjectSerializer(data = inboxSender)
+                            inboxsenderSerializer.is_valid(raise_exception = True)
+                            inboxsenderSerializer.save()
+                    except Exception as e:
+                        data = {'error': str(e)}
+                        return Response(data,status=status.HTTP_404_NOT_FOUND)
+
             return Response(data , status=status.HTTP_201_CREATED)
         elif post_id == None:
             data = {'error': 'This method is not allowed'}
