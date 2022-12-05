@@ -52,6 +52,7 @@ export const login = (data) => async(dispatch) => {
       if(resp.status === 200){
         dispatch(signIn(resp));
         localStorage.setItem("token", resp.data.access);
+        console.log(resp)
         return resp
       }
       else{
@@ -66,7 +67,7 @@ export const login = (data) => async(dispatch) => {
 }
 
 export const logout = () => async(dispatch) =>{
-  await dispatch(signOut);
+  dispatch(signOut());
   localStorage.removeItem('token')
 }  
 

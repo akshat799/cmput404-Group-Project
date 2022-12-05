@@ -1,10 +1,18 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import TextField from "@mui/material/TextField";
-const AddComment = () => {
+import { addComment } from '../features/posts';
+import { useDispatch } from 'react-redux';
+const AddComment = ({authorId, postId}) => {
+
+    const dispatch = useDispatch();
     const imgLink =
         "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
-    return (
+
+        const sendComment = async () => {
+            await dispatch(addComment(authorId, postId))
+          }
+        return (
         <>
             <div style={{ marginTop: 15 }} className="postTop">
 
@@ -25,7 +33,7 @@ const AddComment = () => {
                         style={{ width: 400, marginLeft: 20 }}
 
                     />
-                    <Button variant="contained" style={{ marginLeft: 10 }}>Add comment</Button>
+                    <Button variant="contained" style={{ marginLeft: 10 }} onClick={sendComment}>Add comment</Button>
                 </div>
             </div>
         </>

@@ -10,11 +10,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from "@mui/material/TextField";
 import Typography from '@mui/material/Typography';
+import { getCommentsOnPost } from "../features/posts";
 
 import { alpha, styled } from '@mui/material/styles';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPostLikes } from "../features/posts";
+import { sendLiketoAuthor } from "../features/posts";
 import AddComment from "./AddComment";
 import Comment from "./Comment";
 import "./Post.css";
@@ -79,18 +81,45 @@ export default function Post({ post }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  const authorId = state.auth.author.id;
-  const postId = post.id;
+  const currentAuthorId = state.auth.author.id;
+  console.log(currentAuthorId)
+  const postId = post.id.split("/").reverse()[0];
+
+  const postAuthorId = post.author.id.split("/").reverse()[0]
 
   const getLikeCount = async () => {
-    await dispatch(getPostLikes(authorId, postId));
+    console.log(currentAuthorId)
+    console.log(postId)
+    await dispatch(getPostLikes(currentAuthorId, postId));
   };
+
   const [like, setLike] = useState(post.like);
   const [isLiked, setIsLiked] = useState(false);
 
-  const likeHandler = () => {
-    setLike(isLiked ? like - 1 : like + 1);
-    setIsLiked(!isLiked);
+  const [commentsList, setCommentsList] = useState([])
+
+  const handleGetComments = async() => {
+    const resp = await dispatch(getCommentsOnPost(postAuthorId, postId))
+    setCommentsList = resp
+  }
+
+  const data = {
+    "at_context": "https://www.w3.org/ns/activitystreams",
+    "type": "Like",
+    "summary": state.auth.author.displayName + " likes your post",
+    "author" : currentAuthorId,
+    "post" : postId
+  }
+
+  const likeHandler = async() => {
+    console.log(data)
+    console.log(postAuthorId)
+    const resp = await dispatch(sendLiketoAuthor(postAuthorId, data))
+    if (resp?.status == 200){
+      setIsLiked(true)
+    }        
+    // setLike(isLiked ? like - 1 : like + 1);
+    // setIsLiked(!isLiked);
   };
 
   useEffect(() => {
@@ -167,7 +196,7 @@ export default function Post({ post }) {
           <span style={{ color: "gray" }}> {state.posts.postLikeCount}</span>
         </div>
         <div className="postBottomRight">
-          <span className="postCommentText">{post.count} Comments</span>
+          <span className="postCommentText"><Button variant="text" onClick={handleGetComments} style={{color:"gray"}}> Show Comments </Button></span>
         </div>
       </div>
       <Modal
@@ -224,8 +253,10 @@ export default function Post({ post }) {
           </Box>
         </Box>
       </Modal>
-      <Comment />
-      <AddComment />
+      {commentsList != [] && commentsList.map((c) => (
+          <Comment key={c.id} data= {data} comment={c} postAuthorId = {postAuthorId} />
+        ))}
+      <AddComment authorId={postAuthorId} postId={postId}/>
     </div>
   );
 }
