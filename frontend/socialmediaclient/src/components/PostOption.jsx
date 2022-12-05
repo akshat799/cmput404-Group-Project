@@ -1,14 +1,16 @@
 import Modal from "@material-ui/core/Modal";
 import ImageIcon from '@mui/icons-material/Image';
-import LinkIcon from '@mui/icons-material/Link';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import TextField from "@mui/material/TextField";
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import "./PostOption.css";
+
 
 export default function PostOption() {
 
@@ -16,15 +18,36 @@ export default function PostOption() {
   const [imageOpen, setImageOpen] = React.useState(false);
   const [linkOpen, setLinkOpen] = React.useState(false);
   const [markOpen, setMarkOpen] = React.useState(false);
+  const [finalTextOpen, setFinalTextOpen] = React.useState(false);
+
+  const [privacy, setPrivacy] = React.useState('public');
+  const [postType, setPostType] = React.useState('none');
+
+  const handleChange = (event) => {
+    setPrivacy(event.target.value);
+  };
+
+  const handlePostTypeChange = (event) => {
+    setPostType(event.target.value);
+    if (event.target.value !== 'none') {
+      setTextOpen(false);
+      setFinalTextOpen(true);
+    }
+  };
+
+
   const handleTextOpen = () => setTextOpen(true);
   const handleImageOpen = () => setImageOpen(true);
-  const handleLinkOpen = () => setLinkOpen(true);
   const handleMarkOpen = () => setMarkOpen(true);
+  const handleFinalTextOpen = () => setFinalTextOpen(true);
+
 
   const handleTextClose = () => setTextOpen(false);
   const handleImageClose = () => setImageOpen(false);
   const handleLinkClose = () => setLinkOpen(false);
   const handleMarkClose = () => setMarkOpen(false);
+  const handleFinalTextClose = () => setFinalTextOpen(false);
+
 
 
   const [selectedFile, setSelectedFile] = React.useState();
@@ -87,13 +110,13 @@ export default function PostOption() {
           <ImageIcon />
           <span><button className='button'>Image</button></span>
         </div>
-        <div className="post-type" onClick={handleLinkOpen}>
+        {/* <div className="post-type" onClick={handleLinkOpen}>
           <LinkIcon />
           <span><button className='button'>Image Link</button></span>
-        </div>
+        </div> */}
         <div className="post-type" onClick={handleMarkOpen}>
           <TextSnippetIcon />
-          <span><button className='button'>CommonMark</button></span>
+          <span><button className='button'>Base 64</button></span>
         </div>
 
       </div>
@@ -106,24 +129,23 @@ export default function PostOption() {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }}>
-            <div className="option">Enter what you would like to post</div>
-
+            <div className="option">Select what you would like to post</div>
           </Typography>
 
+          <Box textAlign="center">
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={postType}
+              // label="select an item"
+              onChange={handlePostTypeChange}
+            >
+              <MenuItem value={'none'}>Select an item</MenuItem>
+              <MenuItem value={'html'}>HTML</MenuItem>
+              <MenuItem value={'text'} >Plain Text</MenuItem>
+              <MenuItem value={'markdown'}>Markdown</MenuItem>
 
-          <Box textAlign='center' style={{ marginTop: 10 }}>
-            <TextField
-              id="outlined-multiline-static"
-              label="Enter your post"
-              multiline
-              rows={2}
-              placeholder="write something..."
-              style={{ width: 280, marginTop: 20, marginBottom: 15 }}
-
-            />
-            <Button variant='contained'>
-              Post
-            </Button>
+            </Select>
           </Box>
         </Box>
       </Modal>
@@ -136,8 +158,82 @@ export default function PostOption() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
+          <Box sx={style} textAlign='center'>
+            <Box>
+              <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }} />
+              <div className="option">Title</div>
 
-          <input type='file' accept="image/*" onChange={onSelectFile} />
+              <TextField
+                id="outlined-multiline-static"
+
+                multiline
+                rows={1}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+
+              />
+
+              <div className="option">Description</div>
+
+              <TextField
+                id="outlined-multiline-static"
+
+                multiline
+                rows={1}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              />
+
+              <div className="option">Category</div>
+
+              <TextField
+                id="outlined-multiline-static"
+                rows={1}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              />
+
+              <div className="option">Content</div>
+
+              <TextField
+                id="outlined-multiline-static"
+
+                multiline
+                rows={2}
+                placeholder="write something..."
+                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              />
+              <div className="option">Choose Privacy</div>
+              <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
+
+              </Box>
+
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={privacy}
+                // label="Age"
+                onChange={handleChange}
+              >
+                <MenuItem value={'public'} selected>Public</MenuItem>
+                <MenuItem value={'private'}>Private</MenuItem>
+
+              </Select>
+              <div className="option" style={{ marginTop: 10 }} >Upload image</div>
+
+              <input type='file' accept="image/*" onChange={onSelectFile} />
+              <Box textAlign='center' style={{ marginTop: 10 }}>
+                {selectedFile && <img alt="nothing" style={{ height: '100px', width: '100px', borderRadius: '50%' }} src={preview} />}
+              </Box>
+              <Box textAlign='center' style={{ marginTop: 10 }}>
+                <Button variant='contained'>
+                  Post
+                </Button>
+              </Box>
+            </Box>
+
+          </Box>
+          {/* <input type='file' accept="image/*" onChange={onSelectFile} />
           <Box textAlign='center' style={{ marginTop: 10 }}>
             {selectedFile && <img alt="nothing" style={{ height: '150px', width: '300px' }} src={preview} />}
           </Box>
@@ -146,7 +242,7 @@ export default function PostOption() {
             <Button variant='contained'>
               Post
             </Button>
-          </Box>
+          </Box> */}
         </Box>
       </Modal>
 
@@ -182,22 +278,160 @@ export default function PostOption() {
         </Box>
       </Modal>
 
-      {/* Upload file */}
+      {/* Upload base64 */}
       <Modal
         open={markOpen}
         onClose={handleMarkClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box sx={style} textAlign='center'>
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }} />
+            <div className="option">Title</div>
 
-          <input type='file' />
+            <TextField
+              id="outlined-multiline-static"
 
-          <Box textAlign='center' style={{ marginTop: 10 }}>
-            <Button variant='contained'>
-              Post
-            </Button>
+              multiline
+              rows={1}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+
+            />
+
+            <div className="option">Description</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+
+            <div className="option">Category</div>
+
+            <TextField
+              id="outlined-multiline-static"
+              rows={1}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+
+            <div className="option">Content</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+            <div className="option">Choose Privacy</div>
+            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
+
+            </Box>
+
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={privacy}
+              // label="Age"
+              onChange={handleChange}
+            >
+              <MenuItem value={'public'} selected>Public</MenuItem>
+              <MenuItem value={'private'}>Private</MenuItem>
+
+            </Select>
+
+            <Box textAlign='center' style={{ marginTop: 10 }}>
+              <Button variant='contained'>
+                Post
+              </Button>
+            </Box>
           </Box>
+
+        </Box>
+      </Modal>
+      {/* upload final text type */}
+      <Modal
+        open={finalTextOpen}
+        onClose={handleFinalTextClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} textAlign='center'>
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }} />
+            <div className="option">Title</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={1}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+
+            />
+
+            <div className="option">Description</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+
+            <div className="option">Category</div>
+
+            <TextField
+              id="outlined-multiline-static"
+              rows={1}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+
+            <div className="option">Content</div>
+
+            <TextField
+              id="outlined-multiline-static"
+
+              multiline
+              rows={2}
+              placeholder="write something..."
+              style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+            />
+            <div className="option">Choose Privacy</div>
+            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
+
+            </Box>
+
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={privacy}
+              // label="Age"
+              onChange={handleChange}
+            >
+              <MenuItem value={'public'} selected>Public</MenuItem>
+              <MenuItem value={'private'}>Private</MenuItem>
+
+            </Select>
+
+            <Box textAlign='center' style={{ marginTop: 10 }}>
+              <Button variant='contained'>
+                Post
+              </Button>
+            </Box>
+          </Box>
+
         </Box>
       </Modal>
     </div>
