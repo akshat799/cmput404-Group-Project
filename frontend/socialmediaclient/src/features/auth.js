@@ -39,7 +39,7 @@ export const authorSlice = createSlice({
 export const signUp = (data) => async (dispatch) => {
   try {
     const responseData = await api.register(data);
-    console.log(responseData);
+    // console.log(responseData);
     return responseData.status;
   } catch (e) {
     return e?.response?.data?.detail;
@@ -53,7 +53,7 @@ export const login = (data) => async (dispatch) => {
       if(resp.status === 200){
         dispatch(signIn(resp));
         localStorage.setItem("token", resp.data.access);
-        console.log(resp)
+        // console.log(resp)
         return resp
       }
       else{
@@ -83,10 +83,8 @@ export const logout = () => async (dispatch) => {
 export const getAllLiked = (author_id) => async(dispatch) => {
   try{
     const resp = await api.getLiked(author_id)
-    console.log(resp)
 
     if (resp.status == 200) {
-      console.log("getting all liked")
       dispatch(updateAllLiked(resp.data.items))
     }
   } catch(e) {
