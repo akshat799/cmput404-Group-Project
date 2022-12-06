@@ -114,7 +114,7 @@ export const getLikesOnComment = (author_id, post_id, comment_id) => async () =>
     const resp = await api.getCommentLikes(author_id, post_id, comment_id);
 
     if (resp.status == 200) {
-      return resp.data.length
+      return resp.data
     }
   } catch (e) {
     console.log(e);

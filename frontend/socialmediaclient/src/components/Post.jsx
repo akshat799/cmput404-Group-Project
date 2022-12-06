@@ -94,6 +94,8 @@ export default function Post({ post, comp, index }) {
     await setLikeCount(resp)
   };
 
+
+
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [display, setDisplay] = useState("visible");

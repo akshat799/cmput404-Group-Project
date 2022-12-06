@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { useState } from 'react';
 
 
-const AddComment = ({authorId, postId}) => {
+const AddComment = ({currentAuthorId, postId}) => {
 
     const state = useSelector((state) => state);
     const dispatch = useDispatch();
@@ -21,8 +21,8 @@ const AddComment = ({authorId, postId}) => {
             "comment": commentText,
             "contentType": "text/plain",
         };
-        console.log(authorId, postId) 
-        const status = await dispatch(addComment(authorId, postId, data))
+        console.log(currentAuthorId, postId) 
+        const status = await dispatch(addComment(currentAuthorId, postId, data))
         
         if( status == 200){
             setCommentText("")

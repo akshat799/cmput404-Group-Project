@@ -11,8 +11,13 @@ import { logout } from "../features/auth";
 import { resetPosts } from "../features/posts";
 import { resetUserPosts } from "../features/userposts";
 import "./navbar.css";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import { useEffect } from "react";
+
 
 export default function Navbar() {
+  const state = useSelector((state)=> state);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = async () => {
@@ -36,6 +41,42 @@ export default function Navbar() {
     "user 12",
   ];
 
+  const allRegisteredAuthors = state.auth.allAuthors;
+
+  const [enteredUsername, setEnteredUsername] = useState("")
+
+  const [isMatch, setisMatch] = useState(false)
+
+  const [dispOption,setdispOption] = useState([])
+  const [foreignAuthor, setForeignAuthor] = useState({})
+
+  
+  
+  const matchUsername = () => {
+    console.log("this is called")
+    for(let author of allRegisteredAuthors){
+      // console.log(author.displayName)
+      if(author.displayName === enteredUsername && enteredUsername != ''){
+        setisMatch(true)
+        setForeignAuthor(author)
+        setdispOption([enteredUsername])
+        console.log("Here is: "+ dispOption[0])
+      }
+    }
+  } 
+
+  const handleBadge = () => {
+    setBadgeNumber(0);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(()=> {
+      matchUsername()
+      // console.log(enteredUsername)
+    },500)
+
+    return () => clearTimeout(timer)
+  }, [enteredUsername]);
   return (
     <header className="header">
       <h1 className="logo">
@@ -45,16 +86,14 @@ export default function Navbar() {
         <Autocomplete
           disablePortal
           id="combo-box-demo"
-          options={suggestionsSearch}
+          options={dispOption}
           onChange={(event, value) => {
-            console.log(value);
-            navigate("/pprofile");
+            console.log(foreignAuthor)
+            navigate("/pprofile", {state:{id: 1, foreignAuthor: {foreignAuthor}}});
           }}
-          sx={{ width: 300, borderRadius: "10px", background: "white" }}
-          renderInput={(params) => (
-            <TextField {...params} placeholder="search 🔍" />
-          )}
-        />
+          sx={{ width: 300, borderRadius: '10px', background: 'white' }}
+          renderInput={(params) => <TextField {...params} onChange={(event) => { setEnteredUsername(event.target.value)}} placeholder="search🔍" />} 
+          />
       </div>
 
       <ul className="main-nav">
