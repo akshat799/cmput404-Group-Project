@@ -239,7 +239,7 @@ def PostViewSet(request,author_id = None,post_id = None):
                             post = models.PostModel.objects.get(id=post_id,visibility='PUBLIC', author = author)
                             serializer = serializers.PostSerializer(post)
                             serial_data = serializer.data
-                            serial_data["id"] = url + f'/authors/{post.author.id}/posts/{serial_data["post"]}'
+                            serial_data["id"] = url + f'/authors/{post.author.id}/posts/{post.id}'
                             serial_data["author"] = {
                                 "type": post.author.type,
                                 "id": f'{url}/authors/{post.author.id}',
