@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import django_heroku
 import dj_database_url
-import os
+import os,sys
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -114,7 +114,23 @@ WSGI_APPLICATION = 'socialnetwork.wsgi.application'
 
 #     }
 # }
-DATABASES = {
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'd2hg0jp2a2622',
+            'USER': 'utpogloffpnmle',
+            'PASSWORD': '84583cfd15cff7937471c4c9c981adf082b4e42bf51e05f1bf725297b1a9fde8',
+            'HOST': 'ec2-54-157-79-121.compute-1.amazonaws.com',
+            'PORT': 5432,
+            'TEST': {
+                'NAME': 'd2hg0jp2a2622', #This is an important entry
+            }
+        }
+    }
+else:
+  #Default configuration
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'd4b5fgdrjrpj8',
