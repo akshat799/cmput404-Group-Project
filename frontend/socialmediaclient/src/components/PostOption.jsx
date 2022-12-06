@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-
 export default function PostOption() {
   let requestData = {
     title: "Image Post",
@@ -527,7 +526,6 @@ export default function PostOption() {
               </Button>
             </Box>
           </Box>
-
         </Box>
       </Modal>
       {/* upload final text type */}
@@ -537,55 +535,68 @@ export default function PostOption() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style} textAlign='center'>
+        <Box sx={style} textAlign="center">
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }} />
+            <Typography
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+              style={{ textAlign: "center", color: "black" }}
+            />
             <div className="option">Title</div>
 
             <TextField
+              required
               id="outlined-multiline-static"
-
               multiline
               rows={1}
               placeholder="write something..."
               style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-
+              onChange={(e) => setTitle(e.target.value)}
             />
 
             <div className="option">Description</div>
 
             <TextField
+              required
               id="outlined-multiline-static"
-
               multiline
               rows={2}
               placeholder="write something..."
               style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              onChange={(e) => setDesc(e.target.value)}
             />
 
-            <div className="option">Category</div>
+            <div className="option">Categories (Separate by commas)</div>
 
             <TextField
+              required
               id="outlined-multiline-static"
               rows={1}
               placeholder="write something..."
               style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              onChange={(e) => {
+                let data = e.target.value.split(",");
+                setCategories(data);
+              }}
             />
 
             <div className="option">Content</div>
-
             <TextField
+              required
               id="outlined-multiline-static"
-
               multiline
               rows={2}
               placeholder="write something..."
               style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+              onChange={(e) => setContent(e.target.value)}
             />
-            <div className="option">Choose Privacy</div>
-            <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
 
-            </Box>
+            <div className="option">Choose Privacy</div>
+            <Box
+              textAlign="center"
+              style={{ marginTop: 10, marginBottom: 10 }}
+            ></Box>
 
             <Select
               labelId="demo-simple-select-label"
@@ -594,18 +605,18 @@ export default function PostOption() {
               // label="Age"
               onChange={handleChange}
             >
-              <MenuItem value={'public'} selected>Public</MenuItem>
-              <MenuItem value={'private'}>Private</MenuItem>
-
+              <MenuItem value={"PUBLIC"} selected>
+                Public
+              </MenuItem>
+              <MenuItem value={"FRIENDS"}>Private</MenuItem>
             </Select>
 
-            <Box textAlign='center' style={{ marginTop: 10 }}>
-              <Button variant='contained'>
+            <Box textAlign="center" style={{ marginTop: 10 }}>
+              <Button variant="contained" onClick={() => handleUpload("text")}>
                 Post
               </Button>
             </Box>
           </Box>
-
         </Box>
       </Modal>
     </div>
