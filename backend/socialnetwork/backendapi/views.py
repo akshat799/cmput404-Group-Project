@@ -890,29 +890,6 @@ def CommentViewSet(request, author_id, post_id):
                     inboxsenderSerializer.is_valid(raise_exception = True)
                     inboxsenderSerializer.save()
 
-            # models.InboxObject.objects.create(
-            # author= receiver_url,
-            # #object = responseData
-            # object= {
-            #     "type" : "comment",
-            #     #"author" : authorData,
-            #     "author" : {
-            #     "type": author.type,
-            #     "id": str(author.id),
-            #     "host": author.host,
-            #     "displayName": author.displayName,
-            #     "url": author.url,
-            #     "github": f'http://github.com/{author.githubName}',
-            #     "profileImage": author.profileImage
-            #     },
-            #     "comment" : serializer.data["comment"],
-            #     "contentType" : serializer.data["contentType"],
-            #     "published" : serializer.data["published"],
-            #     "id": comments_id,
-            #     "url_id" : comments_url,
-            #     "summary": str(author.displayName) + " comments on your post " + str(post.title) 
-            # }
-            # )
             return Response(commentData, status = status.HTTP_200_OK)
         except Exception as e:
             data = {'error' : str(e)}
@@ -976,7 +953,7 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 #check if already follow this author
                 if models.FollowerModel.objects.filter(follower = foreign_author_id, followedAuthor = author_id).exists():
                     result = {
-                        "detail": "You already followed this use!"
+                        "detail": "You already followed this user!"
                     }
                     return Response(result,status=status.HTTP_400_BAD_REQUEST)
                 
@@ -986,7 +963,19 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                     TrueFirend_check = True
                     models.FollowerModel.objects.filter(follower = author_id, followedAuthor = foreign_author_id).update(true_friends=TrueFirend_check)
 
+                inbox = get_object_or_404(models.InboxObject , author = author_id)
                 
+                inboxCount = 0
+                for length in inbox.object:
+                    data = json.loads(length)
+                    # print(data["actor"]["id"])
+                    inboxCount += 1
+                    if "actor" in data:
+                        if data["actor"]["id"] == foreign_author_id:
+                            print("hi")
+                            inbox.object.pop(inboxCount)
+                            inbox.save(update_fields=["object"])
+
                 follower = get_object_or_404(models.Users, id = foreign_author_id)
                 followedAuthor = models.Users.objects.get(id = author_id)
                 models.FollowerModel.objects.create(follower = follower,followedAuthor=followedAuthor,true_friends=TrueFirend_check)
@@ -1018,6 +1007,8 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 result={
                     "detail": "Following request has been accpected! "+str(follower.displayName) +" is now following you! "
                     }
+                
+                
                 return Response(result, status = status.HTTP_201_CREATED)
             except Exception as e:
                 data = {'error' : str(e)}
@@ -1027,7 +1018,6 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
             #unfollow the author
             try:
                 follow = get_object_or_404(models.FollowerModel, follower = foreign_author_id, followedAuthor = author_id)
-                print('FOLLOW OBJECT:', follow)
                 serializer = serializers.FollowerSerializer(follow)
                 follow.delete()
                 data = {"message":"Deletion successful"}
