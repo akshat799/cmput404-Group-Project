@@ -120,18 +120,20 @@ def AuthorsView(request,author_id):
             data = request.data
             try:
                 authors = models.Users.objects.get(id=author_id)
-
-                if data["displayName"] is not None:
-                    authors.displayName = data['displayName']
-                if data["githubName"] is not None:
-                    authors.githubName = data['githubName']
-                if data["profileImage"] is not None:
-                    authors.profileImage = data['profileImage']
-
-                authors.save()
+               # serializer = serializers.UserSerializer(authors,data,partial=True)
+                if data.get("displayName"):
+                    authors.displayName = data["displayName"]
+                    authors.save(update_fields=["displayName"])
+                if data.get("githubName"):
+                    authors.githubName = data["githubName"]
+                    authors.save(update_fields=["githubName"])
+                if data.get("profileImage"):
+                    authors.profileImage = data["profileImage"]
+                    authors.save(update_fields=["profileImange"])
+                
+                
                 
                 message = {'message','successfully update profile'}
-                messages.success(request,'Profile is update successfully!')
                 return Response(message,status=status.HTTP_200_OK)
             except Exception as e:
                 message = {'error',e}
