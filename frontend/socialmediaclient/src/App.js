@@ -7,6 +7,7 @@ import Home from "./pages/Home.jsx";
 import Inbox from "./pages/Inbox/Inbox";
 import Pprofile from "./pages/profile/Pprofile";
 import Profile from "./pages/profile/Profile";
+import BasicTabs from "./containers/InboxContainer";
 
 
 function App() {
@@ -17,7 +18,7 @@ function App() {
           <Route path="/" element={<LoginSignUpContainer />} />
           <Route exact path="/home" element={<Home />} />
           <Route exact path="/profile" element={<Profile />} />
-          <Route exact path="/inbox" element={<Inbox />} />
+          <Route exact path="/inbox" element={<BasicTabs />} />
           {/* This is for search bar profile */}
           <Route exact path="/pprofile" element={<Pprofile />} />
         </Routes>

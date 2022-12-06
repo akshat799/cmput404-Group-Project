@@ -20,18 +20,9 @@
     box-sizing: border-box;
 }
 
-
-/* body {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    background-color: var(--Very-light-grayish-blue);
-}
-*/
-
 .notiContainer {
     margin: 3vh auto;
-    width: 800px;
+    width: 60vw;
     background-color: var(--White);
     padding: 1.5rem 1rem;
     border-radius: 0.5rem;
@@ -62,14 +53,6 @@ header {
     border-radius: 0.5rem;
 }
 
-#mark_all {
-    cursor: pointer;
-}
-
-#mark_all:hover {
-    color: var(--Blue);
-}
-
 p {
     color: var(--Dark-grayish-blue);
 }
@@ -85,6 +68,16 @@ main {
     align-items: center;
     border-radius: 0.5rem;
     padding: 1rem;
+    background-color: aliceblue;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: aliceblue;
 }
 
 img {
@@ -141,12 +134,12 @@ strong:hover {
     margin-left: auto;
 }
 
-.notif_card:hover {
-    cursor: pointer;
-}
-
 @media screen and (max-width: 550px) {
     .container {
         margin: 0;
     }
+}
+
+.img{
+    border-radius: 2rem;
 }

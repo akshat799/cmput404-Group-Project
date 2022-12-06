@@ -5,6 +5,7 @@ import Post from "./Post";
 import { useSelector } from "react-redux";
 import { getPublicPosts } from "../features/posts";
 import { useDispatch } from "react-redux";
+import { getOwnFollowers } from "../features/auth";
 
 export default function Feed() {
   const state = useSelector((state) => state);
@@ -15,6 +16,7 @@ export default function Feed() {
   // const authorId = state.auth.author.id.split("/")[-1]
   const getPosts = async () => {
     await dispatch(getPublicPosts());
+    dispatch(getOwnFollowers(authorId));
   };
 
   useEffect(() => {

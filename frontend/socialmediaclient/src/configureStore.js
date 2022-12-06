@@ -4,17 +4,19 @@ import { persistReducer, persistStore } from "redux-persist";
 import authReducer from "./features/auth";
 import postsReducer from "./features/posts";
 import userpostsReducer from "./features/userposts";
+import notificationsReducer from "./features/notifications";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "posts", "userposts"],
+  whitelist: ["auth", "posts", "userposts", "notifications"],
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
   posts: postsReducer,
   userposts: userpostsReducer,
+  notifications: notificationsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

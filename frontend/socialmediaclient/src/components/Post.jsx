@@ -3,15 +3,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-
 import { alpha, styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +19,8 @@ import AddComment from "./AddComment";
 import Comment from "./Comment";
 import "./Post.css";
 import PostContent from "./PostContent";
+import { editPosts } from "../features/userposts";
+import FollowerModal from "./FollowerModal";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -76,7 +77,7 @@ const style = {
   p: 4,
 };
 
-export default function Post({ post, comp }) {
+export default function Post({ post, comp, index }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
 
@@ -89,6 +90,7 @@ export default function Post({ post, comp }) {
   const [like, setLike] = useState(post.like);
   const [isLiked, setIsLiked] = useState(false);
   const [display, setDisplay] = useState("visible");
+  const [followerModal, setFollowerModal] = useState(false);
 
   const likeHandler = () => {
     setLike(isLiked ? like - 1 : like + 1);
@@ -97,7 +99,7 @@ export default function Post({ post, comp }) {
 
   useEffect(() => {
     getLikeCount();
-    if(comp == "home") setDisplay("hidden")
+    if (comp != "profile") setDisplay("hidden");
   }, []);
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -114,23 +116,47 @@ export default function Post({ post, comp }) {
     handleTextOpen();
   };
 
-  const [postType, setPostType] = useState('none');
+  const [postType, setPostType] = useState("none");
   const [textOpen, setTextOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
 
+  const reset = () => {
+    setPostType("none");
+    setTitle(post.title);
+    setDesc(post.description);
+    setCategories([]);
+    setContent("");
+    setPrivacy("PUBLIC");
+    setPreview(undefined);
+  };
+
   const handleTextOpen = () => setTextOpen(true);
-  const handleTextClose = () => setTextOpen(false);
-  const handleImageOpen = () => setImageOpen(true);
-  const handleImageClose = () => setImageOpen(false);
-  const [privacy, setPrivacy] = useState('public');
+  const handleTextClose = () => {
+    setTextOpen(false);
+    reset();
+  };
+  const handleImageOpen = () => {
+    setImageOpen(true);
+  };
+  const handleImageClose = () => {
+    setImageOpen(false);
+    reset();
+  };
+  const handleCloseFollowerModal = () => {
+    setFollowerModal(false);
+  };
+  const [privacy, setPrivacy] = useState(post.visibility);
+  const [title, setTitle] = useState(post.title);
+  const [desc, setDesc] = useState(post.description);
+  const [categories, setCategories] = useState([]);
+  const [content, setContent] = useState("");
 
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
 
-
-
   useEffect(() => {
     if (!selectedFile) {
+      console.log("UNDEFINED");
       setPreview(undefined);
       return;
     }
@@ -142,19 +168,41 @@ export default function Post({ post, comp }) {
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
 
-  const onSelectFile = e => {
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const onSelectFile = (e, type) => {
+    console.log(e.target.files);
     if (!e.target.files || e.target.files.length === 0) {
+      console.log("HERE");
       setSelectedFile(undefined);
       return;
     }
 
-    // I've kept this example simple by using the first image instead of multiple
-    setSelectedFile(e.target.files[0]);
+    if (type == "image") {
+      const ext = e.target.files[0].name.split(".");
+      if (ext[ext.length - 1] != "png" && ext[ext.length - 1] != "jpeg") {
+        //display error
+      } else {
+        setSelectedFile(e.target.files[0]);
+      }
+    }
   };
 
   const handlePostTypeChange = (event) => {
+    console.log(index);
     setPostType(event.target.value);
-    if (event.target.value !== 'none') {
+    if (event.target.value !== "none") {
       setTextOpen(false);
       setImageOpen(true);
     }
@@ -162,23 +210,48 @@ export default function Post({ post, comp }) {
   const handleChange = (event) => {
     setPrivacy(event.target.value);
   };
+
+  const handleUpdate = async () => {
+    const requestData = {
+      title: title,
+      description: desc,
+      contentType: postType,
+      content: content,
+      visibility: privacy,
+      unlisted: false,
+    };
+    if (postType == "image") {
+      requestData.contentType = selectedFile.name.split(".").reverse()[0];
+      requestData.content = await convertToBase64(selectedFile);
+    }
+
+    const res = await dispatch(
+      editPosts(requestData, state.auth.id, post.id, index)
+    );
+  };
+
   return (
     <div className="post">
       <div className="postTop">
         <div className="postTopLeft">
-          {/* <img
+          <img
             className="postProfileImg"
             src={post.author.profileImage}
             alt=""
-          /> */}
-          <span className="postUsername">
-            {/* {post.author.displayName} */}
-          </span>
+          />
+          <span className="postUsername">{post.author.displayName}</span>
         </div>
         <div className="postTopRight">
+          <Button
+            variant="contained"
+            style={{ marginRight: "0.5rem" }}
+            onClick={() => setFollowerModal(true)}
+          >
+            Share
+          </Button>
           <MoreHorizIcon
             onClick={handleClick}
-            style={{ visibility : display}}
+            style={{ visibility: display }}
           />
           <StyledMenu
             id="demo-customized-menu"
@@ -224,7 +297,12 @@ export default function Post({ post, comp }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }}>
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            style={{ textAlign: "center", color: "black" }}
+          >
             <div className="option">Select what you would like to post</div>
           </Typography>
 
@@ -236,17 +314,15 @@ export default function Post({ post, comp }) {
               // label="select an item"
               onChange={handlePostTypeChange}
             >
-              <MenuItem value={'none'}>Select an item</MenuItem>
-              <MenuItem value={'html'}>HTML</MenuItem>
-              <MenuItem value={'text'} >Plain Text</MenuItem>
-              <MenuItem value={'markdown'}>Markdown</MenuItem>
-              <MenuItem value={'image'}>Image</MenuItem>
-              <MenuItem value={'base64'}>base64</MenuItem>
-
+              <MenuItem value={"none"}>Select an item</MenuItem>
+              <MenuItem value={"text/html"}>HTML</MenuItem>
+              <MenuItem value={"text/plain"}>Plain Text</MenuItem>
+              <MenuItem value={"text/markdown"}>Markdown</MenuItem>
+              <MenuItem value={"image"}>Image</MenuItem>
+              <MenuItem value={"application/base64"}>base64</MenuItem>
             </Select>
           </Box>
         </Box>
-
       </Modal>
 
       {/* for final edit */}
@@ -257,30 +333,36 @@ export default function Post({ post, comp }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Box sx={style} textAlign='center'>
+          <Box sx={style} textAlign="center">
             <Box>
-              <Typography id="modal-modal-title" variant="h6" component="h2" style={{ textAlign: 'center', color: 'black' }} />
+              <Typography
+                id="modal-modal-title"
+                variant="h6"
+                component="h2"
+                style={{ textAlign: "center", color: "black" }}
+              />
               <div className="option">Title</div>
 
               <TextField
                 id="outlined-multiline-static"
-
                 multiline
                 rows={1}
                 placeholder="write something..."
                 style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
 
               <div className="option">Description</div>
 
               <TextField
                 id="outlined-multiline-static"
-
                 multiline
                 rows={1}
                 placeholder="write something..."
                 style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
               />
 
               <div className="option">Category</div>
@@ -290,22 +372,32 @@ export default function Post({ post, comp }) {
                 rows={1}
                 placeholder="write something..."
                 style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+                value={categories}
+                onChange={(e) => {
+                  let data = e.target.value.split(",");
+                  setCategories(data);
+                }}
               />
 
-              <div className="option">Content</div>
+              {!imageOpen && (
+                <>
+                  <div className="option">Content</div>
 
-              <TextField
-                id="outlined-multiline-static"
-
-                multiline
-                rows={2}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-              />
+                  <TextField
+                    id="outlined-multiline-static"
+                    multiline
+                    rows={2}
+                    placeholder="write something..."
+                    style={{ width: 330, marginTop: 10, marginBottom: 10 }}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                </>
+              )}
               <div className="option">Choose Privacy</div>
-              <Box textAlign='center' style={{ marginTop: 10, marginBottom: 10 }}>
-
-              </Box>
+              <Box
+                textAlign="center"
+                style={{ marginTop: 10, marginBottom: 10 }}
+              ></Box>
 
               <Select
                 labelId="demo-simple-select-label"
@@ -314,40 +406,53 @@ export default function Post({ post, comp }) {
                 // label="Age"
                 onChange={handleChange}
               >
-                <MenuItem value={'public'} selected>Public</MenuItem>
-                <MenuItem value={'private'}>Private</MenuItem>
-
+                <MenuItem value={"PUBLIC"} selected>
+                  Public
+                </MenuItem>
+                <MenuItem value={"FRIENDS"}>Private</MenuItem>
               </Select>
 
-              {postType === 'image' && <>
-                <div className="option" style={{ marginTop: 10 }} >Upload image</div>
-                <input type='file' accept="image/*" onChange={onSelectFile} />
-                <Box textAlign='center' style={{ marginTop: 10 }}>
-                  {selectedFile && <img alt="nothing" style={{ height: '100px', width: '100px', borderRadius: '50%' }} src={preview} />}
-                </Box>
-              </>}
-              <Box textAlign='center' style={{ marginTop: 10 }}>
-                <Button variant='contained'>
+              {postType === "image" && (
+                <>
+                  <div className="option" style={{ marginTop: 10 }}>
+                    Upload image
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => onSelectFile(e, "image")}
+                  />
+                  <Box textAlign="center" style={{ marginTop: 10 }}>
+                    {selectedFile && (
+                      <img
+                        alt="nothing"
+                        style={{
+                          height: "100px",
+                          width: "100px",
+                          borderRadius: "50%",
+                        }}
+                        src={preview}
+                      />
+                    )}
+                  </Box>
+                </>
+              )}
+              <Box textAlign="center" style={{ marginTop: 10 }}>
+                <Button variant="contained" onClick={() => handleUpdate()}>
                   Update
                 </Button>
               </Box>
             </Box>
-
           </Box>
-          {/* <input type='file' accept="image/*" onChange={onSelectFile} />
-          <Box textAlign='center' style={{ marginTop: 10 }}>
-            {selectedFile && <img alt="nothing" style={{ height: '150px', width: '300px' }} src={preview} />}
-          </Box>
-
-          <Box textAlign='center' style={{ marginTop: 10 }}>
-            <Button variant='contained'>
-              Post
-            </Button>
-          </Box> */}
         </Box>
       </Modal>
       <Comment />
       <AddComment />
+      <FollowerModal
+        open={followerModal}
+        handleCloseFollowerModal={handleCloseFollowerModal}
+        id={postId}
+      />
     </div>
   );
 }

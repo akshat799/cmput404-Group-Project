@@ -1,12 +1,10 @@
-import * as api from "./index"
+import * as api from "./index";
 
-export const registerCall = async(data) => {
-    try{
-        let response = await api.register(data);
-        localStorage.setItem({'token' : response.access})
-        return response;
-    }
-    catch(e){
-        console.log(e);
-    }
-}
+export const acceptRequest = async (author_id, foreign_author_id) => {
+  try {
+    const res = await api.addFollower(author_id, foreign_author_id);
+    console.log(res);
+  } catch (e) {
+    console.log(e);
+  }
+};

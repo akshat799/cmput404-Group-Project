@@ -1,11 +1,11 @@
 /** @format */
 
 .post {
-    width: 100%;
+    width: 60vw;
     margin: 20px 0;
     background-color: #f5f5dc;
     height: auto;
-    padding: 15px;
+    padding: 1rem;
 }
 
 .postTop {
@@ -15,6 +15,11 @@
 }
 
 .postTopLeft {
+    display: flex;
+    align-items: center;
+}
+
+.postTopRight{
     display: flex;
     align-items: center;
 }

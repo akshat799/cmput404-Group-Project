@@ -6,6 +6,7 @@ import { resetUserPosts } from "./userposts";
 const initialState = {
   isSignedIn: false,
   author: {},
+  followers: [],
   error: false,
 };
 
@@ -25,6 +26,9 @@ export const authorSlice = createSlice({
     },
     editProfile: (state, action) => {
       state.author = action.payload.data.user;
+    },
+    updateFollowers: (state, action) => {
+      state.followers = action.payload;
     },
     authError: (state) => {
       state.error = true;
@@ -60,11 +64,21 @@ export const login = (data) => async (dispatch) => {
   }
 };
 
+export const getOwnFollowers = (author_id) => async (dispatch) => {
+  try {
+    const res = await api.getFollowerList(author_id);
+    dispatch(updateFollowers(res.data.items));
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 export const logout = () => async (dispatch) => {
   dispatch(signOut());
   localStorage.removeItem("token");
 };
 
-export const { signIn, signOut, editProfile, authError } = authorSlice.actions;
+export const { signIn, signOut, editProfile, updateFollowers, authError } =
+  authorSlice.actions;
 
 export default authorSlice.reducer;

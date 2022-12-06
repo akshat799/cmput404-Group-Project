@@ -1,8 +1,6 @@
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import InboxRoundedIcon from "@mui/icons-material/InboxRounded";
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import Autocomplete from "@mui/material/Autocomplete";
-import Badge from "@mui/material/Badge";
 import TextField from "@mui/material/TextField";
 
 import { Button } from "@mui/material";
@@ -17,26 +15,33 @@ import "./navbar.css";
 export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [badgeNumber, setBadgeNumber] = React.useState(3);
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await dispatch(logout());
     await dispatch(resetPosts());
     await dispatch(resetUserPosts());
     navigate("/");
   };
   const suggestionsSearch = [
-    'user 1', 'user 2', 'user 3', 'user 4', 'user 5', 'user 6', 'user 7', 'user 8', 'user 9', 'user 10', 'user 11', 'user 12',
+    "user 1",
+    "user 2",
+    "user 3",
+    "user 4",
+    "user 5",
+    "user 6",
+    "user 7",
+    "user 8",
+    "user 9",
+    "user 10",
+    "user 11",
+    "user 12",
   ];
-  const handleBadge = () => {
-    setBadgeNumber(0);
-  };
+
   return (
     <header className="header">
       <h1 className="logo">
         <Link to="/home">Social Connection</Link>
       </h1>
-      <div style={{ display: 'flex' }}>
-
+      <div style={{ display: "flex" }}>
         <Autocomplete
           disablePortal
           id="combo-box-demo"
@@ -45,22 +50,16 @@ export default function Navbar() {
             console.log(value);
             navigate("/pprofile");
           }}
-          sx={{ width: 300, borderRadius: '10px', background: 'white' }}
-          renderInput={(params) => <TextField {...params} placeholder="search 🔍" />} />
+          sx={{ width: 300, borderRadius: "10px", background: "white" }}
+          renderInput={(params) => (
+            <TextField {...params} placeholder="search 🔍" />
+          )}
+        />
       </div>
 
       <ul className="main-nav">
-
         <li className="sym">
-          <Link onClick={handleBadge} to="/inbox">
-            <Badge badgeContent={badgeNumber} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </Link>
-        </li>
-
-        <li className="sym">
-          <Link to = "/inbox">
+          <Link to="/inbox">
             <InboxRoundedIcon className="icon"></InboxRoundedIcon>
           </Link>
         </li>
