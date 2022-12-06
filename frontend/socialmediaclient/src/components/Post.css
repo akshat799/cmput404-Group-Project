@@ -1,11 +1,11 @@
 /** @format */
 
 .post {
-    width: 100%;
+    width: 60vw;
     margin: 20px 0;
-    background-color: 	#F5F5DC;
+    background-color: #f5f5dc;
     height: auto;
-    padding: 15px;
+    padding: 1rem;
 }
 
 .postTop {
@@ -15,6 +15,11 @@
 }
 
 .postTopLeft {
+    display: flex;
+    align-items: center;
+}
+
+.postTopRight{
     display: flex;
     align-items: center;
 }
@@ -46,8 +51,8 @@
 .postImg {
     margin-top: 20px;
     width: 100%;
-    max-height: 500px;
-    object-fit: contain;
+    max-width: 40vw;
+    height: auto;
 }
 
 .postBottom {
@@ -75,4 +80,8 @@
 .postCommentText {
     cursor: pointer;
     font-size: 15px;
+}
+
+.postTopRight:hover {
+    cursor: pointer;
 }

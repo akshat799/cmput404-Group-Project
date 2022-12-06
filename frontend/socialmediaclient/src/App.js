@@ -1,8 +1,14 @@
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginSignUpContainer from "./containers/LoginSignUpContainer";
-import Profile from "./pages/profile/Profile";
 import Home from "./pages/Home.jsx";
+import Inbox from "./pages/Inbox/Inbox";
+import Pprofile from "./pages/profile/Pprofile";
+import Profile from "./pages/profile/Profile";
+import BasicTabs from "./containers/InboxContainer";
+
 
 function App() {
   return (
@@ -12,7 +18,21 @@ function App() {
           <Route path="/" element={<LoginSignUpContainer />} />
           <Route exact path="/home" element={<Home />} />
           <Route exact path="/profile" element={<Profile />} />
+          <Route exact path="/inbox" element={<BasicTabs />} />
+          {/* This is for search bar profile */}
+          <Route exact path="/pprofile" element={<Pprofile />} />
         </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </Router>
   );

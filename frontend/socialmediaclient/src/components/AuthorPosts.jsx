@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./AuthorPosts.css";
+import "../components/feed.css";
 import PostOption from "./PostOption";
 import Post from "./Post";
 import { useDispatch } from "react-redux";
@@ -18,10 +18,10 @@ export default function AuthorPosts() {
   }, []);
 
   return (
-    <div className="authorPosts">
+    <div className="feed">
       <PostOption />
-      {state.userposts.posts.map((p) => (
-        <Post key={p.id} post={p} />
+      {state.userposts.posts.map((p, i) => (
+        <Post key={p.id} post={p} comp="profile" index={i}/>
       ))}
     </div>
   );
