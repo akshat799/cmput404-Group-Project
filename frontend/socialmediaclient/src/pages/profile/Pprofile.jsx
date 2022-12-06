@@ -29,7 +29,8 @@ export default function Pprofile() {
 
   const [followsAuthor, setFollowsAuthor] = useState(false);
   const [isFollowedByAuthor, setIsFollowedByAuthor ] = useState(false);
-  const [requestSent, setRequestSent] = useState(false)
+  const [requestSent, setRequestSent] = useState(false);
+
 
   const currentAuthorfollowers = state.auth.followers
 
@@ -59,7 +60,15 @@ export default function Pprofile() {
   useEffect(() => {
     isAFollower();
     checkIfFollowedByAuthor();
-  }, [followsAuthor, isFollowedByAuthor]);
+  }, [followsAuthor, isFollowedByAuthor, requestSent]);
+
+  useEffect(() => {
+    setFollowsAuthor(false)
+    setIsFollowedByAuthor(false)
+    setRequestSent(false)
+    isAFollower();
+    checkIfFollowedByAuthor();
+  }, []);
 
   const sendFollowRequest = async() => {
     let data ={
@@ -80,7 +89,10 @@ export default function Pprofile() {
     }
   }
   const removeFromAuthorFollowers = async() => {
-    await dispatch(removeFromfollowers(currentAuthorId, foreignAuthorId))
+    const res = await dispatch(removeFromfollowers(currentAuthorId, foreignAuthorId))
+    if(res.status == 200 || res.status == 204){
+      setFollowsAuthor(false)
+    }
   }
 
   return (
