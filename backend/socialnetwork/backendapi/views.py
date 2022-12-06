@@ -120,9 +120,14 @@ def AuthorsView(request,author_id):
             data = request.data
             try:
                 authors = models.Users.objects.get(id=author_id)
-                authors.displayName = data['displayName']
-                authors.githubName = data['githubName']
-                authors.profileImage = data['profileImage']
+
+                if data["displayName"] is not None:
+                    authors.displayName = data['displayName']
+                if data["githubName"] is not None:
+                    authors.githubName = data['githubName']
+                if data["profileImage"] is not None:
+                    authors.profileImage = data['profileImage']
+
                 authors.save()
                 
                 message = {'message','successfully update profile'}
@@ -1083,36 +1088,126 @@ def InboxViewSet(request,author_id):
     if(request.method == "POST"):
         author = get_object_or_404(models.Users,id = author_id)
 
-        # if request.data["type"] == "post":
-        #     """ required: {"type", "postID" }"""
-        #     postID = request.data["id"]
-        #     post = models.PostModel.objects.get(id=postID)
-        #     serialized_post = serializers.PostSerializer(post)
+        if request.data["type"] == "post":
+            postID = request.data["post"]
+            post = models.PostModel.objects.get(id=postID)
+            postData = model_to_dict(post)
+            
+            postData["id"] = url + f'/authors/{post.author.id}/posts/{post.id}'
+            postData["author"] = {
+                "type": post.author.type,
+                "id": str(post.author.id),
+                "host": post.author.host,
+                "displayName": post.author.displayName,
+                "url": post.author.url,
+                "github": f'http://github.com/{post.author.githubName}',
+                "profileImage": post.author.profileImage,
+            }
 
-        #     instance = models.InboxObject(type="post")
-        #     instance.author = models.Users.objects.get(id=author_id)
-        #     instance.object = serialized_post.data
-        #     instance.save()
+            postData["published"] = str(postData["published"])
 
-        # elif request.data["type"] == "like":
-        #     """ required: {"type", "object", "actor"} """
-        #     actor = models.Users.objects.get(id=request.data["actor"])
-        #     obj_type = "comment" if (
-        #         "comment" in request.data["object"]) else "post"
+            receiverAuthor = get_object_or_404(models.Users , id = request.data["author"])
+            try:
+                inboxreceiver = models.InboxObject.objects.get(author = receiverAuthor.id)
+                data_listreceiver = []
+                data_listreceiver.append(json.dumps(postData))
+                inboxreceiver.object = inboxreceiver.object + data_listreceiver
+                inboxreceiver.save(update_fields=["object"])
+            
+            except Exception as e:
+                inboxAuthorreceiver = get_object_or_404(models.Users , id =receiverAuthor.id)
+                inboxReciever = {
+                    "type" : "inbox",
+                    "author" : inboxAuthorreceiver.id,
+                    "object" : [json.dumps(postData , indent=10)]
+                }
 
-        #     like = {
-        #         "type": "like",
-        #         "author": models.Users(actor).data,
-        #         "summary": actor.displayName + " likes your " + obj_type,
-        #         "object": request.data["object"]
-        #     }
+                inboxrecieverSerializer = serializers.InboxObjectSerializer(data = inboxReciever)
+                inboxrecieverSerializer.is_valid(raise_exception = True)
+                inboxrecieverSerializer.save()
 
-        #     instance = models.InboxObject(type="like")
-        #     instance.author = models.Users.objects.get(id=author_id)
-        #     instance.object = like
-        #     instance.save()
+            try:
+                inboxsender = models.InboxObject.objects.get(author = author_id)
+                data_listsender = []
+                data_listsender.append(json.dumps(postData))
+                inboxsender.object = inboxsender.object + data_listsender
+                inboxsender.save(update_fields=["object"])
+                return Response(model_to_dict(inboxsender), status.HTTP_200_OK)
+            
+            except Exception as e:
+                inboxAuthorsender = get_object_or_404(models.Users , id = author_id)
+                inboxSender = {
+                    "type" : "inbox",
+                    "author" : inboxAuthorsender.id,
+                    "object" : [json.dumps(postData , indent=10)]
+                }
 
-        if request.data["type"].lower() == "follow":
+                inboxsenderSerializer = serializers.InboxObjectSerializer(data = inboxSender)
+                inboxsenderSerializer.is_valid(raise_exception = True)
+                inboxsenderSerializer.save()
+                return Response(inboxsenderSerializer.data , status.HTTP_200_OK)
+            
+
+        elif request.data["type"] =="comment":
+
+            comment = get_object_or_404(models.CommentModel , id = request.data["comment"])
+            commentData = model_to_dict(comment)
+            commentData["published"] = str(commentData["published"])
+            commentData["id"] = url + f'/authors/{comment.post.author.id}/posts/{comment.post.id}/comments/{comment.id}'
+            commentData["author"] = {
+                "type": comment.post.author.type,
+                "id": str(comment.post.author.id),
+                "host": comment.post.author.host,
+                "displayName": comment.post.author.displayName,
+                "url": comment.post.author.url,
+                "github": f'http://github.com/{comment.post.author.githubName}',
+                "profileImage": comment.post.author.profileImage
+            }
+            commentData["post"] = url + f'/authors/{comment.post.author.id}/posts/{comment.post.id}'
+            receiverAuthor = get_object_or_404(models.Users , id = request.data["author"])
+
+            try:
+                inboxreceiver = models.InboxObject.objects.get(author = receiverAuthor.id)
+                data_listreceiver = []
+                data_listreceiver.append(json.dumps(commentData))
+                inboxreceiver.object = inboxreceiver.object + data_listreceiver
+                inboxreceiver.save(update_fields=["object"])
+            
+            except Exception as e:
+                inboxAuthorreceiver = get_object_or_404(models.Users , id =receiverAuthor.id)
+                inboxReciever = {
+                    "type" : "inbox",
+                    "author" : inboxAuthorreceiver.id,
+                    "object" : [json.dumps(commentData , indent=10)]
+                }
+
+                inboxrecieverSerializer = serializers.InboxObjectSerializer(data = inboxReciever)
+                inboxrecieverSerializer.is_valid(raise_exception = True)
+                inboxrecieverSerializer.save()
+
+            try:
+                inboxsender = models.InboxObject.objects.get(author = author_id)
+                data_listsender = []
+                data_listsender.append(json.dumps(commentData))
+                inboxsender.object = inboxsender.object + data_listsender
+                inboxsender.save(update_fields=["object"])
+                return Response(model_to_dict(inboxsender), status.HTTP_200_OK)
+            
+            except Exception as e:
+                inboxAuthorsender = get_object_or_404(models.Users , id = author_id)
+                inboxSender = {
+                    "type" : "inbox",
+                    "author" : inboxAuthorsender.id,
+                    "object" : [json.dumps(commentData , indent=10)]
+                }
+
+                inboxsenderSerializer = serializers.InboxObjectSerializer(data = inboxSender)
+                inboxsenderSerializer.is_valid(raise_exception = True)
+                inboxsenderSerializer.save()
+                return Response(inboxsenderSerializer.data , status.HTTP_200_OK)
+
+
+        elif request.data["type"].lower() == "follow":
             """ required: {"type", "follower"} """
             InboxAuthor_name = str(author.displayName)
             follower_url = request.data['object']
@@ -1156,7 +1251,7 @@ def InboxViewSet(request,author_id):
                 "detail": str(follower_obj.displayName) +" sent a follow request to "+ InboxAuthor_name
             }
 
-        return Response(result, status=status.HTTP_200_OK)
+            return Response(result, status=status.HTTP_200_OK)
     
 
     if(request.method == "DELETE"):
