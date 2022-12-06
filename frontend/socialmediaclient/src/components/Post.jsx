@@ -82,7 +82,7 @@ const style = {
 export default function Post({ post, comp, index }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
-
+  const [change , setChange] = useState(false);
   const currentAuthorId = state.auth.author.id;
   const postId = comp == "inbox" ? post.id : post.id.split("/").reverse()[0];
 
@@ -258,15 +258,29 @@ export default function Post({ post, comp, index }) {
       content: content,
       visibility: privacy,
       unlisted: false,
+      categories: categories,
     };
     if (postType == "image") {
-      requestData.contentType = selectedFile.name.split(".").reverse()[0];
+      requestData.contentType = `image/${
+        selectedFile.name.split(".").reverse()[0]
+      };base64`;
       requestData.content = await convertToBase64(selectedFile);
     }
-
+    
     const res = await dispatch(
-      editPosts(requestData, state.auth.id, post.id, index)
+      editPosts(
+        requestData,
+        state.auth.author.id,
+        post.id.split("/").reverse()[0],
+        index
+      )
     );
+    if (res == 201) {
+      setChange(true);
+      handleTextClose();
+      handleImageClose();
+      
+    }
   };
 
   return (
@@ -314,7 +328,8 @@ export default function Post({ post, comp, index }) {
         </div>
       </div>
       <div className="postCenter">
-        <span className="postText"><h1>{post?.title}</h1></span>
+        <span className="postText">{post?.title}</span>
+        
         <PostContent contentType={post} />
         <span className="postDescription">Post Description: {post?.description}</span>
       </div>
@@ -430,7 +445,7 @@ export default function Post({ post, comp, index }) {
                 }}
               />
 
-              {!imageOpen && (
+              {postType != "image" && (
                 <>
                   <div className="option">Content</div>
 

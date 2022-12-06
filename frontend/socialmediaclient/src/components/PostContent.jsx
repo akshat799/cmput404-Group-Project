@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 function PostContent(post) {
+  console.log(post);
   const type = post.contentType.contentType.split("/");
   const content = post.contentType.content;
 
   const [text, setText] = useState(true);
   const [otherType, setOtherType] = useState(null);
   const [textType, setTextType] = useState("plain");
+  
 
   useEffect(() => {
     if (type[0] === "text") {
@@ -21,6 +23,7 @@ function PostContent(post) {
     } else {
       //error handling to be done over here
     }
+    
   }, []);
 
   function decode_utf8(s) {
@@ -30,7 +33,7 @@ function PostContent(post) {
   function createHTML() {
     return { __html: content };
   }
-
+  // post.change(false)
   return (
     <div
       style={{

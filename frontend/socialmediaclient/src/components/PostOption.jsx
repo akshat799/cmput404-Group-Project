@@ -30,7 +30,6 @@ export default function PostOption() {
   const state = useSelector((state) => state);
   const [textOpen, setTextOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
-  const [linkOpen, setLinkOpen] = useState(false);
   const [markOpen, setMarkOpen] = useState(false);
   const [finalTextOpen, setFinalTextOpen] = useState(false);
 
@@ -71,10 +70,6 @@ export default function PostOption() {
     setImageOpen(false);
     setSelectedFile(undefined);
   };
-  const handleLinkClose = () => {
-    setLinkOpen(false);
-    setPreview(undefined);
-  };
   const handleMarkClose = () => {
     setMarkOpen(false);
     setPreview(undefined);
@@ -86,7 +81,6 @@ export default function PostOption() {
 
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
-  const [linkPreview, setLinkPreview] = useState("");
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -132,10 +126,6 @@ export default function PostOption() {
         console.log(selectedFile);
       }
     }
-  };
-
-  const changeLinkHandler = (e) => {
-    setLinkPreview(e.target.value);
   };
 
   const handleUpload = async (type) => {

@@ -35,7 +35,7 @@ export const getPublicPosts = () => api.get("backendapi/authors/posts/");
 export const createPost = (data, author_id, post_id) =>
   api.put(`backendapi/authors/${author_id}/posts/${post_id}/`, data);
 export const updatePost = (data, author_id, post_id) =>
-  api.post(`backendapi/authors/${author_id}/posts/${post_id}/`, data);
+  api.post(`backendapi/authors/${author_id}/posts/${post_id}`, data);
 export const deletePost = (author_id, post_id) =>
   api.delete(`backendapi/authors/${author_id}/posts/${post_id}/`);
 
