@@ -184,7 +184,7 @@ export default function PostOption() {
         <div className="post-type" onClick={handleTextOpen}>
           <TextFieldsIcon />
           <span>
-            <button className="button">Plain Text</button>
+            <button className="button">Text</button>
           </span>
         </div>
         <div className="post-type" onClick={handleImageOpen}>
@@ -193,10 +193,6 @@ export default function PostOption() {
             <button className="button">Image</button>
           </span>
         </div>
-        {/* <div className="post-type" onClick={handleLinkOpen}>
-          <LinkIcon />
-          <span><button className='button'>Image Link</button></span>
-        </div> */}
         <div className="post-type" onClick={handleMarkOpen}>
           <TextSnippetIcon />
           <span>

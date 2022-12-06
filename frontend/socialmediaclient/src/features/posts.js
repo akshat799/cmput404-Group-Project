@@ -5,7 +5,7 @@ const initialState = {
   posts: [],
   postlikeCount: 0,
   error: false,
-  allLiked: []
+  allLiked: [],
 };
 
 export const authorSlice = createSlice({
@@ -58,8 +58,8 @@ export const getPostLikes = (author_id, post_id) => async (dispatch) => {
     const resp = await api.getPostLikes(author_id, post_id);
 
     if (resp.status == 200) {
-      dispatch(updatePostLikes(resp.data.length))
-      return resp.data.length
+      dispatch(updatePostLikes(resp.data.length));
+      return resp.data.length;
     }
   } catch (e) {
     console.log(e);

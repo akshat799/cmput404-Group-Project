@@ -5,10 +5,11 @@ import authReducer from "./features/auth";
 import postsReducer from "./features/posts";
 import userpostsReducer from "./features/userposts";
 import notificationsReducer from "./features/notifications";
+import localforage from "localforage";
 
 const persistConfig = {
   key: "root",
-  storage,
+  storage: localforage,
   whitelist: ["auth", "posts", "userposts", "notifications"],
 };
 

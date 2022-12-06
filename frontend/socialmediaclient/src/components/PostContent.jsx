@@ -41,7 +41,7 @@ function PostContent(post) {
     >
       {text ? (
         textType === "plain" ? (
-          <div>{decode_utf8(content)}</div>
+          <div>{content}</div>
         ) : textType === "markdown" ? (
           <ReactMarkdown>{content}</ReactMarkdown>
         ) : (
@@ -51,7 +51,15 @@ function PostContent(post) {
         <div>{atob(content)}</div>
       ) : (
         <>
-          <img src={content} style={{ height: "60vh", width: "auto" }} />
+          <img
+            src={content}
+            style={{
+              height: "60vh",
+              width: "auto",
+              maxWidth: "50vw",
+              objectFit: "contain",
+            }}
+          />
         </>
       )}
     </div>

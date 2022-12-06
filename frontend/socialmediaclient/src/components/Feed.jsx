@@ -13,7 +13,6 @@ export default function Feed() {
 
   const authorId = state.auth.author.id;
 
-  // const authorId = state.auth.author.id.split("/")[-1]
   const getPosts = async () => {
     await dispatch(getPublicPosts());
     dispatch(getOwnFollowers(authorId));
@@ -26,10 +25,7 @@ export default function Feed() {
   return (
     <div className="feed">
       <PostOption />
-      {/* {state.posts.posts != [] && (
-        <Post post={state.posts.posts[0]} />
-      )} */}
-      {state.posts.posts != [] && state.posts.posts.slice(0, 9).map((p) => (
+      {state.posts.posts != [] && state.posts.posts.map((p) => (
           <Post key={p.id} post={p} comp="home"/>
         ))}
     </div>

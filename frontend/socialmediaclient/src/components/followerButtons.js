@@ -37,22 +37,28 @@ function FollowerButtons({ req, i }) {
           </Button>
         </div>
       ) : (
-        <Button
-          variant="contained"
-          style={{ marginRight: "1rem" }}
-          onClick={() => {
-            dispatch(
-              followUser(req.actor.id, i, {
-                type: "follow",
-                object: state.auth.author.url,
-              })
-            );
-            setIsAccepted(false);
-          }}
-        >
-          {" "}
-          Follow Back{" "}
-        </Button>
+        <div>
+          <Button
+            variant="contained"
+            style={{ marginRight: "1rem" }}
+            onClick={() => {
+              dispatch(
+                followUser(req.actor.id, i, {
+                  type: "follow",
+                  object: state.auth.author.url,
+                })
+              );
+              setIsAccepted(false);
+            }}
+          >
+            {" "}
+            Follow Back{" "}
+          </Button>
+          <Button variant="contained" onClick={() => dispatch(denyRequest(i))}>
+            {" "}
+            Deny{" "}
+          </Button>
+        </div>
       )}
     </>
   );

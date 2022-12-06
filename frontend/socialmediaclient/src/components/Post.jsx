@@ -10,9 +10,8 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
-import Typography from '@mui/material/Typography';
+import Typography from "@mui/material/Typography";
 import { getCommentsOnPost } from "../features/posts";
-
 import { alpha, styled } from "@mui/material/styles";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -83,20 +82,55 @@ export default function Post({ post, comp, index }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  const authorId = state.auth.author.id;
-  const postId = post.id;
+  const currentAuthorId = state.auth.author.id;
+  const postId = comp == "inbox" ? post.id : post.id.split("/").reverse()[0];
+
+  const postAuthorId =
+    comp == "inbox" ? post.author.id : post.author.id.split("/").reverse()[0];
 
   const getLikeCount = async () => {
-    await dispatch(getPostLikes(authorId, postId));
+    const resp = await dispatch(getPostLikes(currentAuthorId, postId));
+    await setLikeCount(resp);
   };
-  const [like, setLike] = useState(post.like);
+
+  const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [display, setDisplay] = useState("visible");
   const [followerModal, setFollowerModal] = useState(false);
 
-  const likeHandler = () => {
-    setLike(isLiked ? like - 1 : like + 1);
-    setIsLiked(!isLiked);
+  const allLikedPosts = state.auth.allLiked;
+
+  const getIsLiked = () => {
+    for (let p of allLikedPosts) {
+      if (p.post == postId) {
+        setIsLiked(true);
+        break;
+      }
+    }
+  };
+  const [commentsList, setCommentsList] = useState([]);
+
+  const handleGetComments = async () => {
+    const resp = await dispatch(getCommentsOnPost(postAuthorId, postId));
+    await setCommentsList(resp);
+  };
+
+  const data = {
+    at_context: "https://www.w3.org/ns/activitystreams",
+    type: "Like",
+    summary: state.auth.author.displayName + " likes your post",
+    author: currentAuthorId,
+    post: postId,
+  };
+
+  const likeHandler = async () => {
+    if (isLiked === false) {
+      const resp = await dispatch(sendLiketoAuthor(postAuthorId, data));
+      if (resp == 201) {
+        setIsLiked(true);
+        getLikeCount();
+      }
+    }
   };
 
   useEffect(() => {
@@ -279,16 +313,28 @@ export default function Post({ post, comp, index }) {
       <div className="postCenter">
         <span className="postText">{post?.title}</span>
         <PostContent contentType={post} />
-        <img className="postImg" src={post?.img} alt="" />
         <span className="postText">{post?.description}</span>
       </div>
       <div className="postBottom">
         <div className="postBottomLeft">
-          <ThumbUpIcon className="likes" onClick={likeHandler} />
-          <span style={{ color: "gray" }}> {state.posts.postLikeCount}</span>
+          <ThumbUpIcon
+            className="likes"
+            style={{ color: isLiked ? "blue" : "gray" }}
+            onClick={likeHandler}
+          />
+          <span style={{ color: "gray" }}> {likeCount}</span>
         </div>
         <div className="postBottomRight">
-          <span className="postCommentText">{post.count} Comments</span>
+          <span className="postCommentText">
+            <Button
+              variant="text"
+              onClick={handleGetComments}
+              style={{ color: "gray" }}
+            >
+              {" "}
+              Show Comments{" "}
+            </Button>
+          </span>
         </div>
       </div>
       {/* for selecting */}
@@ -448,8 +494,16 @@ export default function Post({ post, comp, index }) {
           </Box>
         </Box>
       </Modal>
-      <Comment />
-      <AddComment />
+      {commentsList != [] &&
+        commentsList.map((c) => (
+          <Comment
+            key={c.id}
+            data={data}
+            comment={c}
+            postAuthorId={postAuthorId}
+          />
+        ))}
+      <AddComment currentAuthorId={currentAuthorId} postId={postId} />
       <FollowerModal
         open={followerModal}
         handleCloseFollowerModal={handleCloseFollowerModal}
