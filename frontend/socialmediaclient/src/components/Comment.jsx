@@ -66,28 +66,31 @@ const Comment = ({data, comment, postAuthorId}) => {
 
     return (
         <>
-            <Paper style={{ padding: "10px 10px", marginTop: 60 }}>
+            <Paper style={{ padding: "10px 10px", marginTop: 20 }}>
                 <Grid container wrap="nowrap" spacing={2}>
                     <Grid item>
                         <Avatar alt="Remy Sharp" src={imgLink} />
                     </Grid>
-                    <Grid justifyContent="left" item xs zeroMinWidth>
+                    <Grid  item xs zeroMinWidth>
                         <h4 style={{ margin: 0, textAlign: "left" }}>{commentAuthor}</h4>
                         <p style={{ textAlign: "left" }}>
                             {commentText}
                         </p>
-
-                        <p style={{ textAlign: "left", marginTop: 10 }}>
+                        
+                        <p style={{ textAlign: "left", margin: 0 }}>
                             <div style={{
                                 display: 'flex',
-                                gap: '5px'
+                                gap: '5px',
+                                justifyContent: 'end'
+                         
                             }}>
-                                <ThumbUpAltIcon style={{ color: isLiked? "blue":"gray" }} onClick={handleLike} />
+                            
+                                <ThumbUpAltIcon style={{ color: isLiked? "blue":"gray"  }} onClick={handleLike} />
                                 <span style={{ color: "gray"}}> {likeCount}</span>
                             </div>
 
                         </p>
-                        <hr />
+                        
                         {/* <p className="commentLikeDiv">
                             <span className="commentLike" onClick={handleLike} >{commentLike ? <p>Like</p> : <p>   Dislike</p>}</span>
                         </p> */}

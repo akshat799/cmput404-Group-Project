@@ -85,3 +85,9 @@
 .postTopRight:hover {
     cursor: pointer;
 }
+.postText{
+    text-align: center;
+}
+.postDescription{
+padding: 0.5rem;
+}

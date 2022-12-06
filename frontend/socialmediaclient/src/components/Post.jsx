@@ -314,9 +314,9 @@ export default function Post({ post, comp, index }) {
         </div>
       </div>
       <div className="postCenter">
-        <span className="postText">{post?.title}</span>
+        <span className="postText"><h1>{post?.title}</h1></span>
         <PostContent contentType={post} />
-        <span className="postText">{post?.description}</span>
+        <span className="postDescription">Post Description: {post?.description}</span>
       </div>
       <div className="postBottom">
         <div className="postBottomLeft">
