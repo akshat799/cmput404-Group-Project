@@ -136,21 +136,22 @@ class PostTestCase(APITestCase):
         self.response=self.client.get(url,format="json",**{'HTTP_AUTHORIZATION': f'Bearer {self.token}'})
         self.assertEqual(self.response.status_code,200)
     
-    # def test_getDetial(self):
-    #     """Test GET request to get a post"""
-    #     author = Users.objects.get(username="testuser")
-    #     author_id = str(author.id)
-    #     new_post = {
-    #         "title":"Test title for get Post",
-    #         "description":"This is a get description",
-    #         "contentType":"text/plain",
-    #         "content":"This is a test content",
-    #         "categories":["Category3","Category4"],
-    #         "visibility":"PUBLIC",
-    #         "unlisted":"false",
-    #     }
+    def test_getDetial(self):
+        """Test GET request to get a post"""
+        author = Users.objects.get(username="testuser")
+        author_id = str(author.id)
+        PostModel.objects.create(
+            id = "631f3ebe-d976-4248-a808-db2442a22169",
+            author = author,
+            title="Test title for get Post",
+            description="This is a get description",
+            contentType="text/plain",
+            content="This is a test content",
+            categories=["Category3","Category4"],
+            visibility="PUBLIC",
+            unlisted="False",
+        )
+        post = PostModel.objects.get(id = "631f3ebe-d976-4248-a808-db2442a22169")
+        response = self.client.get(f'/backendapi/authors/'+author_id+'/posts/631f3ebe-d976-4248-a808-db2442a22169',**{'HTTP_AUTHORIZATION': f'Bearer {self.token}'})
 
-    #     # post_id = str(new_post.id)
-    #     response = self.client.get(f'/backendapi/authors/{author_id}/posts/{post_uuid}',**{'HTTP_AUTHORIZATION': f'Bearer {self.token}'})
-
-    #     self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
