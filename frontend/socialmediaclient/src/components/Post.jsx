@@ -22,6 +22,7 @@ import "./Post.css";
 import PostContent from "./PostContent";
 import { editPosts } from "../features/userposts";
 import FollowerModal from "./FollowerModal";
+import { sendLiketoAuthor } from "../features/posts";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -112,6 +113,7 @@ export default function Post({ post, comp, index }) {
 
   const handleGetComments = async () => {
     const resp = await dispatch(getCommentsOnPost(postAuthorId, postId));
+    console.log("COMMENTS : ", resp);
     await setCommentsList(resp);
   };
 
@@ -136,6 +138,7 @@ export default function Post({ post, comp, index }) {
   useEffect(() => {
     getLikeCount();
     if (comp != "profile") setDisplay("hidden");
+    getIsLiked();
   }, []);
 
   const [anchorEl, setAnchorEl] = useState(null);

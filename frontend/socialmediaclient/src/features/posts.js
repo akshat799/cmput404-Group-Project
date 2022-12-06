@@ -102,7 +102,7 @@ export const getCommentsOnPost = (author_id, post_id) => async(dispatch) => {
 
     if (resp.status == 200) {
       console.log(resp);
-      return resp.data.items;
+      return resp.data.comments;
     }
   } catch (e) {
     return [];
