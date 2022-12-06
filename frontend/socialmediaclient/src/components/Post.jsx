@@ -91,6 +91,8 @@ export default function Post({ post }) {
     await setLikeCount(resp)
   };
 
+
+
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -262,7 +264,7 @@ export default function Post({ post }) {
       {commentsList != [] && commentsList.map((c) => (
           <Comment key={c.id} data= {data} comment={c} postAuthorId = {postAuthorId} />
         ))}
-      <AddComment authorId={postAuthorId} postId={postId}/>
+      <AddComment currentAuthorId={currentAuthorId} postId={postId}/>
     </div>
   );
 }

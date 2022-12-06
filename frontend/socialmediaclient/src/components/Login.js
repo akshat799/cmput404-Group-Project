@@ -5,9 +5,10 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { login } from "../features/auth";
-import { getAllLiked } from '../features/auth';
+import { getAllLiked, getAllAuthorsList } from '../features/auth';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { getOwnFollowers } from '../features/auth';
 
 
 const Login = ({ handleChange }) => {
@@ -30,6 +31,14 @@ const Login = ({ handleChange }) => {
 
     const getAllLikedPosts = async() => {
         await dispatch(getAllLiked(currentAuthorId))
+      }
+    
+      const getAllAuthors = async() => {
+        await dispatch(getAllAuthorsList())
+      }
+
+      const getAuthorFollowers = async() => {
+        await dispatch(getOwnFollowers(currentAuthorId))
       }
 
     const handleSubmit = async (e) => {
@@ -58,6 +67,8 @@ const Login = ({ handleChange }) => {
     };
     useEffect(() => {
         getAllLikedPosts();
+        getAllAuthors();
+        getAuthorFollowers();
       }, [isSignedIn]);
     
 

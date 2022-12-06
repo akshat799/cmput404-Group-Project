@@ -1,4 +1,4 @@
-import { Avatar, Grid, Paper } from "@material-ui/core";
+import { Avatar, Grid, Paper, responsiveFontSizes } from "@material-ui/core";
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import React from 'react';
 import './Comment.css';
@@ -21,21 +21,35 @@ const Comment = ({data, comment, postAuthorId}) => {
     const postId = data["post"];
     const currentAuthorId = state.auth.author.id;
 
-
+    const [commentLikesList, setCommentLikesList] = useState([])
     const [likeCount, setLikeCount] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
 
     const getCommentLikes = async () => {
         const resp = await dispatch(getLikesOnComment(postAuthorId, postId, commentId));
-        await setLikeCount(resp)
+        // await console.log(resp)
+        await setLikeCount(resp.length)
+        await setCommentLikesList(resp)
+        // getIsLiked()
     };
-    
+    const getIsLiked = () => {
+        for (let c of commentLikesList){
+            console.log('setting....')
+            console.log(c.author.id, currentAuthorId)
+            if( c.author.id === currentAuthorId){
+                console.log('set')
+                setIsLiked(true)
+                break;
+          }
+        }
+      }
     const handleLike = async() => {
         if (isLiked === false) {
             data["comment"] = commentId
             data["summary"] = state.auth.author.displayName + " likes your comment";
             data["author"] = currentAuthorId
-            const resp = await dispatch(sendLiketoAuthor(commentAuthorId, data))
+            console.log()
+            const resp = await dispatch(sendLiketoAuthor(currentAuthorId, data))
             await console.log(resp)
             if (resp == 201){
                 console.log(resp)
@@ -47,6 +61,7 @@ const Comment = ({data, comment, postAuthorId}) => {
 
     useEffect(() => {
         getCommentLikes();
+        getIsLiked();
     }, []);
 
     return (
