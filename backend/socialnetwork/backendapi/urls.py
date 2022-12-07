@@ -1,5 +1,9 @@
+from django.urls import path, re_path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 from rest_framework.routers import SimpleRouter
-from django.urls import path
+
 from . import views
 
 app_name = 'backendapi'
@@ -14,6 +18,19 @@ routes.register(r'backendapi/auth/register', views.RegistrationViewSet, basename
 # routes.register(r'backendapi/user', views.UserViewSet, basename='user')
 # routes.register(r'backendapi/authors', views.UserViewSet, basename='author')
 # routes.register(r'backendapi/authors/', views.AuthorsListView, basename='author')
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+
+   permission_classes=[permissions.AllowAny],
+)
 
 
 urlpatterns = [
@@ -30,5 +47,10 @@ urlpatterns = [
     path('backendapi/authors/<author_id>/posts/<post_id>/comments', views.CommentViewSet),
     path('backendapi/authors/<author_id>/followers/<foreign_author_id>', views.FollowerViewSet),
     path('backendapi/authors/<author_id>/followers', views.FollowerViewSet)
-    *routes.urls,
+]
+urlpatterns+=routes.urls
+urlpatterns+=[
+      re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+   re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+   re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
