@@ -312,7 +312,6 @@ def PostViewSet(request,author_id = None,post_id = None):
                             r3 = requests.get(grp05_url+"/authors/posts_all",auth=HTTPBasicAuth(grp05_username,grp05_password))
                             if(r.status_code == 200 ):
                                 posts_all = (json.loads(r.content)['items'])
-                                print(posts_all)
                             if(r2.status_code == 200):
                                 posts_all += (json.loads(r2.content)['items'])
                             if(r3.status_code == 200):
