@@ -22,6 +22,7 @@ const Signup = ({ handleChange }) => {
   const [email, setEmail] = useState("");
   const [isError, setError] = useState(false);
   const [githubName, setGithubName] = useState("");
+  // const [reqdFieldsErr, setReqdFieldsError] = useState(false);
 
   useEffect(() => {
     if (confirmPassword != password) {
@@ -33,16 +34,30 @@ const Signup = ({ handleChange }) => {
 
   const paperStyle = {
     padding: 20,
-    height: "80vh",
+    height: "auto",
     width: 300,
     margin: "0px auto",
   };
   const avatarStyle = { backgroundColor: "#9494de" };
   const formFieldStyle = { margin: "10px 0px 0px 0px" };
   const headerStyle = { margin: 0 };
+
+
+  const checkRequired = () => {
+    if (username === "" || fullName === "" || password === "" || 
+      confirmPassword === "" || email === "" || githubName === ""){
+
+        return true
+    }
+    else{
+      return false
+    }
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isError) {
+    const isReqdFieldsErr = checkRequired();
+
+    if (!isError && !isReqdFieldsErr) {
       let formData = {
         username: username,
         displayName: fullName,
@@ -58,8 +73,10 @@ const Signup = ({ handleChange }) => {
       } else {
         toast.error("Something went wrong. please try agin");
       }
-    } else {
-      toast.error("something went wrong. please try agin");
+    } else if(isReqdFieldsErr) {
+      toast.error("Please Enter all the Required (*) Fields");
+    } else{
+      toast.error("Sorry Cannot Sign Up! Passwords Don't Match");
     }
   };
 
