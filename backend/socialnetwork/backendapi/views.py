@@ -788,6 +788,7 @@ def CommentViewSet(request, author_id, post_id):
                    req = requests.get(grp15_url + f'/authors/{author_id}/posts/{post_id}/comments', auth=HTTPBasicAuth(grp15_username,grp15_password))
                    commentGrp15 = json.loads(req.content)
                    commentGrp15["comments"] = commentGrp15["items"]
+                   commentGrp15.pop("items")
                    return Response(commentGrp15 , status.HTTP_200_OK) 
                 except Exception as e:
                     try:
