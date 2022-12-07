@@ -10,6 +10,7 @@ const initialState = {
   error: false,
   allLiked: [],
   allAuthors: [],
+  requestedAuthorIds: [],
 }
 
 export const authorSlice = createSlice({
@@ -20,11 +21,14 @@ export const authorSlice = createSlice({
         state.isSignedIn = true
         state.author = action.payload.data.user
         state.error = false
+        state.requestedAuthorIds = []
       },
       signOut: (state) => {
         state.isSignedIn = false
         state.error = false
         state.author= {}
+        state.requestedAuthorIds =[]
+        state = initialState
       },
       editProfile: (state,action) => {
         state.author = action.payload.data.user
@@ -41,6 +45,10 @@ export const authorSlice = createSlice({
       updateFollowers: (state, action) => {
         state.followers = action.payload;
       }, 
+      updateRequestedAuthorIds: (state, action) => {
+        state.requestedAuthorIds = [action.payload, ...state.requestedAuthorIds];
+        
+      },
     },
     signOut: (state) => {
       state.isSignedIn = false;
@@ -168,17 +176,22 @@ export const checkIfFollower = (author_id, foreign_author_id) => async(dispatch)
       console.log(e)
   }
 }
-export const sendRequestToFollow = (foreign_author_id, data) => async() => {
+export const sendRequestToFollow = (foreign_author_id, data) => async(dispatch) => {
   try{
     const res = await api.sendRequest(foreign_author_id, data);
-    console.log(res);
+    if (res.status == 200){
+      console.log(res)
+      console.log(foreign_author_id)
+      dispatch(updateRequestedAuthorIds(foreign_author_id))
+      
     return res;
+    }
   }
   catch(e){
     console.log(e)
 }
 }
 
-export const { signIn, signOut, editProfile, authError, updateAllLiked, updateAllAuthorsList, updateFollowers } = authorSlice.actions
+export const { signIn, signOut, editProfile, authError, updateAllLiked, updateAllAuthorsList, updateFollowers, updateRequestedAuthorIds } = authorSlice.actions
 
 export default authorSlice.reducer;

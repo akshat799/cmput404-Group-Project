@@ -1,5 +1,3 @@
-import HowToRegIcon from '@mui/icons-material/HowToReg';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import React from 'react';
 import { useSelector } from "react-redux";
 import Navbar from "../../components/Navbar";
@@ -7,8 +5,9 @@ import "./Pprofile.css";
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { checkIfFollower } from '../../features/auth';
+import { checkIfFollower, updateFollowers } from '../../features/auth';
 import { removeFromfollowers } from '../../features/auth';
+import { getOwnFollowers } from '../../features/auth';
 
 import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button';
@@ -18,9 +17,10 @@ import { sendRequestToFollow } from '../../features/auth';
 export default function Pprofile() {
 
   const state = useSelector((state) => state);
+  const requestedAuthors = state.auth?.requestedAuthorIds != null? state.auth?.requestedAuthorIds: [];
   const dispatch = useDispatch();
   const location = useLocation();
-  const foreignAuthor = location != null ? location.state.foreignAuthor: {};
+  const foreignAuthor= location != null ? location.state.foreignAuthor: {};
   const [req, setReq] = React.useState(false);
   const ProfilePhoto = state.auth.author.profileImage;
   const Username = foreignAuthor.foreignAuthor.displayName;
@@ -57,15 +57,29 @@ export default function Pprofile() {
       }
     }
   }
+
+  const isRequested = () => {
+    console.log(requestedAuthors)
+    if( requestedAuthors != []){
+      for (let id of requestedAuthors){
+        if (id == foreignAuthorId){
+          setRequestSent(true);
+          break;
+        }
+      }
+    }
+  }
+
+  const updateFollowersList = async() => {
+    await dispatch(getOwnFollowers(currentAuthorId))
+  }
+  
   useEffect(() => {
-    isAFollower();
-    checkIfFollowedByAuthor();
-  }, [followsAuthor, isFollowedByAuthor, requestSent]);
+      updateFollowersList();
+  }, [followsAuthor]);
 
   useEffect(() => {
-    setFollowsAuthor(false)
-    setIsFollowedByAuthor(false)
-    setRequestSent(false)
+    isRequested();
     isAFollower();
     checkIfFollowedByAuthor();
   }, []);
@@ -79,8 +93,7 @@ export default function Pprofile() {
     
     if (res.status == 200){
       setRequestSent(true)
-    }
-    
+    } 
   }
   const removeFromForeignFollowers = async() => {
     const res = await dispatch(removeFromfollowers(foreignAuthorId, currentAuthorId))
@@ -110,10 +123,10 @@ export default function Pprofile() {
         <div className='nameAdd'>
           <h4 className="profileName">{Username} </h4>
 
-          {/* Add friend/unfollow  */}
+          {/* Add friend/unfollow 
           {req ?
             <PersonAddIcon color="action" sx={{ fontSize: 30 }} className="addIcon" onClick={() => { setReq(prev => !prev); }} /> : <HowToRegIcon color="action" sx={{ fontSize: 30 }} onClick={() => { setReq(prev => !prev); }} className="addIcon" />
-          }
+          } */}
         </div>
         <span className="profileDescription">Welcome to {Username}'s profile! </span>
         <span style={{marginTop:'20px'}}> 

@@ -61,8 +61,11 @@ const Comment = ({data, comment, postAuthorId}) => {
 
     useEffect(() => {
         getCommentLikes();
-        getIsLiked();
     }, []);
+
+    useEffect(() => {
+        getIsLiked();
+    },[commentLikesList])
 
     return (
         <>
