@@ -628,36 +628,18 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                     inbox.save(update_fields=["object"])
 
                 except Exception as e:
-                    try:
-                        inboxAuthor = get_object_or_404(models.Users , id = author_id)
-                        inbox = {
-                            "type" : "inbox",
-                            "author" : inboxAuthor.id,
-                            "object" : [json.dumps(data , indent=10)]
-                        }
+                    inboxAuthor = get_object_or_404(models.Users , id = author_id)
+                    inbox = {
+                        "type" : "inbox",
+                        "author" : inboxAuthor.id,
+                        "object" : [json.dumps(data , indent=10)]
+                    }
 
-                        inboxSerializer = serializers.InboxObjectSerializer(data = inbox)
-                        inboxSerializer.is_valid(raise_exception = True)
-                        inboxSerializer.save()
+                    inboxSerializer = serializers.InboxObjectSerializer(data = inbox)
+                    inboxSerializer.is_valid(raise_exception = True)
+                    inboxSerializer.save()
 
-                        return Response(data , status=status.HTTP_201_CREATED)
-
-                    except Exception as e:
-                        try:
-                            req = requests.post(grp05_url + f'/authors/{author_id}/posts/{post_id}/inbox', data, auth=HTTPBasicAuth(grp05_username,grp05_password))
-                            likesGrp05 = json.loads(req.content)
-                            return Response(likesGrp05 , status.HTTP_200_OK)
-                        except Exception as e:
-                            try:
-                                inbox = {
-                                    "type" : "inbox",
-                                    "author" : author_id,
-                                    "items" : data
-                                }
-                                req = requests.post(grp17_url + f'/authors/{author_id}/inbox', inbox , auth=HTTPBasicAuth(grp17_username,grp17_password))
-                            except Exception as e:
-                                message = {"Error" : "Inbox not found"}
-                                return Response(message , status.HTTP_404_NOT_FOUND)
+                    return Response(data , status=status.HTTP_201_CREATED)
 
         elif(request.method == 'GET'):
             if post_id != None:
