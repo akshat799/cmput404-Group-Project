@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 function PostContent(post) {
-  console.log(post);
+  // console.log(post);
   const type = post.contentType.contentType.split("/");
   const content = post.contentType.content;
 

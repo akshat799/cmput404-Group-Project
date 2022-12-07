@@ -12,6 +12,7 @@ import { getOwnFollowers } from '../../features/auth';
 import { useDispatch } from 'react-redux';
 import Button from '@mui/material/Button';
 import { sendRequestToFollow } from '../../features/auth';
+import UserPosts from '../../components/UserPosts';
 
 
 export default function Pprofile() {
@@ -73,7 +74,7 @@ export default function Pprofile() {
   const updateFollowersList = async() => {
     await dispatch(getOwnFollowers(currentAuthorId))
   }
-  
+
   useEffect(() => {
       updateFollowersList();
   }, [followsAuthor]);
@@ -148,7 +149,7 @@ export default function Pprofile() {
           
         </span>
       </div>
-
+      <UserPosts authorId={foreignAuthorId} />
     </>
   );
 }

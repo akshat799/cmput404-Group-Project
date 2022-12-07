@@ -20,7 +20,7 @@ export default function AuthorPosts() {
   return (
     <div className="feed">
       <PostOption />
-      {state.userposts.posts.slice(0, 1).map((p, i) => (
+      {state.userposts.posts.map((p, i) => (
         <Post key={p.id} post={p} comp="profile" index={i} />
       ))}
     </div>
