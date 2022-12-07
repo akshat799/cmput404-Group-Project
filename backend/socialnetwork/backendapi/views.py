@@ -136,8 +136,8 @@ def AuthorsView(request,author_id):
                 
                 
                 
-                message = {'message','successfully update profile'}
-                return Response(message,status=status.HTTP_200_OK)
+                # message = {'message','successfully update profile'}
+                return Response(model_to_dict(authors),status=status.HTTP_200_OK)
             except Exception as e:
                 message = {'error',e}
                 messages.error(request,'Fail to update profile')
