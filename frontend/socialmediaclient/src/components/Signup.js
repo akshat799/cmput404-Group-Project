@@ -42,22 +42,27 @@ const Signup = ({ handleChange }) => {
   const formFieldStyle = { margin: "10px 0px 0px 0px" };
   const headerStyle = { margin: 0 };
 
-
   const checkRequired = () => {
-    if (username === "" || fullName === "" || password === "" || 
-      confirmPassword === "" || email === "" || githubName === ""){
-
-        return true
+    if (
+      username === "" ||
+      fullName === "" ||
+      password === "" ||
+      confirmPassword === "" ||
+      email === "" ||
+      githubName === ""
+    ) {
+      return true;
+    } else {
+      return false;
     }
-    else{
-      return false
-    }
-  }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isReqdFieldsErr = checkRequired();
 
     if (!isError && !isReqdFieldsErr) {
+      const imgData = convertToBase64(selectedFile);
+
       let formData = {
         username: username,
         displayName: fullName,
@@ -68,16 +73,48 @@ const Signup = ({ handleChange }) => {
       };
 
       const status = await dispatch(signUp(formData));
-      if (status == 201) {
-        toast.success("User Registered");
-        handleChange(e, 0);
+      if (status) {
+        if (status == 201) {
+          toast.success("User Registered");
+          handleChange(e, 0);
+        } else {
+          toast.error("Something went wrong. please try agin");
+        }
+      } else if (isReqdFieldsErr) {
+        toast.error("Please Enter all the Required (*) Fields");
       } else {
-        toast.error("Something went wrong. please try agin");
+        toast.error("Sorry Cannot Sign Up! Passwords Don't Match");
       }
-    } else if(isReqdFieldsErr) {
-      toast.error("Please Enter all the Required (*) Fields");
-    } else{
-      toast.error("Sorry Cannot Sign Up! Passwords Don't Match");
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const onSelectFile = (e, type) => {
+    console.log(e.target.files);
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedFile(undefined);
+      return;
+    }
+
+    if (type == "image") {
+      const ext = e.target.files[0].name.split(".");
+      if (ext[ext.length - 1] != "png" && ext[ext.length - 1] != "jpeg") {
+        //display error
+      } else {
+        setSelectedFile(e.target.files[0]);
+      }
     }
   };
 

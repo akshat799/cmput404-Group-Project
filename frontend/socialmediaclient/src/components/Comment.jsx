@@ -37,10 +37,10 @@ const Comment = ({ data, comment, postAuthorId }) => {
   };
   const getIsLiked = () => {
     for (let c of commentLikesList) {
-      console.log("setting....");
-      console.log(c.author.id, currentAuthorId);
+      // console.log('setting....')
+      // console.log(c.author.id, currentAuthorId)
       if (c.author.id === currentAuthorId) {
-        console.log("set");
+        // console.log('set')
         setIsLiked(true);
         break;
       }

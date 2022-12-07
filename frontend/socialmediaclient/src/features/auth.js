@@ -32,7 +32,9 @@ export const authorSlice = createSlice({
       state.requestedAuthorIds = [];
       state = initialState;
     },
-    editProfile: (state, action) => {},
+    editProfile: (state, action) => {
+      state.author = action.payload;
+    },
     authError: (state) => {
       state.error = true;
     },
@@ -197,21 +199,9 @@ export const editAuthorInfo = (data, author_id) => async (dispatch) => {
     console.log(res);
 
     if (res.status == 200) {
-      return res;
-    }
-  } catch (e) {
-    // return e
-    console.log(e);
-  }
-};
-export const getAuthorInfo = (author_id) => async (dispatch) => {
-  try {
-    const res = await api.getAuthor(author_id);
-    if (res == 200) {
       dispatch(editProfile(res.data));
       return res;
     }
-    console.log(res.status);
   } catch (e) {
     console.log(e);
   }
