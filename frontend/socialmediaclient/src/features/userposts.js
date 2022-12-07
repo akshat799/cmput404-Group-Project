@@ -54,7 +54,7 @@ export const editPosts =
       const res = await api.updatePost(data, author_id, post_id);
       const payload = { "data": res.data, "index": index };
       dispatch(editPost(payload));
-      return res.status;
+      return res;
     } catch (e) {
       console.log(e);
     }

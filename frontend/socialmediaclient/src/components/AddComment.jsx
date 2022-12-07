@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import { addComment } from "../features/posts";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Post.css";
 
 const AddComment = ({ currentAuthorId, postId }) => {
@@ -25,15 +25,36 @@ const AddComment = ({ currentAuthorId, postId }) => {
   const [imageOpen, setImageOpen] = useState(false);
   const [markOpen, setMarkOpen] = useState(false);
   const [finalTextOpen, setFinalTextOpen] = useState(false);
-
-  const [privacy, setPrivacy] = useState("PUBLIC");
   const [postType, setPostType] = useState("none");
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
-  const [categories, setCategories] = useState([]);
   const [content, setContent] = useState("");
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreview(undefined);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreview(objectUrl);
+
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
 
   const handleTextOpen = () => setTextOpen(true);
   const handleImageOpen = () => {
@@ -61,9 +82,6 @@ const AddComment = ({ currentAuthorId, postId }) => {
     setFinalTextOpen(false);
     setPostType("none");
   };
-  const handleChange = (event) => {
-    setPrivacy(event.target.value);
-  };
 
   const handlePostTypeChange = (event) => {
     setPostType(event.target.value);
@@ -81,31 +99,33 @@ const AddComment = ({ currentAuthorId, postId }) => {
 
     if (type == "image") {
       const ext = e.target.files[0].name.split(".");
-      console.log(ext);
       if (ext[ext.length - 1] != "png" && ext[ext.length - 1] != "jpeg") {
         //display error
       } else {
         setPostType(`image/${ext[ext.length - 1]};base64`);
         setSelectedFile(e.target.files[0]);
-        console.log(selectedFile);
       }
     }
   };
 
-  const sendComment = async () => {
+  const sendComment = async (type) => {
     let data = {
-      comment: commentText,
-      contentType: "text/plain",
+      comment: content,
+      contentType: postType,
     };
-    console.log(currentAuthorId, postId);
+
+    if (type == "image") {
+      const imgData = await convertToBase64(selectedFile);
+      data.comment = imgData;
+    }
+
     const status = await dispatch(addComment(currentAuthorId, postId, data));
 
     if (status == 200) {
-      setCommentText("");
+      console.log("ADDED")
+      setContent("");
     }
   };
-
-  const handleUpload = async () => {};
 
   const style = {
     position: "absolute",
@@ -119,14 +139,25 @@ const AddComment = ({ currentAuthorId, postId }) => {
     p: 4,
   };
   return (
-    <div style={{ width: "58vw", display: "flex" }}>
+    <div
+      style={{
+        width: "58vw",
+        display: "flex",
+        marginTop: "1rem",
+      }}
+    >
       <div
         className="post"
         style={{
           marginTop: "1rem",
           padding: "0",
+          backgroundColor: "#454545",
+          borderRadius: "15px",
         }}
       >
+        <div className="what-to-post" style={{ marginTop: "1rem" }}>
+          Add a comment
+        </div>
         <br />
         <div className="post-options">
           <div className="post-type" onClick={handleTextOpen}>
@@ -192,71 +223,9 @@ const AddComment = ({ currentAuthorId, postId }) => {
           <Box sx={style}>
             <Box sx={style} textAlign="center">
               <Box>
-                <Typography
-                  id="modal-modal-title"
-                  variant="h6"
-                  component="h2"
-                  style={{ textAlign: "center", color: "black" }}
-                />
-                <div className="option">Title</div>
-
-                <TextField
-                  required
-                  id="outlined-multiline-static"
-                  multiline
-                  rows={1}
-                  placeholder="write something..."
-                  style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-
-                <div className="option">Description</div>
-
-                <TextField
-                  required
-                  id="outlined-multiline-static"
-                  multiline
-                  rows={2}
-                  placeholder="write something..."
-                  style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                  onChange={(e) => setDesc(e.target.value)}
-                />
-
-                <div className="option">Categories (Separate by commas)</div>
-
-                <TextField
-                  required
-                  id="outlined-multiline-static"
-                  rows={1}
-                  placeholder="write something..."
-                  style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                  onChange={(e) => {
-                    let data = e.target.value.split(",");
-                    setCategories(data);
-                  }}
-                />
-                <div className="option">Choose Privacy</div>
-                <Box
-                  textAlign="center"
-                  style={{ marginTop: 10, marginBottom: 10 }}
-                ></Box>
-
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={privacy}
-                  // label="Age"
-                  onChange={handleChange}
-                >
-                  <MenuItem value={"PUBLIC"} selected>
-                    Public
-                  </MenuItem>
-                  <MenuItem value={"FRIENDS"}>Private</MenuItem>
-                </Select>
                 <div className="option" style={{ marginTop: 10 }}>
                   Upload image
                 </div>
-
                 <input
                   type="file"
                   accept="image/*"
@@ -278,7 +247,7 @@ const AddComment = ({ currentAuthorId, postId }) => {
                 <Box textAlign="center" style={{ marginTop: 10 }}>
                   <Button
                     variant="contained"
-                    onClick={() => handleUpload("image")}
+                    onClick={() => sendComment("image")}
                   >
                     Post
                   </Button>
@@ -297,50 +266,6 @@ const AddComment = ({ currentAuthorId, postId }) => {
         >
           <Box sx={style} textAlign="center">
             <Box sx={style}>
-              <Typography
-                id="modal-modal-title"
-                variant="h6"
-                component="h2"
-                style={{ textAlign: "center", color: "black" }}
-              />
-              <div className="option">Title</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                multiline
-                rows={1}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-
-              <div className="option">Description</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                multiline
-                rows={2}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => setDesc(e.target.value)}
-              />
-
-              <div className="option">Categories (Separate by commas)</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                rows={1}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => {
-                  let data = e.target.value.split(",");
-                  setCategories(data);
-                }}
-              />
-
               <div className="option">Content</div>
               <TextField
                 required
@@ -351,29 +276,10 @@ const AddComment = ({ currentAuthorId, postId }) => {
                 style={{ width: 330, marginTop: 10, marginBottom: 10 }}
                 onChange={(e) => setContent(e.target.value)}
               />
-              <div className="option">Choose Privacy</div>
-              <Box
-                textAlign="center"
-                style={{ marginTop: 10, marginBottom: 10 }}
-              ></Box>
-
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={privacy}
-                // label="Age"
-                onChange={handleChange}
-              >
-                <MenuItem value={"PUBLIC"} selected>
-                  Public
-                </MenuItem>
-                <MenuItem value={"FRIENDS"}>Private</MenuItem>
-              </Select>
-
               <Box textAlign="center" style={{ marginTop: 10 }}>
                 <Button
                   variant="contained"
-                  onClick={() => handleUpload("application")}
+                  onClick={() => sendComment("application")}
                 >
                   Post
                 </Button>
@@ -390,50 +296,6 @@ const AddComment = ({ currentAuthorId, postId }) => {
         >
           <Box sx={style} textAlign="center">
             <Box sx={style}>
-              <Typography
-                id="modal-modal-title"
-                variant="h6"
-                component="h2"
-                style={{ textAlign: "center", color: "black" }}
-              />
-              <div className="option">Title</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                multiline
-                rows={1}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-
-              <div className="option">Description</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                multiline
-                rows={2}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => setDesc(e.target.value)}
-              />
-
-              <div className="option">Categories (Separate by commas)</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                rows={1}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => {
-                  let data = e.target.value.split(",");
-                  setCategories(data);
-                }}
-              />
-
               <div className="option">Content</div>
               <TextField
                 required
@@ -444,125 +306,8 @@ const AddComment = ({ currentAuthorId, postId }) => {
                 style={{ width: 330, marginTop: 10, marginBottom: 10 }}
                 onChange={(e) => setContent(e.target.value)}
               />
-
-              <div className="option">Choose Privacy</div>
-              <Box
-                textAlign="center"
-                style={{ marginTop: 10, marginBottom: 10 }}
-              ></Box>
-
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={privacy}
-                // label="Age"
-                onChange={handleChange}
-              >
-                <MenuItem value={"PUBLIC"} selected>
-                  Public
-                </MenuItem>
-                <MenuItem value={"FRIENDS"}>Private</MenuItem>
-              </Select>
-
               <Box textAlign="center" style={{ marginTop: 10 }}>
-                <Button
-                  variant="contained"
-                  onClick={() => handleUpload("text")}
-                >
-                  Post
-                </Button>
-              </Box>
-            </Box>
-          </Box>
-        </Modal>
-        {/* upload final text type */}
-        <Modal
-          open={finalTextOpen}
-          onClose={handleFinalTextClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style} textAlign="center">
-            <Box sx={style}>
-              <Typography
-                id="modal-modal-title"
-                variant="h6"
-                component="h2"
-                style={{ textAlign: "center", color: "black" }}
-              />
-              <div className="option">Title</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                multiline
-                rows={1}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-
-              <div className="option">Description</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                multiline
-                rows={2}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => setDesc(e.target.value)}
-              />
-
-              <div className="option">Categories (Separate by commas)</div>
-
-              <TextField
-                required
-                id="outlined-multiline-static"
-                rows={1}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => {
-                  let data = e.target.value.split(",");
-                  setCategories(data);
-                }}
-              />
-
-              <div className="option">Content</div>
-              <TextField
-                required
-                id="outlined-multiline-static"
-                multiline
-                rows={2}
-                placeholder="write something..."
-                style={{ width: 330, marginTop: 10, marginBottom: 10 }}
-                onChange={(e) => setContent(e.target.value)}
-              />
-
-              <div className="option">Choose Privacy</div>
-              <Box
-                textAlign="center"
-                style={{ marginTop: 10, marginBottom: 10 }}
-              ></Box>
-
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={privacy}
-                // label="Age"
-                onChange={handleChange}
-              >
-                <MenuItem value={"PUBLIC"} selected>
-                  Public
-                </MenuItem>
-                <MenuItem value={"FRIENDS"}>Private</MenuItem>
-              </Select>
-
-              <Box textAlign="center" style={{ marginTop: 10 }}>
-                <Button
-                  variant="contained"
-                  onClick={() => handleUpload("text")}
-                >
+                <Button variant="contained" onClick={() => sendComment("text")}>
                   Post
                 </Button>
               </Box>

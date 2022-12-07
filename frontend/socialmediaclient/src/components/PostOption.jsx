@@ -155,19 +155,19 @@ export default function PostOption() {
   };
 
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
   };
 
   return (
-    <div className="post">
+    <div className="post" style={{ backgroundColor: "black" , color: "white" }}>
       <div className="what-to-post">What would you like to post today?</div>
       <br />
       <div className="post-options">
@@ -606,6 +606,5 @@ export default function PostOption() {
         </Box>
       </Modal>
     </div>
-
   );
 }

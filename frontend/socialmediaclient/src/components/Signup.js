@@ -22,6 +22,7 @@ const Signup = ({ handleChange }) => {
   const [email, setEmail] = useState("");
   const [isError, setError] = useState(false);
   const [githubName, setGithubName] = useState("");
+  const [selectedFile, setSelectedFile] = useState();
 
   useEffect(() => {
     if (confirmPassword != password) {
@@ -43,12 +44,15 @@ const Signup = ({ handleChange }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isError) {
+      const imgData = convertToBase64(selectedFile);
+
       let formData = {
         username: username,
         displayName: fullName,
         password: password,
         githubName: githubName,
         email: email,
+        profileImage: imgData,
       };
 
       const status = await dispatch(signUp(formData));
@@ -60,6 +64,36 @@ const Signup = ({ handleChange }) => {
       }
     } else {
       toast.error("something went wrong. please try agin");
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const onSelectFile = (e, type) => {
+    console.log(e.target.files);
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedFile(undefined);
+      return;
+    }
+
+    if (type == "image") {
+      const ext = e.target.files[0].name.split(".");
+      if (ext[ext.length - 1] != "png" && ext[ext.length - 1] != "jpeg") {
+        //display error
+      } else {
+        setSelectedFile(e.target.files[0]);
+      }
     }
   };
 
@@ -155,7 +189,11 @@ const Signup = ({ handleChange }) => {
           <p style={{ textAlign: "center", marginTop: 15, marginBottom: 10 }}>
             upload file for profile picture
           </p>
-          <input type="file" id="myfile" />
+          <input
+            type="file"
+            id="myfile"
+            onChange={(e) => onSelectFile(e, "image")}
+          />
           <Button
             className="submit"
             style={{ margin: "25px 0px 10px 0px" }}

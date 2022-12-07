@@ -82,7 +82,7 @@ const style = {
 export default function Post({ post, comp, index }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
-  const [change , setChange] = useState(false);
+  const [change, setChange] = useState(false);
   const currentAuthorId = state.auth.author.id;
   const postId = comp == "inbox" ? post.id : post.id.split("/").reverse()[0];
 
@@ -189,13 +189,12 @@ export default function Post({ post, comp, index }) {
   const [desc, setDesc] = useState(post.description);
   const [categories, setCategories] = useState([]);
   const [content, setContent] = useState("");
-
+  const [p, setP] = useState(post);
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
 
   useEffect(() => {
     if (!selectedFile) {
-      console.log("UNDEFINED");
       setPreview(undefined);
       return;
     }
@@ -266,7 +265,7 @@ export default function Post({ post, comp, index }) {
       };base64`;
       requestData.content = await convertToBase64(selectedFile);
     }
-    
+
     const res = await dispatch(
       editPosts(
         requestData,
@@ -275,11 +274,11 @@ export default function Post({ post, comp, index }) {
         index
       )
     );
-    if (res == 201) {
-      setChange(true);
+    if (res.status == 201) {
+      setP(res.data);
+      setChange(!change);
       handleTextClose();
       handleImageClose();
-      
     }
   };
 
@@ -328,16 +327,28 @@ export default function Post({ post, comp, index }) {
         </div>
       </div>
       <div className="postCenter">
-        <span className="postText">{post?.title}</span>
-        
-        <PostContent contentType={post} />
-        <span className="postDescription">Post Description: {post?.description}</span>
+        <h2
+          className="postText"
+          style={{
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "1rem",
+            fontWeight: "bold",
+          }}
+        >
+          {post?.title}
+        </h2>
+        <PostContent contentType={post} isChanged={change} comp="post" />
+        <span className="postDescription">
+          Post Description: {post?.description}
+        </span>
       </div>
-      <div className="postBottom">
+      <div className="postBottom" style={{ marginBottom: "1rem" }}>
         <div className="postBottomLeft">
           <ThumbUpIcon
             className="likes"
-            style={{ color: isLiked ? "blue" : "gray" }}
+            style={{ color: isLiked ? "#00B7EB" : "white" }}
             onClick={likeHandler}
           />
           <span style={{ color: "gray" }}> {likeCount}</span>
@@ -513,14 +524,16 @@ export default function Post({ post, comp, index }) {
         </Box>
       </Modal>
       {commentsList != [] &&
-        commentsList.map((c) => (
-          <Comment
-            key={c.id}
-            data={data}
-            comment={c}
-            postAuthorId={postAuthorId}
-          />
-        ))}
+        commentsList
+          .reverse()
+          .map((c) => (
+            <Comment
+              key={c.id}
+              data={data}
+              comment={c}
+              postAuthorId={postAuthorId}
+            />
+          ))}
       <AddComment currentAuthorId={currentAuthorId} postId={postId} />
       <FollowerModal
         open={followerModal}

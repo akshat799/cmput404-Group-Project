@@ -6,6 +6,7 @@ const initialState = {
   postlikeCount: 0,
   error: false,
   allLiked: [],
+  isLoading: false,
 };
 
 export const authorSlice = createSlice({
@@ -24,9 +25,10 @@ export const authorSlice = createSlice({
     reset: (state) => {
       state.posts = [];
     },
-    setError: (state) => {
-
-    }
+    setError: (state) => {},
+    loading: (state, action) => {
+      state.isLoading = action.payload;
+    },
   },
 });
 
@@ -46,8 +48,7 @@ export const getPublicPosts = () => async (dispatch) => {
 export const addNewPost = (data, author_id) => async (dispatch) => {
   try {
     const res = await api.createNewPost(data, author_id);
-    dispatch(addPost(res.data));
-    console.log(res);
+    if (data.visibility == "PUBLIC") dispatch(addPost(res.data));
   } catch (e) {
     console.log(e);
   }
@@ -74,31 +75,31 @@ export const sendLiketoAuthor = (authorId, data) => async () => {
   try {
     const resp = await api.sendLike(data, authorId);
 
-    if (resp.status == 201){
-      return resp.status
+    if (resp.status == 201) {
+      return resp.status;
     }
   } catch (e) {
     console.log(e);
   }
 };
 
-export const addComment = (author_id, post_id, data) => async(dispatch) =>{
-  try{
-    const resp = await api.postComment(author_id, post_id, data)
-    console.log(resp)
+export const addComment = (author_id, post_id, data) => async (dispatch) => {
+  try {
+    const resp = await api.postComment(author_id, post_id, data);
+    console.log(resp);
 
-    if (resp.status == 201){
-      dispatch(setError)
-      return resp.status
+    if (resp.status == 201) {
+      dispatch(setError);
+      return resp.status;
     }
   } catch (e) {
-    console.log(e)
-    return 400
+    console.log(e);
+    return 400;
   }
 };
-export const getCommentsOnPost = (author_id, post_id) => async(dispatch) => {
-  try{
-    const resp = await api.getComments(author_id, post_id)
+export const getCommentsOnPost = (author_id, post_id) => async (dispatch) => {
+  try {
+    const resp = await api.getComments(author_id, post_id);
 
     if (resp.status == 200) {
       console.log(resp);
@@ -108,19 +109,31 @@ export const getCommentsOnPost = (author_id, post_id) => async(dispatch) => {
     return [];
     console.log(e);
   }
-}
-export const getLikesOnComment = (author_id, post_id, comment_id) => async () => {
-  try{
-    const resp = await api.getCommentLikes(author_id, post_id, comment_id);
+};
+export const getLikesOnComment =
+  (author_id, post_id, comment_id) => async () => {
+    try {
+      const resp = await api.getCommentLikes(author_id, post_id, comment_id);
 
-    if (resp.status == 200) {
-      return resp.data
+      if (resp.status == 200) {
+        return resp.data;
+      }
+    } catch (e) {
+      console.log(e);
     }
-  } catch (e) {
-    console.log(e);
-  }
+  };
+
+export const setLoading = (val) => (dispatch) => {
+  dispatch(loading(val));
 };
 
-export const { updatePosts, addPost, updatePostLikes, reset, setError } = authorSlice.actions;
+export const {
+  updatePosts,
+  addPost,
+  updatePostLikes,
+  reset,
+  setError,
+  loading,
+} = authorSlice.actions;
 
 export default authorSlice.reducer;

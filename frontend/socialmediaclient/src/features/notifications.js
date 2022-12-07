@@ -37,19 +37,9 @@ export const getNotifications = (author_id) => async (dispatch) => {
   const requests = data.items.filter(
     (notif) => notif.type == "follow" || notif.type == "Follow"
   );
-  dispatch(fetchNotifs(notifs));
-  dispatch(fetchRequests(requests));
+  dispatch(fetchNotifs(notifs.reverse()));
+  dispatch(fetchRequests(requests.reverse()));
 };
-
-export const addFollower =
-  (author_id, foreign_author_id, index) => async (dispatch) => {
-    try {
-      const res = await api.addFollower(author_id, foreign_author_id);
-      return res;
-    } catch (e) {
-      console.log(e);
-    }
-  };
 
 export const denyRequest = (index) => async (dispatch) => {
   dispatch(updateRequests(index));

@@ -54,7 +54,7 @@ export default function Navbar() {
   useEffect(() => {
     const timer = setTimeout(()=> {
       matchUsername()
-      // console.log(enteredUsername)
+      console.log(enteredUsername)
     },500)
 
     return () => clearTimeout(timer)

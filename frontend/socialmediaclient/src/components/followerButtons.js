@@ -1,16 +1,25 @@
-import { useState } from "react";
-import {
-  addFollower,
-  denyRequest,
-  followUser,
-} from "../features/notifications";
+import { useEffect, useState } from "react";
+import { denyRequest, followUser } from "../features/notifications";
 import { Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
+import { addNewFollower, checkIfFollower } from "../features/auth";
 
 function FollowerButtons({ req, i }) {
   const [isAccepted, setIsAccepted] = useState(false);
+  const [isFollower, setFollower] = useState(true);
   const dispatch = useDispatch();
   const state = useSelector((state) => state);
+
+  const checkFollower = async () => {
+    const res = await dispatch(
+      checkIfFollower(req.actor.id, state.auth.author.id)
+    );
+    if (res.data.split(" ")[1] == "NOT") setFollower(false);
+  };
+
+  useEffect(() => {
+    checkFollower();
+  }, []);
 
   return (
     <>
@@ -21,10 +30,11 @@ function FollowerButtons({ req, i }) {
             style={{ marginRight: "1rem" }}
             onClick={async () => {
               const res = await dispatch(
-                addFollower(state.auth.author.id, req.actor.id, i)
+                addNewFollower(state.auth.author.id, req.actor, i)
               );
               if (res?.status == 201) {
-                setIsAccepted(true);
+                if (!isFollower) setIsAccepted(true);
+                else dispatch(denyRequest(i));
               }
             }}
           >

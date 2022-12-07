@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 function PostContent(post) {
-  console.log(post);
   const type = post.contentType.contentType.split("/");
-  const content = post.contentType.content;
+  const content =
+    post.comp == "post" ? post.contentType.content : post.contentType.comment;
 
   const [text, setText] = useState(true);
   const [otherType, setOtherType] = useState(null);
   const [textType, setTextType] = useState("plain");
-  
 
   useEffect(() => {
     if (type[0] === "text") {
@@ -23,11 +22,17 @@ function PostContent(post) {
     } else {
       //error handling to be done over here
     }
-    
-  }, []);
+  }, [post?.isChanged]);
 
-  function decode_utf8(s) {
-    return decodeURIComponent(s);
+  function isBase64(str) {
+    if (str === "" || str.trim() === "") {
+      return false;
+    }
+    try {
+      return btoa(atob(str)) == str;
+    } catch (err) {
+      return false;
+    }
   }
 
   function createHTML() {
@@ -40,26 +45,36 @@ function PostContent(post) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        marginBottom: "2rem",
+        color: "white",
       }}
     >
       {text ? (
         textType === "plain" ? (
-          <div>{content}</div>
+          <div style={{ color: "white" }}>{content}</div>
         ) : textType === "markdown" ? (
-          <ReactMarkdown>{content}</ReactMarkdown>
+          <ReactMarkdown style={{ color: "white" }}>{content}</ReactMarkdown>
         ) : (
-          <div dangerouslySetInnerHTML={createHTML()}></div>
+          <div
+            dangerouslySetInnerHTML={createHTML()}
+            style={{ color: "white" }}
+          ></div>
         )
       ) : otherType === "application" ? (
-        <div>{atob(content)}</div>
+        (console.log("HERE", content),
+        (
+          <div style={{ color: "white" }}>
+            {isBase64(content) ? atob(content) : null}
+          </div>
+        ))
       ) : (
         <>
           <img
             src={content}
             style={{
-              height: "60vh",
+              height: post.comp == "post" ? "60vh" : "30vh",
               width: "auto",
-              maxWidth: "50vw",
+              maxWidth: post.comp == "post" ? "50vw" : "30vw",
               objectFit: "contain",
             }}
           />
