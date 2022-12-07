@@ -24,13 +24,6 @@ export default function Feed() {
     getPosts();
   }, []);
 
-  let arr = state.posts.posts.filter((post, i) => {
-    if (
-      post.id.split("/").reverse()[0] === "ff3faadc-54d6-4011-a6de-2d77c74c92cd"
-    )
-      console.log(i);
-  });
-
   return (
     <>
       {state.posts.isLoading ? (
@@ -39,8 +32,8 @@ export default function Feed() {
         <div className="feed">
           <PostOption />
           {state.posts.posts != [] &&
-            state.posts.posts.map((p) => (
-              <Post key={p.id} post={p} comp="home" />
+            state.posts.posts.map((p, i) => (
+              <Post key={p.id} post={p} comp="home" index={i} />
             ))}
         </div>
       )}

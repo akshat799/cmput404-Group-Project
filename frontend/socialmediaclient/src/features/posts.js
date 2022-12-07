@@ -29,6 +29,10 @@ export const authorSlice = createSlice({
     loading: (state, action) => {
       state.isLoading = action.payload;
     },
+    incComment: (state, action) => {
+      console.log(action);
+      state.posts.posts[action.payload].count += 1;
+    },
   },
 });
 
@@ -84,20 +88,22 @@ export const sendLiketoAuthor = (authorId, data) => async () => {
   }
 };
 
-export const addComment = (author_id, post_id, data) => async (dispatch) => {
-  try {
-    const resp = await api.postComment(author_id, post_id, data);
-    console.log(resp);
+export const addComment =
+  (author_id, post_id, data, index) => async (dispatch) => {
+    try {
+      const resp = await api.postComment(author_id, post_id, data);
+      console.log(resp);
 
-    if (resp.status == 201) {
-      dispatch(setError);
-      return resp.status;
+      if (resp.status == 200) {
+        console.log(index)
+        // dispatch(incComment(index));
+        return resp.status;
+      }
+    } catch (e) {
+      console.log(e);
+      return 400;
     }
-  } catch (e) {
-    console.log(e);
-    return 400;
-  }
-};
+  };
 export const getCommentsOnPost = (author_id, post_id) => async (dispatch) => {
   try {
     const resp = await api.getComments(author_id, post_id);
@@ -149,6 +155,7 @@ export const {
   reset,
   setError,
   loading,
+  incComment,
 } = authorSlice.actions;
 
 export default authorSlice.reducer;

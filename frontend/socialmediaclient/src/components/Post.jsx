@@ -549,7 +549,8 @@ export default function Post({ post, comp, index }) {
               postAuthorId={postAuthorId}
             />
           ))}
-      <AddComment currentAuthorId={currentAuthorId} postId={postId} />
+      {console.log(index)}
+      <AddComment currentAuthorId={currentAuthorId} postId={postId} index={index}/>
       <FollowerModal
         open={followerModal}
         handleCloseFollowerModal={handleCloseFollowerModal}

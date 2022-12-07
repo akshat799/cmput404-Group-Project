@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import "./Post.css";
 
-const AddComment = ({ currentAuthorId, postId }) => {
+const AddComment = ({ currentAuthorId, postId, index }) => {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
   const imgLink = state.auth.profileImage;
@@ -119,10 +119,18 @@ const AddComment = ({ currentAuthorId, postId }) => {
       data.comment = imgData;
     }
 
-    const status = await dispatch(addComment(currentAuthorId, postId, data));
+    console.log(index);
+
+    const status = await dispatch(
+      addComment(currentAuthorId, postId, data, index)
+    );
+    console.log("STATUS : ", status);
 
     if (status == 200) {
-      console.log("ADDED")
+      console.log("SENT");
+      handleImageClose();
+      handleFinalTextClose();
+      handleMarkClose();
       setContent("");
     }
   };
