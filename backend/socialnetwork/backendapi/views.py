@@ -127,6 +127,9 @@ def AuthorsView(request,author_id):
                 if data.get("githubName"):
                     authors.githubName = data["githubName"]
                     authors.save(update_fields=["githubName"])
+                if data.get("email"):
+                    authors.email = data["email"]
+                    authors.save(update_fields=["email"])
                 if data.get("profileImage"):
                     authors.profileImage = data["profileImage"]
                     authors.save(update_fields=["profileImange"])
@@ -140,45 +143,6 @@ def AuthorsView(request,author_id):
                 messages.error(request,'Fail to update profile')
                 return Response(message,status=status.HTTP_400_BAD_REQUEST)
 
-
-# @api_view(['GET'])
-# def ProfileView(request,id):
-#     try:
-#         author_object = models.Users.objects.get(id=id)
-#         # print(author_object.profileImage)
-#         profile = {
-#             'user': author_object.user,
-#             'id': id,
-#             'host': author_object.host,
-#             'displayName': author_object.displayName,
-#             'githubName':author_object.githubName,
-#             'profileImage': author_object.profileImage,
-#         }
-#         return Response(profile,status=status.HTTP_200_OK)
-#     except Exception as e:
-#         message = {'error',e}
-#         return Response(message,status.HTTP_400_BAD_REQUEST)
-
-        
-# class UserViewSet(ModelViewSet):
-#     http_method_names = ['get']
-#     serializer_class = serializers.UserSerializer
-#     permission_classes = (IsAuthenticated,)
-#     filter_backends = [filters.OrderingFilter]
-#     ordering_fields = ['updated']
-#     ordering = ['-updated']
-
-#     def get_queryset(self):
-#         if self.request.user.is_superuser:
-#             return models.Users.objects.all()
-
-#     def get_object(self):
-#         lookup_field_value = self.kwargs[self.lookup_field]
-
-#         obj = models.Users.objects.get(lookup_field_value)
-#         self.check_object_permissions(self.request, obj)
-
-#         return obj
 
     
 
@@ -974,8 +938,8 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                     inboxCount += 1
                     if "actor" in data:
                         if data["actor"]["id"] == foreign_author_id:
-                            print("hi")
-                            inbox.object.pop(inboxCount)
+                            #print("hi")
+                            inbox.object.pop(inboxCount-1)
                             inbox.save(update_fields=["object"])
 
                 follower = get_object_or_404(models.Users, id = foreign_author_id)
@@ -1028,26 +992,6 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 data = {'error' : str(e)}
                 return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
-# def get_foreign_posts_t17():
-#     r = requests.get(grp17_url + "/posts/",auth=HTTPBasicAuth('t18user1','Password123!'))
-    
-#     authors = json.loads(r.content)['items']
-#     #print(authors)
-#     posts_list = []
-#     for author in authors:
-#         author_url = author['url'] + 'posts/'
-#         print(author['url'])
-        
-#         try:
-#             r = requests.get(author_url,auth=HTTPBasicAuth('t18user1','Password123!'))
-#             #print(json.loads(r.content)['items'])
-#             for post in json.loads(r.content)['items']:
-#                 #print(post)
-#                 if post != []:
-#                     posts_list.append(post)
-#         except Exception as e:
-#             return posts_list  
-#     return posts_list
 
 
 @api_view(['GET', 'POST', 'DELETE'])
