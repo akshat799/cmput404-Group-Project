@@ -91,30 +91,15 @@ export default function Profile() {
       githubName : githubName,
       email: email,
     };
-    console.log("here")
+  
     const res = await dispatch(editAuthorInfo(formData, currentAuthorId))
 
     if (res.status == 200){
+  
       setFormOpen(false)
-      fetchCurrentAuthorInfo()
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
     }
     
   }
-
-  const fetchCurrentAuthorInfo = async() => {
-    const res = await dispatch(getAuthorInfo(currentAuthorId))
-    if (res.status == 200){
-      setupdateSuccess(true)
-    }
-
-  }
-
-  useEffect(()=>{
-    // setDisplayName(state.auth.author.displayName)
-  }, [updateSuccess])
 
   
 

@@ -64,6 +64,20 @@ export const resetUserPosts = () => (dispatch) => {
   dispatch(resetUserPost());
 };
 
+export const deletePostRequest = (author_id, post_id, arr) => async (dispatch) => {
+  try{
+    const res = await api.deletePost(author_id, post_id)
+    console.log(res)
+    if( res.status == 202){
+      dispatch(updatePosts(arr))
+      console.log(res)
+      return res;
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}; 
+
 export const { updatePosts, addPost, editPost, resetUserPost } =
   authorSlice.actions;
 
