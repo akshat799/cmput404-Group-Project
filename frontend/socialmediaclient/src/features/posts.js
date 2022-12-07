@@ -136,6 +136,8 @@ export const getForeignAuthorPosts = (authorId) => async () => {
   }
 };
 
+
+
 export const { updatePosts, addPost, updatePostLikes, reset, setError } = authorSlice.actions;
 
 export default authorSlice.reducer;

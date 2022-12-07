@@ -31,7 +31,7 @@ export const authorSlice = createSlice({
         state = initialState
       },
       editProfile: (state,action) => {
-        
+        state.author = action.payload;
       },
       authError: (state) => {
         state.error = true
@@ -49,20 +49,6 @@ export const authorSlice = createSlice({
         state.requestedAuthorIds = [action.payload, ...state.requestedAuthorIds];
         
       },
-    },
-    signOut: (state) => {
-      state.isSignedIn = false;
-      state.error = false;
-      state.author = {};
-    },
-    editProfile: (state, action) => {
-      state.author = action.payload;
-    },
-    updateFollowers: (state, action) => {
-      state.followers = action.payload;
-    },
-    authError: (state) => {
-      state.error = true;
     },
   },
 );
@@ -192,28 +178,15 @@ export const sendRequestToFollow = (foreign_author_id, data) => async(dispatch) 
 }
 }
 export const editAuthorInfo = (data, author_id) => async(dispatch) => {
-  console.log("in auth.js")
   try{
     const res = await api.updateAuthor(data, author_id);
     console.log(res)
     
     if (res.status == 200){
-      return res
-    }
-  } catch(e){
-    // return e
-    console.log(e)
-  }
-}
-export const getAuthorInfo = (author_id) => async(dispatch) => {
-  try{
-    const res = await api.getAuthor(author_id);
-    if (res == 200){
       dispatch(editProfile(res.data))
       return res
     }
-    console.log(res.status)
-  }catch(e){
+  } catch(e){
     console.log(e)
   }
 }

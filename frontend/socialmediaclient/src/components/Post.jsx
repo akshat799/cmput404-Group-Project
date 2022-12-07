@@ -22,7 +22,9 @@ import "./Post.css";
 import PostContent from "./PostContent";
 import { editPosts } from "../features/userposts";
 import FollowerModal from "./FollowerModal";
+import { deletePostRequest } from "../features/userposts";
 import { sendLiketoAuthor } from "../features/posts";
+import { applyMiddleware } from "@reduxjs/toolkit";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -87,7 +89,6 @@ export default function Post({ post, comp, index }) {
   const post_Id = comp == "inbox" ? post.id : post.id.split("/").reverse();
   const postId = post_Id[0] == ""? post_Id[1]: post_Id[0]
 
-
   const postAuthorId =
     comp == "inbox" ? post.author.id : post.author.id.split("/").reverse()[0];
 
@@ -139,7 +140,6 @@ export default function Post({ post, comp, index }) {
 
   useEffect(() => {
     getLikeCount();
-    handleGetComments();
     if (comp != "profile") setDisplay("hidden");
     getIsLiked();
   }, []);
@@ -152,6 +152,18 @@ export default function Post({ post, comp, index }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+
+
+  const handleDelete = async() => {
+    const arr = state.userposts.posts.filter((post, i) => i != index);
+
+    const res = await dispatch(deletePostRequest(currentAuthorId, postId, arr))
+    if (res.status == 202){
+      console.log("success");
+      setAnchorEl(null);
+    }
+  }
 
   const handleEdit = () => {
     setAnchorEl(null);
@@ -323,7 +335,7 @@ export default function Post({ post, comp, index }) {
               Edit
             </MenuItem>
             <Divider sx={{ my: 0.5 }} />
-            <MenuItem onClick={handleClose} disableRipple>
+            <MenuItem onClick={handleDelete} disableRipple>
               <DeleteIcon />
               Delete
             </MenuItem>
@@ -353,7 +365,7 @@ export default function Post({ post, comp, index }) {
               style={{ color: "gray" }}
             >
               {" "}
-              Show {commentsList.length} Comments{" "}
+              Show {post.count} Comments{" "}
             </Button>
           </span>
         </div>

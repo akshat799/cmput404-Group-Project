@@ -29,9 +29,9 @@ export const removeFollower = (author_id, foreign_author_id) => api.delete(`back
 // POST
 export const getPublicPost = (author_id, post_id) =>api.get(`backendapi/authors/${author_id}/posts/${post_id}/`);
 export const getPublicPosts = () => api.get("backendapi/authors/posts/");
-export const createPost = (data, author_id, post_id) =>api.put(`backendapi/authors/${author_id}/posts/${post_id}/`, data);
+export const createPost = (data, author_id, post_id) =>api.put(`backendapi/authors/${author_id}/posts/${post_id}`, data);
 export const updatePost = (data, author_id, post_id) =>api.post(`backendapi/authors/${author_id}/posts/${post_id}`, data);
-export const deletePost = (author_id, post_id) =>api.delete(`backendapi/authors/${author_id}/posts/${post_id}/`);
+export const deletePost = (author_id, post_id) =>api.delete(`backendapi/authors/${author_id}/posts/${post_id}`);
 
 export const getAuthorPosts = (author_id) =>api.get(`backendapi/authors/${author_id}/posts/`);
 export const createNewPost = (data, author_id) =>api.post(`backendapi/authors/${author_id}/posts/`, data);
