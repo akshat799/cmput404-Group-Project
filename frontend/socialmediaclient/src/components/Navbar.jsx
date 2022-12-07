@@ -28,6 +28,7 @@ export default function Navbar() {
   };
 
   const allRegisteredAuthors = state.auth.allAuthors;
+  const currentAuthorName = state.auth.author.displayName;
 
   const [enteredUsername, setEnteredUsername] = useState("")
 
@@ -42,7 +43,9 @@ export default function Navbar() {
     console.log("this is called")
     for(let author of allRegisteredAuthors){
       // console.log(author.displayName)
-      if(author.displayName === enteredUsername && enteredUsername != ''){
+      if(author.displayName == enteredUsername && 
+        enteredUsername != '' && 
+        enteredUsername != currentAuthorName){
         setisMatch(true)
         setForeignAuthor(author)
         setdispOption([enteredUsername])
