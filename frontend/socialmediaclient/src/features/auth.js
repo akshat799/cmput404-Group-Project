@@ -13,53 +13,26 @@ const initialState = {
   allLiked: [],
   allAuthors: [],
   requestedAuthorIds: [],
-}
+};
 
 export const authorSlice = createSlice({
-    name: 'auth',
-    initialState,
-    reducers: {
-      signIn: (state, action) => {
-        state.isSignedIn = true
-        state.author = action.payload.data.user
-        state.error = false
-        state.requestedAuthorIds = []
-      },
-      signOut: (state) => {
-        state.isSignedIn = false
-        state.error = false
-        state.author= {}
-        state.requestedAuthorIds =[]
-        state = initialState
-      },
-      editProfile: (state,action) => {
-        state.author = action.payload.data.user
-      },
-      authError: (state) => {
-        state.error = true
-      },
-      updateAllLiked: (state, action)  => {
-        state.allLiked = action.payload;
-      },
-      updateAllAuthorsList: (state, action) => {
-        state.allAuthors = action.payload;
-      },
-      updateFollowers: (state, action) => {
-        state.followers = action.payload;
-      }, 
-      updateRequestedAuthorIds: (state, action) => {
-        state.requestedAuthorIds = [action.payload, ...state.requestedAuthorIds];
-        
-      },
+  name: "auth",
+  initialState,
+  reducers: {
+    signIn: (state, action) => {
+      state.isSignedIn = true;
+      state.author = action.payload.data.user;
+      state.error = false;
+      state.requestedAuthorIds = [];
     },
     signOut: (state) => {
       state.isSignedIn = false;
       state.error = false;
       state.author = {};
+      state.requestedAuthorIds = [];
+      state = initialState;
     },
-    editProfile: (state, action) => {
-      state.author = action.payload.data.user;
-    },
+    editProfile: (state, action) => {},
     authError: (state) => {
       state.error = true;
     },
@@ -71,6 +44,9 @@ export const authorSlice = createSlice({
     },
     updateFollowers: (state, action) => {
       state.followers = action.payload;
+    },
+    updateRequestedAuthorIds: (state, action) => {
+      state.requestedAuthorIds = [action.payload, ...state.requestedAuthorIds];
     },
     addFollower: (state, action) => {
       state.followers = [action.payload, ...state.followers];
@@ -185,22 +161,22 @@ export const removeFromfollowers =
     } catch (e) {
       console.log(e);
     }
-    catch(e){
-      console.log(e)
-  }
-}
-export const sendRequestToFollow = (foreign_author_id, data) => async(dispatch) => {
-  try{
-    const res = await api.sendRequest(foreign_author_id, data);
-    if (res.status == 200){
-      console.log(res)
-      console.log(foreign_author_id)
-      dispatch(updateRequestedAuthorIds(foreign_author_id))
-      
-    return res;
+  };
+export const sendRequestToFollow =
+  (foreign_author_id, data) => async (dispatch) => {
+    try {
+      const res = await api.sendRequest(foreign_author_id, data);
+      if (res.status == 200) {
+        console.log(res);
+        console.log(foreign_author_id);
+        dispatch(updateRequestedAuthorIds(foreign_author_id));
+
+        return res;
+      }
+    } catch (e) {
+      console.log(e);
     }
-  }
-};
+  };
 
 export const addNewFollower =
   (author_id, foreign_author, index) => async (dispatch) => {
@@ -214,7 +190,43 @@ export const addNewFollower =
       console.log(e);
     }
   };
+export const editAuthorInfo = (data, author_id) => async (dispatch) => {
+  console.log("in auth.js");
+  try {
+    const res = await api.updateAuthor(data, author_id);
+    console.log(res);
 
-export const { signIn, signOut, editProfile, authError, updateAllLiked, updateAllAuthorsList, updateFollowers, updateRequestedAuthorIds } = authorSlice.actions
+    if (res.status == 200) {
+      return res;
+    }
+  } catch (e) {
+    // return e
+    console.log(e);
+  }
+};
+export const getAuthorInfo = (author_id) => async (dispatch) => {
+  try {
+    const res = await api.getAuthor(author_id);
+    if (res == 200) {
+      dispatch(editProfile(res.data));
+      return res;
+    }
+    console.log(res.status);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const {
+  signIn,
+  signOut,
+  editProfile,
+  authError,
+  updateAllLiked,
+  updateAllAuthorsList,
+  updateFollowers,
+  updateRequestedAuthorIds,
+  addFollower
+} = authorSlice.actions;
 
 export default authorSlice.reducer;

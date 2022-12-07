@@ -103,7 +103,7 @@ export const getCommentsOnPost = (author_id, post_id) => async (dispatch) => {
     const resp = await api.getComments(author_id, post_id);
 
     if (resp.status == 200) {
-      console.log(resp);
+      // console.log(resp);
       return resp.data.comments;
     }
   } catch (e) {
@@ -126,6 +126,20 @@ export const getLikesOnComment =
 
 export const setLoading = (val) => (dispatch) => {
   dispatch(loading(val));
+};
+
+export const getForeignAuthorPosts = (authorId) => async () => {
+  try {
+    console.log(authorId.authorId);
+    const res = await api.getAuthorPosts(authorId);
+
+    if (res.status == 200) {
+      console.log(res);
+      return res;
+    }
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const {

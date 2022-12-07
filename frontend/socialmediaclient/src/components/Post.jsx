@@ -115,7 +115,7 @@ export default function Post({ post, comp, index }) {
 
   const handleGetComments = async () => {
     const resp = await dispatch(getCommentsOnPost(postAuthorId, postId));
-    console.log("COMMENTS : ", resp);
+    
     await setCommentsList(resp);
   };
 
@@ -139,6 +139,7 @@ export default function Post({ post, comp, index }) {
 
   useEffect(() => {
     getLikeCount();
+    handleGetComments();
     if (comp != "profile") setDisplay("hidden");
     getIsLiked();
   }, []);
