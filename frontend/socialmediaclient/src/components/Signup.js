@@ -118,36 +118,6 @@ const Signup = ({ handleChange }) => {
     }
   };
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
-
-  const onSelectFile = (e, type) => {
-    console.log(e.target.files);
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedFile(undefined);
-      return;
-    }
-
-    if (type == "image") {
-      const ext = e.target.files[0].name.split(".");
-      if (ext[ext.length - 1] != "png" && ext[ext.length - 1] != "jpeg") {
-        //display error
-      } else {
-        setSelectedFile(e.target.files[0]);
-      }
-    }
-  };
-
   return (
     <Grid>
       <Paper style={paperStyle}>
