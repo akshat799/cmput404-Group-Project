@@ -777,8 +777,26 @@ def CommentViewSet(request, author_id, post_id):
             
             return Response(result, status = status.HTTP_200_OK)
         except Exception as e:
-            data = {'error' : str(e)}
-            return Response(data, status = status.HTTP_400_BAD_REQUEST)
+            try:
+                req = requests.get(grp05_url+ f'/authors/{author_id}/posts/{post_id}/comments', auth=HTTPBasicAuth(grp05_username,grp05_password))
+                commentGrp05 = json.loads(req.content)
+
+                return Response(commentGrp05 , status.HTTP_200_OK)
+
+            except Exception as e:
+                try:
+                   req = requests.get(grp15_url + f'/authors/{author_id}/posts/', auth=HTTPBasicAuth(grp15_username,grp15_password))
+                   commentGrp15 = json.loads(req.content)
+                   commentGrp15["comments"] = commentGrp15["items"]
+                   return Response(commentGrp15 , status.HTTP_200_OK) 
+                except Exception as e:
+                    try:
+                        req = requests.get(grp17_url + f'/authors/{author_id}/posts/{post_id}/', auth=HTTPBasicAuth(grp17_username,grp17_password))
+                        commentGrp17 = json.loads(req.content)
+                        return Response(commentGrp17 , status.HTTP_200_OK)
+                    except Exception as e:
+                        data = {'error' : str(e)}
+                        return Response(data, status = status.HTTP_400_BAD_REQUEST)
 
     if(request.method == 'POST'):
         try:
