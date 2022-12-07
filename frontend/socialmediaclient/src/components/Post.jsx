@@ -84,7 +84,9 @@ export default function Post({ post, comp, index }) {
   const dispatch = useDispatch();
   const [change, setChange] = useState(false);
   const currentAuthorId = state.auth.author.id;
-  const postId = comp == "inbox" ? post.id : post.id.split("/").reverse()[0];
+  const post_Id = comp == "inbox" ? post.id : post.id.split("/").reverse();
+  const postId = post_Id[0] == ""? post_Id[1]: post_Id[0]
+
 
   const postAuthorId =
     comp == "inbox" ? post.author.id : post.author.id.split("/").reverse()[0];
@@ -361,7 +363,7 @@ export default function Post({ post, comp, index }) {
               style={{ color: "gray" }}
             >
               {" "}
-              Show Comments{" "}
+              Show {commentsList.length} Comments{" "}
             </Button>
           </span>
         </div>

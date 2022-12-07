@@ -57,6 +57,7 @@ export const addNewPost = (data, author_id) => async (dispatch) => {
 export const getPostLikes = (author_id, post_id) => async (dispatch) => {
   try {
     const resp = await api.getPostLikes(author_id, post_id);
+    // console.log(post_id)
 
     if (resp.status == 200) {
       dispatch(updatePostLikes(resp.data.length));

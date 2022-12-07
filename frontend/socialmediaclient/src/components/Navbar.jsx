@@ -72,6 +72,7 @@ export default function Navbar() {
           onChange={(event, value) => {
             console.log(foreignAuthor)
             navigate("/pprofile", {state:{id: 1, foreignAuthor: {foreignAuthor}}});
+            window.location.reload(true)
           }}
           sx={{ width: 300, borderRadius: '10px', background: 'white' }}
           renderInput={(params) => <TextField {...params} onChange={(event) => { setEnteredUsername(event.target.value)}} placeholder="search🔍" />} 
