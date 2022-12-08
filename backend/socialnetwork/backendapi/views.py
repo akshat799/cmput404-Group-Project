@@ -639,7 +639,7 @@ def LikeViewSet(request,author_id,post_id = None,comment_id = None):
                     inboxSerializer.is_valid(raise_exception = True)
                     inboxSerializer.save()
 
-                    return Response(data , status=status.HTTP_201_CREATED)
+                return Response(data , status=status.HTTP_201_CREATED)
 
         elif(request.method == 'GET'):
             if post_id != None:
