@@ -1004,7 +1004,7 @@ def FollowerViewSet(request, author_id, foreign_author_id = None):
                 follow = get_object_or_404(models.FollowerModel, follower = foreign_author_id, followedAuthor = author_id)
                 serializer = serializers.FollowerSerializer(follow)
                 follow.delete()
-                data = {"message":"Deletion successful"}
+                data = {"message":"Unfollow successful"}
                 return Response(data, status = status.HTTP_204_NO_CONTENT)
             except Exception as e:
                 data = {'error' : str(e)}
