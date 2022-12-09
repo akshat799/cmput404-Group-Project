@@ -11,7 +11,7 @@ api.interceptors.request.use((req) => {
   return req;
 });
 
-#AUTH
+//AUTH
 export const signIn = (data) => api.post("backendapi/auth/login/", data);
 export const register = (data) => api.post("backendapi/auth/register/", data);
 
