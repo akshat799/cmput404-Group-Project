@@ -1,0 +1,11 @@
+
+.feed{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin:auto;
+    padding: 10px;
+}
+
+
+
