@@ -9,7 +9,7 @@ AJAX Usages
 =================
 We used Ajax whenever we needed to fetch/send data to our Django server. Below is a list of our front-end React code where we used Ajax:
 
-Registration
+Registration (https://github.com/akshat799/cmput404-Group-Project/blob/jasmine-dev-2/frontend/socialmediaclient/src/api/index.js)
 Login
 Logout
 Creating a Post
