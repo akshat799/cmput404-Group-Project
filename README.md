@@ -4,8 +4,8 @@ CMPUT404-project-socialconnection
 
 See project.org (plain-text/org-mode) for a description of the project.
 
-**Video Demo:** https://www.youtube.com/watch?v=D0KUJdRMXtg
-**Application Link:** [https://social-connection.herokuapp.com/](https://social-connection.herokuapp.com/) 
+- **Video Demo:** https://www.youtube.com/watch?v=D0KUJdRMXtg
+- **Application Link:** [https://social-connection.herokuapp.com/](https://social-connection.herokuapp.com/) 
 
 ## Running the Program Locally
 
