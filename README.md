@@ -41,7 +41,6 @@ npm run dev
 
 - For more information about the frontend including references, and client startup, please see our [README](./frontend/socialmediaclient/README.md).
 - Please contact any of the project member to get the `.env` file for the client.
-- AJAX Documentation is found [here]().
 
 ## Running the Test
 
