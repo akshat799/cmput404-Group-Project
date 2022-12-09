@@ -28,6 +28,7 @@ export default function Navbar() {
   };
 
   const allRegisteredAuthors = state.auth.allAuthors;
+  const currentAuthorName = state.auth.author.displayName;
 
   const [enteredUsername, setEnteredUsername] = useState("")
 
@@ -42,7 +43,9 @@ export default function Navbar() {
     console.log("this is called")
     for(let author of allRegisteredAuthors){
       // console.log(author.displayName)
-      if(author.displayName === enteredUsername && enteredUsername != ''){
+      if(author.displayName == enteredUsername && 
+        enteredUsername != '' && 
+        enteredUsername != currentAuthorName){
         setisMatch(true)
         setForeignAuthor(author)
         setdispOption([enteredUsername])
@@ -54,7 +57,7 @@ export default function Navbar() {
   useEffect(() => {
     const timer = setTimeout(()=> {
       matchUsername()
-      // console.log(enteredUsername)
+      console.log(enteredUsername)
     },500)
 
     return () => clearTimeout(timer)
@@ -72,6 +75,7 @@ export default function Navbar() {
           onChange={(event, value) => {
             console.log(foreignAuthor)
             navigate("/pprofile", {state:{id: 1, foreignAuthor: {foreignAuthor}}});
+            window.location.reload(true)
           }}
           sx={{ width: 300, borderRadius: '10px', background: 'white' }}
           renderInput={(params) => <TextField {...params} onChange={(event) => { setEnteredUsername(event.target.value)}} placeholder="search🔍" />} 

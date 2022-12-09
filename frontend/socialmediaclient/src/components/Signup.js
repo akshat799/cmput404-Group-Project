@@ -22,6 +22,7 @@ const Signup = ({ handleChange }) => {
   const [email, setEmail] = useState("");
   const [isError, setError] = useState(false);
   const [githubName, setGithubName] = useState("");
+  const [selectedFile, setSelectedFile] = useState();
 
   useEffect(() => {
     if (confirmPassword != password) {
@@ -33,33 +34,87 @@ const Signup = ({ handleChange }) => {
 
   const paperStyle = {
     padding: 20,
-    height: "80vh",
+    height: "auto",
     width: 300,
     margin: "0px auto",
   };
   const avatarStyle = { backgroundColor: "#9494de" };
   const formFieldStyle = { margin: "10px 0px 0px 0px" };
   const headerStyle = { margin: 0 };
+
+  const checkRequired = () => {
+    if (
+      username === "" ||
+      fullName === "" ||
+      password === "" ||
+      confirmPassword === "" ||
+      email === "" ||
+      githubName === ""
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isError) {
+    const isReqdFieldsErr = checkRequired();
+
+    if (!isError && !isReqdFieldsErr) {
+      const imgData = convertToBase64(selectedFile);
+
       let formData = {
         username: username,
         displayName: fullName,
         password: password,
         githubName: githubName,
         email: email,
+        profileImage: imgData,
       };
 
       const status = await dispatch(signUp(formData));
-      if (status == 201) {
-        toast.success("User Registered");
-        handleChange(e, 0);
+      if (status) {
+        if (status == 201) {
+          toast.success("User Registered");
+          handleChange(e, 0);
+        } else {
+          toast.error("Something went wrong. please try agin");
+        }
+      } else if (isReqdFieldsErr) {
+        toast.error("Please Enter all the Required (*) Fields");
       } else {
-        toast.error("Something went wrong. please try agin");
+        toast.error("Sorry Cannot Sign Up! Passwords Don't Match");
       }
-    } else {
-      toast.error("something went wrong. please try agin");
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const onSelectFile = (e, type) => {
+    console.log(e.target.files);
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedFile(undefined);
+      return;
+    }
+
+    if (type == "image") {
+      const ext = e.target.files[0].name.split(".");
+      if (ext[ext.length - 1] != "png" && ext[ext.length - 1] != "jpeg") {
+        //display error
+      } else {
+        setSelectedFile(e.target.files[0]);
+      }
     }
   };
 
@@ -155,7 +210,11 @@ const Signup = ({ handleChange }) => {
           <p style={{ textAlign: "center", marginTop: 15, marginBottom: 10 }}>
             upload file for profile picture
           </p>
-          <input type="file" id="myfile" />
+          <input
+            type="file"
+            id="myfile"
+            onChange={(e) => onSelectFile(e, "image")}
+          />
           <Button
             className="submit"
             style={{ margin: "25px 0px 10px 0px" }}

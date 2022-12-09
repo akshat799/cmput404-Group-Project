@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import LikesTile from "../../components/LikesTile";
 import Post from "../../components/Post";
 import "./Inbox.css";
+import CommentTile from "../../components/CommentTile";
+
 const Inbox = () => {
   useEffect(() => {
     document.body.style.backgroundColor = "#DADADA";
@@ -27,13 +29,10 @@ const Inbox = () => {
       </header>
       {state.notifications.notifs != [] &&
         state.notifications.notifs.map((notif) => {
-          if (
-            notif.type == "like" ||
-            notif.type == "Like" ||
-            notif.type == "comment" ||
-            notif.type == "Comment"
-          ) {
+          if (notif.type == "like" || notif.type == "Like") {
             return <LikesTile notif={notif} />;
+          } else if (notif.type == "comment" || notif.type == "Comment") {
+            return <CommentTile notif={notif} />;
           } else {
             return <Post post={notif} comp="inbox" />;
           }

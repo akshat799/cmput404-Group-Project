@@ -30,7 +30,6 @@ export default function PostOption() {
   const state = useSelector((state) => state);
   const [textOpen, setTextOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
-  const [linkOpen, setLinkOpen] = useState(false);
   const [markOpen, setMarkOpen] = useState(false);
   const [finalTextOpen, setFinalTextOpen] = useState(false);
 
@@ -71,10 +70,6 @@ export default function PostOption() {
     setImageOpen(false);
     setSelectedFile(undefined);
   };
-  const handleLinkClose = () => {
-    setLinkOpen(false);
-    setPreview(undefined);
-  };
   const handleMarkClose = () => {
     setMarkOpen(false);
     setPreview(undefined);
@@ -86,7 +81,6 @@ export default function PostOption() {
 
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
-  const [linkPreview, setLinkPreview] = useState("");
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -134,10 +128,6 @@ export default function PostOption() {
     }
   };
 
-  const changeLinkHandler = (e) => {
-    setLinkPreview(e.target.value);
-  };
-
   const handleUpload = async (type) => {
     let data;
     if (type == "image") {
@@ -165,19 +155,19 @@ export default function PostOption() {
   };
 
   const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
   };
 
   return (
-    <div className="post">
+    <div className="post" style={{ backgroundColor: "black" , color: "white" }}>
       <div className="what-to-post">What would you like to post today?</div>
       <br />
       <div className="post-options">
@@ -616,6 +606,5 @@ export default function PostOption() {
         </Box>
       </Modal>
     </div>
-
   );
 }
