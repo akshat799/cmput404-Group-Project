@@ -12,7 +12,6 @@ function LikesTile({ notif }) {
       const liked = state.userposts.posts.filter(
         (post) => post.id.split("/").reverse()[0] == postId
       );
-      console.log(liked);
       setPost(liked[0]);
     } else {
       console.log(notif.object.split("/").reverse()[1]);
@@ -25,7 +24,6 @@ function LikesTile({ notif }) {
         <div class="notif_card read">
           <img src={notif.author.profileImage} alt="avatar" className="img" />
           <div class="description">
-            {console.log(post?.title)}
             <p class="user_activity">
               {notif.summary} {post?.title}
             </p>

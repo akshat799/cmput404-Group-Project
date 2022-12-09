@@ -22,7 +22,9 @@ import "./Post.css";
 import PostContent from "./PostContent";
 import { editPosts } from "../features/userposts";
 import FollowerModal from "./FollowerModal";
+import { deletePostRequest } from "../features/userposts";
 import { sendLiketoAuthor } from "../features/posts";
+import { applyMiddleware } from "@reduxjs/toolkit";
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -82,9 +84,10 @@ const style = {
 export default function Post({ post, comp, index }) {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
-
+  const [change, setChange] = useState(false);
   const currentAuthorId = state.auth.author.id;
-  const postId = comp == "inbox" ? post.id : post.id.split("/").reverse()[0];
+  const post_Id = comp == "inbox" ? post.id : post.id.split("/").reverse();
+  const postId = post_Id[0] == ""? post_Id[1]: post_Id[0]
 
   const postAuthorId =
     comp == "inbox" ? post.author.id : post.author.id.split("/").reverse()[0];
@@ -113,7 +116,7 @@ export default function Post({ post, comp, index }) {
 
   const handleGetComments = async () => {
     const resp = await dispatch(getCommentsOnPost(postAuthorId, postId));
-    console.log("COMMENTS : ", resp);
+    
     await setCommentsList(resp);
   };
 
@@ -149,6 +152,18 @@ export default function Post({ post, comp, index }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+
+
+  const handleDelete = async() => {
+    const arr = state.userposts.posts.filter((post, i) => i != index);
+
+    const res = await dispatch(deletePostRequest(currentAuthorId, postId, arr))
+    if (res.status == 202){
+      console.log("success");
+      setAnchorEl(null);
+    }
+  }
 
   const handleEdit = () => {
     setAnchorEl(null);
@@ -189,13 +204,12 @@ export default function Post({ post, comp, index }) {
   const [desc, setDesc] = useState(post.description);
   const [categories, setCategories] = useState([]);
   const [content, setContent] = useState("");
-
+  const [p, setP] = useState(post);
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
 
   useEffect(() => {
     if (!selectedFile) {
-      console.log("UNDEFINED");
       setPreview(undefined);
       return;
     }
@@ -258,15 +272,29 @@ export default function Post({ post, comp, index }) {
       content: content,
       visibility: privacy,
       unlisted: false,
+      categories: categories,
     };
     if (postType == "image") {
-      requestData.contentType = selectedFile.name.split(".").reverse()[0];
+      requestData.contentType = `image/${
+        selectedFile.name.split(".").reverse()[0]
+      };base64`;
       requestData.content = await convertToBase64(selectedFile);
     }
 
     const res = await dispatch(
-      editPosts(requestData, state.auth.id, post.id, index)
+      editPosts(
+        requestData,
+        state.auth.author.id,
+        post.id.split("/").reverse()[0],
+        index
+      )
     );
+    if (res.status == 201) {
+      setP(res.data);
+      setChange(!change);
+      handleTextClose();
+      handleImageClose();
+    }
   };
 
   return (
@@ -306,7 +334,7 @@ export default function Post({ post, comp, index }) {
               Edit
             </MenuItem>
             <Divider sx={{ my: 0.5 }} />
-            <MenuItem onClick={handleClose} disableRipple>
+            <MenuItem onClick={handleDelete} disableRipple>
               <DeleteIcon />
               Delete
             </MenuItem>
@@ -314,15 +342,28 @@ export default function Post({ post, comp, index }) {
         </div>
       </div>
       <div className="postCenter">
-        <span className="postText"><h1>{post?.title}</h1></span>
-        <PostContent contentType={post} />
-        <span className="postDescription">Post Description: {post?.description}</span>
+        <h2
+          className="postText"
+          style={{
+            textAlign: "center",
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "1rem",
+            fontWeight: "bold",
+          }}
+        >
+          {post?.title}
+        </h2>
+        <PostContent contentType={post} isChanged={change} comp="post" />
+        <span className="postDescription">
+          Post Description: {post?.description}
+        </span>
       </div>
-      <div className="postBottom">
+      <div className="postBottom" style={{ marginBottom: "1rem" }}>
         <div className="postBottomLeft">
           <ThumbUpIcon
             className="likes"
-            style={{ color: isLiked ? "blue" : "gray" }}
+            style={{ color: isLiked ? "#00B7EB" : "white" }}
             onClick={likeHandler}
           />
           <span style={{ color: "gray" }}> {likeCount}</span>
@@ -335,7 +376,7 @@ export default function Post({ post, comp, index }) {
               style={{ color: "gray" }}
             >
               {" "}
-              Show Comments{" "}
+              Show {post.count} Comments{" "}
             </Button>
           </span>
         </div>
@@ -430,7 +471,7 @@ export default function Post({ post, comp, index }) {
                 }}
               />
 
-              {!imageOpen && (
+              {postType != "image" && (
                 <>
                   <div className="option">Content</div>
 
@@ -498,15 +539,18 @@ export default function Post({ post, comp, index }) {
         </Box>
       </Modal>
       {commentsList != [] &&
-        commentsList.map((c) => (
-          <Comment
-            key={c.id}
-            data={data}
-            comment={c}
-            postAuthorId={postAuthorId}
-          />
-        ))}
-      <AddComment currentAuthorId={currentAuthorId} postId={postId} />
+        commentsList
+          .reverse()
+          .map((c) => (
+            <Comment
+              key={c.id}
+              data={data}
+              comment={c}
+              postAuthorId={postAuthorId}
+            />
+          ))}
+      {console.log(index)}
+      <AddComment currentAuthorId={currentAuthorId} postId={postId} index={index}/>
       <FollowerModal
         open={followerModal}
         handleCloseFollowerModal={handleCloseFollowerModal}

@@ -7,11 +7,15 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import AuthorPosts from "../../components/AuthorPosts";
 import Navbar from "../../components/Navbar";
 import "./Profile.css";
+import { editAuthorInfo } from "../../features/auth";
+import { useDispatch } from "react-redux";
+import { getAuthorInfo } from "../../features/auth";
+import { useEffect } from "react";
 
 const style = {
   position: "absolute",
@@ -39,20 +43,29 @@ const formStyle = {
 
 export default function Profile() {
   const state = useSelector((state) => state);
+  const dispatch = useDispatch()
   const [req, setReq] = React.useState(false);
   const [imageOpen, setImageOpen] = React.useState(false);
   const [formOpen, setFormOpen] = React.useState(false);
+  const currentAuthorId = state.auth.author.id;
 
   const ProfilePhoto = state.auth.author.profileImage;
   const Username = state.auth.author.displayName;
 
+  const [displayname, setDisplayName] = useState(state.auth.author.displayName)
+  const [githubName, setgithubName] = useState(state.auth.author.githubName)
+  const [email, setEmail] = useState(state.auth.author.email)
+  const [updateSuccess, setupdateSuccess] = useState(false)
+
+
+  
   const handleImageOpen = () => setImageOpen(true);
   const handleFormOpen = () => setFormOpen(true);
   const handleImageClose = () => setImageOpen(false);
   const handleFormClose = () => setFormOpen(false);
   const [selectedFile, setSelectedFile] = React.useState();
   const [preview, setPreview] = React.useState();
-  React.useEffect(() => {
+  useEffect(() => {
     if (!selectedFile) {
       setPreview(undefined);
       return;
@@ -61,18 +74,34 @@ export default function Profile() {
     const objectUrl = URL.createObjectURL(selectedFile);
     setPreview(objectUrl);
 
-    // free memory when ever this component is unmounted
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
+
   const onSelectFile = (e) => {
     if (!e.target.files || e.target.files.length === 0) {
       setSelectedFile(undefined);
       return;
     }
-
-    // I've kept this example simple by using the first image instead of multiple
     setSelectedFile(e.target.files[0]);
   };
+
+  const handleSubmit = async() => {
+    const formData = {
+      displayName: displayname,
+      githubName : githubName,
+      email: email,
+    };
+  
+    const res = await dispatch(editAuthorInfo(formData, currentAuthorId))
+
+    if (res.status == 200){
+  
+      setFormOpen(false)
+    }
+    
+  }
+
+  
 
   return (
     <>
@@ -89,7 +118,6 @@ export default function Profile() {
           src={ProfilePhoto}
           alt=""
         />
-        {/* upload image modal */}
         <Modal
           open={imageOpen}
           onClose={handleImageClose}
@@ -116,7 +144,6 @@ export default function Profile() {
                 <AddPhotoAlternateIcon />
               </Fab>
             </label>
-            {/* <input type='file' accept="image/*" onChange={onSelectFile} /> */}
             <Box textAlign="center" style={{ marginTop: 10 }}>
               {selectedFile ? (
                 <img
@@ -166,25 +193,13 @@ export default function Profile() {
                 Update your profile
               </h4>
               <Box textAlign="center" style={{ marginTop: 10 }}>
-                <TextField
-                  id="input-with-icon-textfield"
-                  label="Username"
-                  placeholder="testuser1"
-                  style={{ marginTop: 10 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                />
+                
                 <TextField
                   id="input-with-icon-textfield"
                   label="Fullname"
-                  placeholder="test name"
+                  value= {displayname}
                   style={{ marginTop: 20 }}
+                  onChange={(e) => {setDisplayName(e.target.value)}}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -198,7 +213,8 @@ export default function Profile() {
                   id="input-with-icon-textfield"
                   label="Email"
                   type="email"
-                  placeholder="test@gmail.com"
+                  value={email}
+                  onChange={(e) => {setEmail(e.target.value)}}
                   style={{ marginTop: 20 }}
                   InputProps={{
                     startAdornment: (
@@ -212,8 +228,9 @@ export default function Profile() {
                 <TextField
                   id="input-with-icon-textfield"
                   label="Github Name"
-                  placeholder="usergithub"
+                  valeue={githubName}
                   style={{ marginTop: 20, marginBottom: 20 }}
+                  onChange={(e) => {setgithubName(e.target.value)}}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -223,41 +240,7 @@ export default function Profile() {
                   }}
                   variant="standard"
                 />
-
-                <h4 style={{ color: "black", textAlign: "center" }}>
-                  Update your Password
-                </h4>
-
-                <TextField
-                  id="input-with-icon-textfield"
-                  label="Password"
-                  placeholder="Enter new password"
-                  type="password"
-                  style={{ marginTop: 20 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                />
-                <TextField
-                  id="input-with-icon-textfield"
-                  label="Confirm password"
-                  placeholder="Confirm password"
-                  type="password"
-                  style={{ marginTop: 20 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle />
-                      </InputAdornment>
-                    ),
-                  }}
-                  variant="standard"
-                />
+                <Button variant="contained" onClick={handleSubmit}>Submit</Button>
               </Box>
             </Box>
           </Modal>

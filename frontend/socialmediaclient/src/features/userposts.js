@@ -17,7 +17,7 @@ export const authorSlice = createSlice({
       state.posts = [action.payload, ...state.posts];
     },
     editPost: (state, action) => {
-      state.posts[action.index] = action.payload;
+      state.posts[action.payload.index] = action.payload.data;
     },
     resetUserPost: (state) => {
       state.posts = [];
@@ -52,8 +52,9 @@ export const editPosts =
   (data, author_id, post_id, index) => async (dispatch) => {
     try {
       const res = await api.updatePost(data, author_id, post_id);
-      const data = { data: res.data, index: index };
-      dispatch(editPost(data));
+      const payload = { "data": res.data, "index": index };
+      dispatch(editPost(payload));
+      return res;
     } catch (e) {
       console.log(e);
     }
@@ -62,6 +63,20 @@ export const editPosts =
 export const resetUserPosts = () => (dispatch) => {
   dispatch(resetUserPost());
 };
+
+export const deletePostRequest = (author_id, post_id, arr) => async (dispatch) => {
+  try{
+    const res = await api.deletePost(author_id, post_id)
+    console.log(res)
+    if( res.status == 202){
+      dispatch(updatePosts(arr))
+      console.log(res)
+      return res;
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}; 
 
 export const { updatePosts, addPost, editPost, resetUserPost } =
   authorSlice.actions;

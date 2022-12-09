@@ -5,12 +5,16 @@ import Signup from "../components/Signup";
 
 const LoginSignUpContainer = () => {
   const [value, setValue] = useState(0);
-  
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const paperStyle = { width: 340, margin: "20px auto" };
+  const paperStyle = {
+    padding: "1rem",
+    height: "100vh",
+    margin: "0 35vw",
+  };
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -31,7 +35,7 @@ const LoginSignUpContainer = () => {
     );
   }
   return (
-    <Paper elevation={20} style={paperStyle}>
+    <Box elevation={0} style={paperStyle}>
       <Tabs
         value={value}
         indicatorColor="primary"
@@ -39,18 +43,19 @@ const LoginSignUpContainer = () => {
         onChange={handleChange}
         aria-label="log in sign up"
         variant="fullWidth"
+        style={{ marginBottom: "5rem" }}
       >
-        <Tab label="Log In" />
+        <Tab label="Log In" style={{ color: "white" }} />
 
-        <Tab label="Sign Up" />
+        <Tab label="Sign Up" style={{ color: "white" }} />
       </Tabs>
       <TabPanel value={value} index={0}>
         <Login handleChange={handleChange} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Signup handleChange={handleChange}/>
+        <Signup handleChange={handleChange} />
       </TabPanel>
-    </Paper>
+    </Box>
   );
 };
 

@@ -9,9 +9,9 @@ import { useSelector } from "react-redux";
 export default function AuthorPosts() {
   const dispatch = useDispatch();
 
-  let state = useSelector((state) => state);
+  const state = useSelector((state) => state);
 
-  const authorId = state.auth.author.id
+  const authorId = state.auth.author.id;
 
   useEffect(() => {
     dispatch(getAuthorPosts(authorId));
@@ -21,7 +21,7 @@ export default function AuthorPosts() {
     <div className="feed">
       <PostOption />
       {state.userposts.posts.map((p, i) => (
-        <Post key={p.id} post={p} comp="profile" index={i}/>
+        <Post key={p.id} post={p} comp="profile" index={i} />
       ))}
     </div>
   );

@@ -3,9 +3,10 @@ import "./feed.css";
 import PostOption from "./PostOption";
 import Post from "./Post";
 import { useSelector } from "react-redux";
-import { getPublicPosts } from "../features/posts";
+import { getPublicPosts, setLoading } from "../features/posts";
 import { useDispatch } from "react-redux";
 import { getOwnFollowers } from "../features/auth";
+import LoadingSpinner from "./spinner";
 
 export default function Feed() {
   const state = useSelector((state) => state);
@@ -15,7 +16,8 @@ export default function Feed() {
 
   const getPosts = async () => {
     await dispatch(getPublicPosts());
-    dispatch(getOwnFollowers(authorId));
+    await dispatch(getOwnFollowers(authorId));
+    dispatch(setLoading(false));
   };
 
   useEffect(() => {
@@ -23,11 +25,18 @@ export default function Feed() {
   }, []);
 
   return (
-    <div className="feed">
-      <PostOption />
-      {state.posts.posts != [] && state.posts.posts.map((p) => (
-          <Post key={p.id} post={p} comp="home"/>
-        ))}
-    </div>
+    <>
+      {state.posts.isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="feed">
+          <PostOption />
+          {state.posts.posts != [] &&
+            state.posts.posts.map((p, i) => (
+              <Post key={p.id} post={p} comp="home" index={i} />
+            ))}
+        </div>
+      )}
+    </>
   );
 }
