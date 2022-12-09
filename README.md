@@ -4,7 +4,7 @@ CMPUT404-project-socialconnection
 
 See project.org (plain-text/org-mode) for a description of the project.
 
-Video Demo: 
+Video Demo: https://www.youtube.com/watch?v=D0KUJdRMXtg
 
 ## Running the Program Locally
 
