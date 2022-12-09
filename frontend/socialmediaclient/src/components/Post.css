@@ -3,7 +3,8 @@
 .post {
     width: 60vw;
     margin: 20px 0;
-    background-color: #f5f5dc;
+    background-color: black;
+    color: white;
     height: auto;
     padding: 1rem;
 }
@@ -84,4 +85,10 @@
 
 .postTopRight:hover {
     cursor: pointer;
+}
+.postText{
+    text-align: center;
+}
+.postDescription{
+padding: 0.5rem;
 }

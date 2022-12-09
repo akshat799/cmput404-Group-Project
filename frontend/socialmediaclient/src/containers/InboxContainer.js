@@ -76,9 +76,9 @@ export default function BasicTabs() {
               flex: 1,
             }}
           >
-            <Tab label="Notifications" {...a11yProps(0)} />
-            <Tab label="Friend Requests" {...a11yProps(1)} />
-            <Tab label="Liked Items" {...a11yProps(2)} />
+            <Tab label="Notifications" {...a11yProps(0)} style={{color : "white"}}/>
+            <Tab label="Friend Requests" {...a11yProps(1)} style={{color : "white"}}/>
+            <Tab label="Liked Items" {...a11yProps(2)} style={{color : "white"}}/>
           </Tabs>
         </div>
         <TabPanel value={value} index={0}>

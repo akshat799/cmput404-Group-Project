@@ -9,11 +9,13 @@ import Pprofile from "./pages/profile/Pprofile";
 import Profile from "./pages/profile/Profile";
 import BasicTabs from "./containers/InboxContainer";
 
-
 function App() {
   return (
     <Router>
-      <div className="App">
+      <div
+        className="App"
+        style={{ backgroundColor: "black", height: "100vh" }}
+      >
         <Routes>
           <Route path="/" element={<LoginSignUpContainer />} />
           <Route exact path="/home" element={<Home />} />
